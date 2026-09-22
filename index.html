@@ -10,6 +10,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="skeleton.css">
 <script src="skeleton.js"></script>
+<link rel="stylesheet" href="prompt.css">
+<script src="prompt.js"></script>
 <style>
 :root{
   --ground:#EEF1F6; --paper:#FFFFFF; --sunk:#F5F7FB; --ink:#141A29; --ink2:#3A4357; --muted:#6B7488; --faint:#7C8496;
@@ -131,6 +133,18 @@ a.lnk:hover{text-decoration:underline}
 .hero .lbl[data-tip]{width:max-content;max-width:100%}
 .hv{font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 .hero .amtc{text-align:right}
+/* правка управляющей даты валютирования */
+.hero .vd .pen{display:inline-grid;place-items:center;width:17px;height:17px;margin-left:5px;vertical-align:-4px;
+               border-radius:3px;color:transparent;cursor:pointer}
+.hero .vd .pen svg{width:12px;height:12px}
+.hero:hover .vd .pen{color:var(--muted)}
+.hero .vd .pen:hover{color:var(--val);background:var(--val-soft)}
+.hero .vd .vdinp{font:600 13px var(--sans);color:var(--ink);background:var(--paper);
+                 border:1px solid var(--val);border-radius:4px;padding:0 4px;height:22px}
+.hero .vd .vdx{border:0;background:none;font:500 11.5px var(--sans);color:var(--muted);cursor:pointer;padding:0 4px}
+.hero .vd .vdx:hover{color:var(--val)}
+.hero .vd.edited .hv{color:var(--warn)}
+.hero .vd.edited .mark{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--warn);vertical-align:3px;margin-left:4px}
 .amt{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;letter-spacing:-.01em}
 .amt small{font-size:12px;color:var(--val);margin-left:5px;font-weight:600}
 .amt .lnk{font-size:11.5px;margin-left:10px;border:1px solid var(--line);border-radius:4px;padding:1px 6px;background:var(--paper)}
@@ -717,7 +731,7 @@ var DOCS=[
 ];
 DOCS.push(cl(DOCS[0]));
 var TYPE='MT103';
-function mkui(tx){return {open:new Set(),editing:null,all:false,shut:{tx:tx},tab:'main',audit:new Set(['commonSection']),tasks:new Set(),linked:new Set([0]),src:new Set(['swiftMessage']),mpu:new Set([0]),accEdit:null,txtEdit:null}}
+function mkui(tx){return {open:new Set(),editing:null,vdEdit:false,vdDraft:null,all:false,shut:{tx:tx},tab:'main',audit:new Set(['commonSection']),tasks:new Set(),linked:new Set([0]),src:new Set(['swiftMessage']),mpu:new Set([0]),accEdit:null,txtEdit:null}}
 var ui=[mkui(true),mkui(true),mkui(false)];
 
 /* ===================== ОТРИСОВКА ===================== */
@@ -792,14 +806,25 @@ function txSummary(t){var c={};t.forEach(function(x){c[x.st]=(c[x.st]||0)+1});re
 function shortTime(t){var m=/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2}:\d{2})/.exec(t||'');return m?m[3]+'.'+m[2]+' '+m[4]:(t||'—')}
 function stCls(s){return s==='EXECUTED'||s==='DONE'?'ok':s==='CANCELED'?'bad':'wait'}
 
-function heroHtml(d,p){
+function heroHtml(d,p,di){
+  function ruToIso(x){var m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(x||'');return m?m[3]+'-'+m[2]+'-'+m[1]:''}
   var names=['Вх','Исх','Дт','Кт'],vd=d.vd,same=vd.every(function(x){return x===vd[0]}),diffs=[];
   vd.forEach(function(x,k){if(x!==vd[0])diffs.push(names[k]+' '+x.slice(0,5))});
   var C={
     '20':function(){return '<div><span class="lbl" data-tip="20 · '+esc(FIELDS['20'].name)+'">20 · № / от</span><span class="hv mono v" style="font-size:12.5px">'+esc(d.f['20'].lines[0])+'</span> <span class="hv" style="font-size:12.5px;font-weight:500">№ '+d.num+' от '+d.numDate+'</span></div>'},
     '21':function(){return '<div><span class="lbl" data-tip="21 · '+esc(FIELDS['21'].name)+'">21</span><span class="hv mono v" style="font-size:12.5px">'+esc((d.f['21'].lines[0])||'—')+'</span></div>'},
     '71A':function(){return '<div><span class="lbl" data-tip="71A · '+esc(FIELDS['71A'].name)+'">71A</span><span class="hv">'+esc(d.f['71A'].lines[0])+'</span></div>'},
-    'vd':function(){return '<div><span class="lbl">Валютирование</span><span class="hv">'+vd[0]+'</span>'+(same?'<span class="same" title="Вх, Исх, по Дт и по Кт совпадают">✓</span>':'<span class="diff" title="'+names.map(function(n,k){return n+': '+vd[k]}).join('\n')+'">'+diffs.join(', ')+'</span>')+'</div>'},
+    'vd':function(){
+      var u=ui[di],right=same?'<span class="same" title="Вх, Исх, по Дт и по Кт совпадают">✓</span>'
+            :'<span class="diff" title="'+names.map(function(n,k){return n+': '+vd[k]}).join('\n')+'">'+diffs.join(', ')+'</span>';
+      if(u&&u.vdEdit)
+        return '<div class="vd"><span class="lbl">Валютирование</span>'+
+          '<input type="date" class="vdinp" data-vd-input aria-label="Дата валютирования" value="'+ruToIso(u.vdDraft||vd[0])+'" min="'+ruToIso(d.created.slice(0,10))+'">'+
+          '<button type="button" class="vdx" data-vd-cancel>Отмена</button></div>';
+      return '<div class="vd'+(d.vdEdit?' edited':'')+'"'+(d.vdEdit?' title="Было '+d.vdEdit.was+' · '+esc(d.vdEdit.who)+', '+d.vdEdit.when+'"':'')+'>'+
+        '<span class="lbl">Валютирование</span><span class="hv">'+vd[0]+'</span>'+(d.vdEdit?'<span class="mark"></span>':'')+right+
+        '<span class="pen" data-vd-edit role="button" tabindex="0" data-tip="Изменить дату валютирования">'+ic('edit')+'</span></div>';
+    },
     '32A':function(){return '<div class="amtc"><span class="lbl" data-tip="32A · '+esc(FIELDS['32A'].name)+'">32A · сумма</span><span class="amt">'+d.amount+'<small>'+d.ccy+'</small><a class="lnk">Курс</a></span></div>'}
   };
   var cols=p.hero.map(function(h,k){return k===p.hero.length-1?'1fr':'auto'}).join(' ');
@@ -1037,7 +1062,7 @@ function render(di){
     '<div class="acts">'+ACTIONS.map(function(a,k){
       return (a.danger?'<span class="sep"></span>':'')+'<button class="ib'+(a.danger?' danger':'')+'" aria-label="'+a.t+'">'+ic(a.id)+'<span class="slot">'+(k+1)+'</span><span class="tip">'+a.t+(a.k?' · '+a.k:'')+'</span></button>'}).join('')+'</div></div>'+
   tabsHtml(d,u)+
-  (u.tab!=='main'?'<div class="db">'+viewHtml(di)+'</div>':'<div class="db">'+heroHtml(d,p)+p.blocks.map(function(b){return B[b]()}).join('')+
+  (u.tab!=='main'?'<div class="db">'+viewHtml(di)+'</div>':'<div class="db">'+heroHtml(d,p,di)+p.blocks.map(function(b){return B[b]()}).join('')+
    '<div class="fh"><h5>Поля '+T+'</h5>'+(p.grid.length?'<span class="lbl">отправитель слева · получатель справа</span>':'')+(hasGrid?'<a class="lnk" data-all>'+(u.all?'Свернуть поля':'Развернуть поля')+'</a>':'')+'</div>'+
    '<div class="fg'+(u.all?' allopen':'')+'">'+gridHtml(di,p.grid)+textHtml(di,p.text)+'</div>'+extraHtml(di,p.extra)+
    (p.seqB?'<div class="fh seqb"><h5>'+p.seqB.title+'</h5></div><div class="fg'+(u.all?' allopen':'')+'">'+gridHtml(di,p.seqB.grid)+textHtml(di,p.seqB.text)+'</div>'+extraHtml(di,p.seqB.extra):'')+
@@ -1045,6 +1070,27 @@ function render(di){
   el.innerHTML=h;fitTabs(el);meter();
 }
 function renderAll(){[].forEach.call(document.querySelectorAll('.dw'),function(el){render(+el.dataset.d)});renderConfig();}
+
+/* Управляющая дата валютирования: выбор даты не применяется сам —
+   его утверждают промтом. Отказ возвращает в правку, выбор не теряется. */
+document.getElementById('pair').addEventListener('change',function(e){
+  var inp=e.target.closest('[data-vd-input]');if(!inp)return;
+  var dw=inp.closest('.dw'),di=+dw.dataset.d,d=DOCS[di],u=ui[di];
+  function isoToRu(x){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(x||'');return m?m[3]+'.'+m[2]+'.'+m[1]:''}
+  var now=isoToRu(inp.value),was=d.vd[0];
+  if(!now){return}                       /* пустую дату не принимаем */
+  if(now===was){u.vdEdit=false;u.vdDraft=null;render(di);return}
+  u.vdDraft=now;
+  PR.confirm({host:dw,title:'Утвердить новую дату валютирования?',
+    note:'<span class="was">'+was+'</span><span class="arr">→</span><span class="now">'+now+'</span>',
+    ok:'Утвердить',cancel:'Отмена'}).then(function(ok){
+      if(ok){
+        if(!d.vdEdit)d.vdEdit={was:was,who:'Клименко И.',when:new Date().toLocaleString('ru-RU').slice(0,16)};
+        d.vd[0]=now;u.vdEdit=false;u.vdDraft=null;
+      }
+      render(di);                        /* отказ — остаёмся в правке с выбранной датой */
+    });
+});
 
 var pair=document.getElementById('pair');
 var STANDALONE=!pair.hasAttribute('data-host');
@@ -1061,6 +1107,11 @@ pair.addEventListener('click',function(e){
     var list=JSON.parse(mr.dataset.menu),m=document.createElement('div');m.className='tabmenu';
     m.innerHTML=list.map(function(x){return '<span class="'+(x.off?'off':'')+'"'+(x.k?' data-tab="'+x.k+'"':'')+'>'+esc(x.n)+(x.off?' <span class="lbl">— нет данных</span>':'')+'</span>'}).join('');
     var bar=mr.parentNode;m.style.top=(bar.offsetTop+bar.offsetHeight-1)+'px';dw.appendChild(m);return}
+  var vdE=e.target.closest('[data-vd-edit]');
+  if(vdE){u.vdEdit=true;u.vdDraft=null;render(di);
+    var vi=dw.querySelector('[data-vd-input]');if(vi)vi.focus();return}
+  var vdC=e.target.closest('[data-vd-cancel]');
+  if(vdC){u.vdEdit=false;u.vdDraft=null;render(di);return}
   var lkEl=e.target.closest('.lk:not(.off)');if(lkEl){try{navigator.clipboard.writeText(lkEl.dataset.v).then(function(){},function(){})}catch(_){};lkEl.classList.add('flash');setTimeout(function(){lkEl.classList.remove('flash')},600);return}
   var rr=e.target.closest('[data-routerevert]');if(rr){if(d.routeEdit){d.route=cl(d.routeEdit.was);delete d.routeEdit}render(di);return}
   var te=e.target.closest('[data-txtedit]');if(te){var tk=te.dataset.txtedit;u.txtEdit={key:tk,q:d[tk]||'',err:null};u.accEdit=null;render(di);var ti=document.getElementById('txt-'+tk);if(ti){ti.focus();ti.select()}return}
