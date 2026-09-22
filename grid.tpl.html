@@ -136,7 +136,10 @@ body.resizing{cursor:col-resize;user-select:none}
 .toast.on{opacity:1}
 .grid .ico.open{color:var(--val)}
 .grid .num{display:block;font-size:10.5px;color:var(--faint);margin-top:3px;text-align:center}
-.grid .ico{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:4px;color:var(--muted);vertical-align:middle;cursor:pointer}
+/* главное действие строки — настоящая кнопка: доступна с клавиатуры, имеет имя и фокус */
+.grid .ico{display:inline-grid;place-items:center;width:24px;height:24px;border:0;padding:0;background:none;
+           border-radius:4px;color:var(--muted);vertical-align:middle;cursor:pointer}
+.grid .ico:focus-visible{outline:2px solid var(--val);outline-offset:1px;color:var(--val)}
 .grid .ico:hover{background:var(--paper);color:var(--val);box-shadow:0 0 0 1px var(--line)}
 .grid .ico svg{width:14px;height:14px}
 .grid .stdot{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;color:#fff;font:700 10px var(--sans);vertical-align:middle;margin-left:4px}
@@ -280,7 +283,7 @@ function srPair(s,r){
 function rowHtml(d,i,ord){
   var vd=d.vd,same=vd.every(function(x){return x===vd[0]}),purp=(d.f['70']||{lines:[]}).lines.join(' ');
   return '<tbody class="row" data-i="'+i+'"><tr><td rowspan="2"><input type="checkbox" aria-label="Выбрать"><span class="num">'+ord+'</span></td>'+
-   '<td class="icons"><span class="ico open" data-open="'+i+'" data-tip="Открыть деталку · двойной клик — рядом для сравнения">'+ic('esid')+'</span><span class="stdot sc-'+SM[d.status].cls+'" data-tip="'+SM[d.status].label+' · '+d.status+'">'+(d.st==='ok'?'✓':d.st==='bad'?'✕':'·')+'</span></td>'+
+   '<td class="icons"><button type="button" class="ico open" data-open="'+i+'" aria-label="Открыть деталку документа № '+d.num+'" data-tip="Открыть деталку · двойной клик (или Shift) — рядом для сравнения">'+ic('esid')+'</button><span class="stdot sc-'+SM[d.status].cls+'" data-tip="'+SM[d.status].label+' · '+d.status+'">'+(d.st==='ok'?'✓':d.st==='bad'?'✕':'·')+'</span></td>'+
    '<td class="id"><b>'+cv(d.num)+'</b><span class="lks">'+lk('uuid',d.uuid)+lk('refIn',d.f['20'].lines[0])+lk('refOut',d.r20out)+'</span></td>'+
    '<td rowspan="2">'+cv(d.created.slice(0,10))+' <span class="lbl">'+cv(d.created.slice(11,16))+'</span><span class="l2">Дт '+cv(vd[2])+'<br>Кт '+(same?cv(vd[3]):'<span style="color:var(--warn)">'+cv(vd[3])+'</span>')+'</span></td>'+
    '<td rowspan="2">'+cv(d.type,'tag mt')+'</td>'+
