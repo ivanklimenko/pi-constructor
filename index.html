@@ -193,6 +193,18 @@ a.lnk:hover{text-decoration:underline}
 .xrow{display:flex;flex-wrap:wrap;gap:3px 16px;padding:4px 8px;border:1px solid var(--line);border-radius:4px;white-space:nowrap}
 .xrow .fno{margin-right:3px}
 .xrow .nl{color:var(--faint)}
+.tabs span[data-tab]{cursor:pointer}
+.tabs span[data-tab]:hover{color:var(--ink)}
+.xg{border:1px solid var(--line);border-radius:5px}
+.xg h6{margin:0;padding:4px 10px;font:600 11.5px var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid var(--line2);background:var(--sunk)}
+.xr{display:grid;grid-template-columns:40px 200px minmax(0,1fr);gap:0 10px;align-items:center;min-height:24px;padding:1px 10px;border-bottom:1px solid var(--line2)}
+.xr:last-child{border-bottom:0}
+.xr .nm{color:var(--muted);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xr .kv{display:flex;flex-wrap:wrap;gap:0 14px;align-items:baseline;min-width:0}
+.xr .kv>span{white-space:nowrap}
+.xr .kv .lbl{margin-right:4px}
+.xr .len{font-size:10.5px;color:var(--faint);margin-left:auto}
+.xr .diffd{color:var(--warn);font-weight:600}
 .fh.seqb{margin-top:6px;padding-top:8px;border-top:2px solid var(--line)}
 .regt td:first-child{font-family:var(--mono)}
 .regt tr.use td{background:var(--val-soft)}
@@ -286,6 +298,10 @@ ol.q b,ul.l b{color:var(--ink)}
         <button data-type="MT202COV" aria-pressed="false">MT202COV</button>
         <button data-type="MT199" aria-pressed="false">MT199</button>
       </div>
+      <div class="seg" role="group" aria-label="Вкладка">
+        <button data-tabs="main" aria-pressed="true">Общие данные</button>
+        <button data-tabs="extra" aria-pressed="false">Доп. поля</button>
+      </div>
       <label class="chk"><input type="checkbox" id="c-slots"> Показать слоты лейна</label>
       <label class="chk"><input type="checkbox" id="c-fold" checked> Линия 1080p</label>
       <span class="meter">Высота: <b id="h0">—</b> / <b id="h1">—</b> px</span>
@@ -314,6 +330,10 @@ var FIELDS={
   '59': {name:'Бенефициар',kind:'party',opts:['','A','F']},
   '70': {name:'Детали платежа',kind:'text',lines:4,width:35},
   '71A':{name:'Детали расходов',kind:'short'},
+  '71B':{name:'Расходы, взимаемые получателем',kind:'short'},
+  '71F':{name:'Расходы отправителя',kind:'short'},
+  '71G':{name:'Расходы получателя',kind:'short'},
+  '121':{name:'UETR — уникальный сквозной референс',kind:'ref'},
   '72': {name:'Информация отправителя получателю',kind:'text',lines:6,width:35,show:4},
   '77B':{name:'Регуляторная отчётность',kind:'short'},
   '79': {name:'Текст сообщения',kind:'text',lines:35,width:50,show:6}
@@ -340,6 +360,25 @@ var PROFILES={
     hero:['20','21'], blocks:['msgs'],
     grid:[], text:['79']}
 };
+
+/* 3. Вкладка «Доп. поля»: группы строк. tag — номер поля, items — пары «подпись → ключ данных».
+      Ключи: f.<tag>[.n] — n-я часть строки поля, d.<prop> — свойство документа, vd.<i> — i-я дата валютирования. */
+var XTAB=[
+  {title:'SWIFT-поля',rows:[
+    {tag:'32A',items:[['Дата','vd.0'],['Валюта','d.ccy'],['Сумма','d.amount']]},
+    {tag:'33B',items:[['Валюта','f.33B.0'],['Сумма','f.33B.1']]},
+    {tag:'36', items:[['Курс','f.36']]},
+    {tag:'71', name:'Комиссии',items:[['71A','f.71A'],['71B','f.71B'],['71F','f.71F'],['71G','f.71G']]},
+    {tag:'77B',items:[['','f.77B']]}]},
+  {title:'Референсы',rows:[
+    {tag:'20', name:'docReference Вх',items:[['','f.20']],len:16},
+    {tag:'20', name:'docReference Исх',items:[['','d.r20out']],len:16},
+    {tag:'21', name:'Связанный reference',items:[['','f.21']],len:16},
+    {tag:'121',name:'UETR',items:[['','d.uetr']],len:36}]},
+  {title:'Даты валютирования',rows:[
+    {tag:'',name:'Вх',items:[['','vd.0']]},{tag:'',name:'Исх',items:[['','vd.1']]},
+    {tag:'',name:'по Дт',items:[['','vd.2']]},{tag:'',name:'по Кт',items:[['','vd.3']]}]}
+];
 
 /* ===================== ДАННЫЕ ===================== */
 var ACTIONS=[
@@ -368,13 +407,13 @@ var TX6=[
  {dir:'CREDIT',st:'EXECUTED',acc:'70601840100000000519',reg:'00020_CommissionIncome',time:'2026-09-22 07:35:01.121Z',amount:'35.00',ccy:'USD'},
  {dir:'DEBIT',st:'PENDING',acc:'47422840500000000311',reg:'00030_FxConversion',time:'—',amount:'1 148 300.00',ccy:'EUR'}];
 var DOCS=[
- {status:'DONE',st:'ok',dirTxt:'входящий от ЕРС на клиента',uuid:'19ea6301-209c-4185-9a9f-6619d79f8a97',created:'22.09.2026 07:31:45',
+ {status:'DONE',st:'ok',dirTxt:'входящий от ЕРС на клиента',uuid:'19ea6301-209c-4185-9a9f-6619d79f8a97',uetr:'eb6305c9-1f8c-41e3-a3b2-6d7e9f2a4c10',created:'22.09.2026 07:31:45',
   num:'417',numDate:'22.09.26',amount:'1 250 000.00',ccy:'USD',vd:['22.09.2026','22.09.2026','22.09.2026','22.09.2026'],
   inS:'NRDIRUMMXXX',inR:'VKRBRU8KXXX',outS:'VKRBRU8KXXX',outR:'BCLHLV22XXX',r20out:'VK2609220000417',
   dt:'30110 840 7 0000 0001842',kt:'40817 840 1 0005 0017762',
   route:{type:'NOSTRO',acc:'30114840900000000517',desc:'Счёт ностро в Baltic Clearing Bank (Рига), USD',recv:'BCLHLV22XXX',text:'Маршрут через Baltic Clearing по правилу для USD от контрагентов ЕС; прямой корсчёт с NORDINVEST закрыт с 01.07.2026'},
   txId:'cf03cfd4-246d-4669-889f-63bc1af67574',txDate:'2026-09-22 07:33:21',txs:TX6,
-  f:{'20':{lines:['FX2609220000417']},'21':{lines:['NONREF']},'71A':{lines:['OUR']},'33B':{lines:['EUR 1148300,00']},'36':{lines:['1,0886']},'77B':{lines:['/ORDERRES/RU//CONTRACT 12-45 DD 01.03.2026']},
+  f:{'20':{lines:['FX2609220000417']},'21':{lines:['NONREF']},'71A':{lines:['OUR']},'71B':{lines:[]},'71F':{lines:['USD 35,00']},'71G':{lines:[]},'33B':{lines:['EUR 1148300,00']},'36':{lines:['1,0886']},'77B':{lines:['/ORDERRES/RU//CONTRACT 12-45 DD 01.03.2026']},
      '50':cl(P50),'59':cl(P59),'52':cl(B52),'53':cl(B53),'54':cl(B54),'55':cl(B55),'56':cl(B56),
      '57':{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8KXXX'],edit:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8K2KD'],who:'Петрова А. С.',when:'22.09.2026 10:42'}},
      '58':cl(B58),
@@ -382,14 +421,14 @@ var DOCS=[
      '79':{lines:['RE YOUR MT103 FX2609220000417 DD 22.09.2026','AMOUNT USD 1250000,00','PLS BE ADVISED THAT BENEFICIARY ACCOUNT','40817840100050017762 IS CLOSED.','KINDLY AUTHORIZE US TO RETURN THE FUNDS','LESS OUR CHARGES USD 35,00','OR PROVIDE AMENDED BENEFICIARY DETAILS.','BEST REGARDS','PAYMENTS DEPT, VOSTOCHNY KREDIT BANK']},
      'B.50':cl(P50),'B.59':cl(P59),'B.52':cl(B52),'B.57':cl(B57),'B.56':cl(B56),'B.70':{lines:T70},'B.72':{lines:['/INS/ NRDIRUMMXXX','/BNF/ COVER FOR FX2609220000417']},'B.33B':{lines:['EUR 1148300,00']}}
  },
- {status:'NEW',st:'wait',dirTxt:'исходящий возврат',uuid:'7c02b9e4-51aa-4f0e-8d13-2b7f0c9e41d5',created:'23.09.2026 09:02:11',
+ {status:'NEW',st:'wait',dirTxt:'исходящий возврат',uuid:'7c02b9e4-51aa-4f0e-8d13-2b7f0c9e41d5',uetr:'4a1d7e20-9b3f-4c58-8e61-0f2c5d7a9b33',created:'23.09.2026 09:02:11',
   num:'18',numDate:'23.09.26',amount:'1 249 965.00',ccy:'USD',vd:['23.09.2026','23.09.2026','23.09.2026','24.09.2026'],
   inS:'—',inR:'—',outS:'VKRBRU8KXXX',outR:'NRDIRUMMXXX',r20out:'RT2609230000018',
   dt:'40817 840 1 0005 0017762',kt:'30110 840 7 0000 0001842',
   route:{type:'NOSTRO',acc:'30114840900000000517',desc:'Счёт ностро в Baltic Clearing Bank (Рига), USD',recv:'BCLHLV22XXX',text:'Возврат по ПИ 19ea6301, ожидает подтверждения контролёра'},
   txId:'2b91c0de-44a1-4f7b-9c0e-11af0b7e2c39',txDate:'2026-09-23 09:02:40',
   txs:[{dir:'DEBIT',st:'PENDING',acc:'40817840100050017762',reg:'00010_ClientCurrent',time:'—',amount:'1 249 965.00',ccy:'USD'}],
-  f:{'20':{lines:['RT2609230000018']},'21':{lines:['FX2609220000417']},'71A':{lines:['SHA']},'33B':{lines:[]},'36':{lines:[]},'77B':{lines:[]},
+  f:{'20':{lines:['RT2609230000018']},'21':{lines:['FX2609220000417']},'71A':{lines:['SHA']},'71B':{lines:[]},'71F':{lines:[]},'71G':{lines:['USD 15,00']},'33B':{lines:[]},'36':{lines:[]},'77B':{lines:[]},
      '50':cl(P59),'59':cl(P50),'52':cl(B57),'57':cl(B52),'53':cl(B53),'54':{lines:[]},'55':{lines:[]},'56':{lines:[]},
      '58':{opt:'A',lines:['NORDINVEST BANK MOSCOW','NRDIRUMMXXX']},
      '70':{lines:['/RETN/ RETURN OF FX2609220000417','DD 22.09.2026 USD 1250000,00','/RC/ AC01 BENEFICIARY ACCOUNT CLOSED','LESS CHARGES USD 35,00']},'72':{lines:['/REC/ RETURN OF FUNDS','/REJT/ AC01']},
@@ -399,7 +438,7 @@ var DOCS=[
 ];
 DOCS.push(cl(DOCS[0]));
 var TYPE='MT103';
-function mkui(tx){return {open:new Set(),editing:null,all:false,shut:{tx:tx}}}
+function mkui(tx){return {open:new Set(),editing:null,all:false,shut:{tx:tx},tab:'main'}}
 var ui=[mkui(true),mkui(true),mkui(false)];
 
 /* ===================== ОТРИСОВКА ===================== */
@@ -483,6 +522,22 @@ function heroHtml(d,p){
   return '<div class="hero" style="grid-template-columns:'+cols+'">'+p.hero.map(function(h){return C[h]()}).join('')+'</div>';
 }
 
+function resolve(d,key){
+  var p=key.split('.');
+  if(p[0]==='vd')return d.vd[+p[1]]||'';
+  if(p[0]==='d')return d[p[1]]||'';
+  if(p[0]==='f'){var f=d.f[p[1]];if(!f||!f.lines.length)return '';var s=cur(f).lines.join(' ');if(p.length<3)return s;var parts=s.split(/\s+/);return parts[+p[2]]||'';}
+  return '';
+}
+function xtabHtml(d){
+  var vdSame=d.vd.every(function(x){return x===d.vd[0]});
+  return XTAB.map(function(g){
+    return '<div class="xg"><h6>'+esc(g.title)+'</h6>'+g.rows.map(function(r){
+      var name=r.name||(FIELDS[r.tag]?FIELDS[r.tag].name:'');
+      var kv=r.items.map(function(it){var v=resolve(d,it[1]);var isDate=it[1].indexOf('vd.')===0;
+        return '<span>'+(it[0]?'<span class="lbl">'+esc(it[0])+'</span>':'')+(v?'<span class="'+(isDate&&!vdSame&&v!==d.vd[0]?'v diffd':'v')+(/^[A-Z0-9-]{8,}$/i.test(v)&&!isDate?' mono':'')+'">'+esc(v)+'</span>':'<span class="nl">—</span>')+'</span>'}).join('');
+      return '<div class="xr">'+(r.tag?fnoHtml(r.tag):'<span></span>')+'<span class="nm" title="'+esc(name)+'">'+esc(name)+'</span><span class="kv">'+kv+(r.len?'<span class="len">'+r.len+' симв.</span>':'')+'</span></div>'}).join('')+'</div>'}).join('');
+}
 function render(di){
   var d=DOCS[di],u=ui[di],p=PROFILES[TYPE],el=document.querySelector('.dw[data-d="'+di+'"]');if(!el)return;
   var B={
@@ -510,12 +565,12 @@ function render(di){
   '<div class="lane"><span class="tag mt">'+TYPE+'</span><span class="st '+d.st+'">'+d.status+'</span><span class="kind">'+p.title+' · '+d.dirTxt+'</span>'+
     '<div class="acts">'+ACTIONS.map(function(a,k){
       return (a.danger?'<span class="sep"></span>':'')+'<button class="ib'+(a.danger?' danger':'')+'" aria-label="'+a.t+'">'+ic(a.id)+'<span class="slot">'+(k+1)+'</span><span class="tip">'+a.t+(a.k?' · '+a.k:'')+'</span></button>'}).join('')+'</div></div>'+
-  '<div class="tabs"><span class="on">Общие данные</span><span>Доп</span><span>SWIFT</span><span>Связанные документы</span><span>MPU</span><span>Notif-n</span><span>Comission</span></div>'+
-  '<div class="db">'+heroHtml(d,p)+p.blocks.map(function(b){return B[b]()}).join('')+
+  '<div class="tabs"><span data-tab="main" class="'+(u.tab==='main'?'on':'')+'">Общие данные</span><span data-tab="extra" class="'+(u.tab==='extra'?'on':'')+'">Доп. поля</span><span>SWIFT</span><span>Связанные документы</span><span>MPU</span><span>Notif-n</span><span>Comission</span></div>'+
+  (u.tab==='extra'?'<div class="db">'+xtabHtml(d)+'</div>':'<div class="db">'+heroHtml(d,p)+p.blocks.map(function(b){return B[b]()}).join('')+
    '<div class="fh"><h5>Поля '+TYPE+'</h5>'+(p.grid.length?'<span class="lbl">отправитель слева · получатель справа</span>':'')+(hasGrid?'<a class="lnk" data-all>'+(u.all?'Свернуть поля':'Развернуть поля')+'</a>':'')+'</div>'+
    '<div class="fg'+(u.all?' allopen':'')+'">'+gridHtml(di,p.grid)+textHtml(di,p.text)+'</div>'+extraHtml(di,p.extra)+
    (p.seqB?'<div class="fh seqb"><h5>'+p.seqB.title+'</h5></div><div class="fg'+(u.all?' allopen':'')+'">'+gridHtml(di,p.seqB.grid)+textHtml(di,p.seqB.text)+'</div>'+extraHtml(di,p.seqB.extra):'')+
-  '</div>';
+  '</div>');
   el.innerHTML=h;meter();
 }
 function renderAll(){[].forEach.call(document.querySelectorAll('.dw'),function(el){render(+el.dataset.d)});renderConfig();}
@@ -529,6 +584,7 @@ pair.addEventListener('click',function(e){
   var dw=e.target.closest('.dw');if(!dw)return;var di=+dw.dataset.d,d=DOCS[di],u=ui[di];
   var cp=e.target.closest('.cp');
   if(cp){try{navigator.clipboard.writeText(cp.dataset.copy).then(function(){cp.textContent='✓';setTimeout(function(){cp.textContent='⧉'},1200)},function(){})}catch(_){};return}
+  var tb=e.target.closest('[data-tab]');if(tb){u.tab=tb.dataset.tab;render(di);return}
   var tg=e.target.closest('[data-tg]');if(tg){u.shut[tg.dataset.tg]=!u.shut[tg.dataset.tg];render(di);return}
   if(e.target.closest('[data-all]')){u.all=!u.all;render(di);return}
   var ob=e.target.closest('[data-opts] button');
@@ -564,6 +620,7 @@ document.getElementById('m-one').onclick=function(){setMode('one')};
 [].forEach.call(document.querySelectorAll('[data-type]'),function(b){b.onclick=function(){
   TYPE=b.dataset.type;ui.forEach(function(u){u.editing=null});
   [].forEach.call(document.querySelectorAll('[data-type]'),function(x){x.setAttribute('aria-pressed',String(x===b))});renderAll();}});
+[].forEach.call(document.querySelectorAll('[data-tabs]'),function(b){b.onclick=function(){ui.forEach(function(u){u.tab=b.dataset.tabs});[].forEach.call(document.querySelectorAll('[data-tabs]'),function(x){x.setAttribute('aria-pressed',String(x===b))});renderAll();}});
 document.getElementById('c-fold').onchange=function(e){pair.classList.toggle('no-fold',!e.target.checked)};
 document.getElementById('c-slots').onchange=function(e){pair.classList.toggle('show-slots',e.target.checked)};
 document.getElementById('slots').innerHTML=ACTIONS.map(function(a,k){
