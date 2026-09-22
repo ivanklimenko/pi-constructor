@@ -34,21 +34,25 @@ body{margin:0;overflow:hidden}
 .apph .sp{margin-left:auto;display:flex;gap:8px;align-items:center}
 .apph a{color:var(--val);font-size:12.5px;text-decoration:none}
 .apph a:hover{text-decoration:underline}
-.slane{display:flex;align-items:center;gap:2px;padding:4px 14px 0;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
-.slane .chbtn{margin-left:auto;flex:none;display:inline-grid;place-items:center;width:28px;height:28px;margin-bottom:2px;
+/* Прокручивается только список статусов. Кнопка графика лежит вне
+   прокрутки: внутри переполненного flex-контейнера margin-left:auto
+   не работает, и иконка не доходила до правого края. */
+.slane{display:flex;align-items:flex-end;gap:8px;padding:4px 20px 0;border-bottom:1px solid var(--line)}
+.slist{display:flex;align-items:center;gap:2px;flex:1 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none}
+.slist::-webkit-scrollbar{display:none}
+.slane .chbtn{flex:none;display:inline-grid;place-items:center;width:28px;height:28px;margin-bottom:2px;
               border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink2);cursor:pointer}
 .slane .chbtn svg{width:15px;height:15px}
 .slane .chbtn:hover{border-color:var(--val);color:var(--val)}
 .slane .chbtn[aria-pressed="true"]{background:var(--val-soft);border-color:var(--val);color:var(--val)}
 .slane .chbtn:focus-visible{outline:2px solid var(--val);outline-offset:1px}
-.slane::-webkit-scrollbar{display:none}
-.slane button{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:none;font:500 12.5px var(--sans);color:var(--ink2);cursor:pointer;white-space:nowrap}
-.slane button:hover{color:var(--ink);background:var(--hover)}
-.slane button[aria-pressed="true"]{color:var(--val);border-bottom-color:var(--val)}
-.slane .sd{width:14px;height:14px;border-radius:50%;display:inline-grid;place-items:center;color:#fff;font:700 9px var(--sans)}
-.slane .n{min-width:18px;height:17px;padding:0 5px;border-radius:9px;background:var(--chip);color:var(--ink2);font:600 11px var(--sans);display:grid;place-items:center}
-.slane button[aria-pressed="true"] .n{background:var(--val);color:var(--paper)}
-.slane .n.zero{color:var(--faint);background:none;border:1px solid var(--line2)}
+.slist button{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:none;font:500 12.5px var(--sans);color:var(--ink2);cursor:pointer;white-space:nowrap}
+.slist button:hover{color:var(--ink);background:var(--hover)}
+.slist button[aria-pressed="true"]{color:var(--val);border-bottom-color:var(--val)}
+.slist .sd{width:14px;height:14px;border-radius:50%;display:inline-grid;place-items:center;color:#fff;font:700 9px var(--sans)}
+.slist .n{min-width:18px;height:17px;padding:0 5px;border-radius:9px;background:var(--chip);color:var(--ink2);font:600 11px var(--sans);display:grid;place-items:center}
+.slist button[aria-pressed="true"] .n{background:var(--val);color:var(--paper)}
+.slist .n.zero{color:var(--faint);background:none;border:1px solid var(--line2)}
 /* 4 семейства: в движении (синее) · внимание (красно-янтарное) · завершено успешно (зелёное) · завершено нейтрально (серое) */
 /* те же токены, что у линий графика: в тёмной теме свои шаги */
 .sc-flow{background:var(--st-flow)} .sc-flowl{background:var(--st-flowl)} .sc-flowd{background:var(--st-flowd)}
@@ -204,7 +208,7 @@ body.resizing{cursor:col-resize;user-select:none}
 <div class="app">
   <div class="apph"><h1>Валютные документы</h1><span class="cnt" id="cnt"></span>
     <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, двойной клик по ней — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · фильтры — из vtb-filters</span><a href="index.html">конструктор деталки →</a><button type="button" class="skbtn" id="skdemo" aria-pressed="false" style="margin-left:10px" data-tip="Первое нажатие — скелетон первой загрузки, второе — обновление уже показанных данных">Скелетоны</button><span id="zoomctl" style="display:inline-flex;align-items:center;margin-left:10px"></span></div></div>
-  <div class="slane" id="slane"></div>
+  <div class="slane"><div class="slist" id="slane"></div><button type="button" class="chbtn" id="chartbtn" aria-pressed="false" data-tip="Динамика по статусам во времени" aria-label="Динамика по статусам во времени"></button></div>
   <div id="chhost"></div>
   <div class="filters">
     <button class="fbtn" id="ftoggle" aria-expanded="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4.2 5.4A1 1 0 015.1 4h13.8a1 1 0 01.8 1.6L14 12.2V18a1 1 0 01-1.5.86l-3-1.8A1 1 0 019 16.2v-4L4.3 5.6a1 1 0 01-.1-.2z"/></svg>Фильтры<span class="badge" id="fcount" hidden>0</span></button>
@@ -569,17 +573,16 @@ function chRefresh(){
     chCtl.cfg.busy=false;chCtl.render();
   },500);
 }
-document.getElementById('slane').addEventListener('click',function(e){
-  if(e.target.closest('#chartbtn')){chCtl?chClose():chOpen();return}
-});
+var chBtnEl=document.getElementById('chartbtn');
+chBtnEl.innerHTML=ic('chart');
+chBtnEl.addEventListener('click',function(){chCtl?chClose():chOpen()});
 
 /* лейн статусов: счётчики по текущей выборке панели и быстрый фильтр (один статус или все) */
 function renderLane(base){
   var cnt={};base.forEach(function(i){var st=ROWS[i].status;cnt[st]=(cnt[st]||0)+1});
   var el=document.getElementById('slane');
   el.innerHTML='<button type="button" data-st="" aria-pressed="'+(!quick)+'">Все<span class="n">'+base.length+'</span></button>'+
-    STATUS_META.map(function(x){var n=cnt[x[0]]||0;return '<button type="button" data-st="'+x[0]+'" aria-pressed="'+(quick===x[0])+'"><span class="sd sc-'+x[2]+'">'+(x[2]==='ok'||x[2]==='teal'?'✓':x[2]==='bad'?'✕':x[2]==='grey'?'⊘':x[2]==='dark'?'?':'!')+'</span>'+esc(x[1])+'<span class="n'+(n?'':' zero')+'">'+n+'</span></button>'}).join('')+
-    '<button type="button" class="chbtn" id="chartbtn" aria-pressed="'+!!chCtl+'" data-tip="Динамика по статусам во времени" aria-label="Динамика по статусам во времени">'+ic('chart')+'</button>';
+    STATUS_META.map(function(x){var n=cnt[x[0]]||0;return '<button type="button" data-st="'+x[0]+'" aria-pressed="'+(quick===x[0])+'"><span class="sd sc-'+x[2]+'">'+(x[2]==='ok'||x[2]==='teal'?'✓':x[2]==='bad'?'✕':x[2]==='grey'?'⊘':x[2]==='dark'?'?':'!')+'</span>'+esc(x[1])+'<span class="n'+(n?'':' zero')+'">'+n+'</span></button>'}).join('');
 }
 document.getElementById('slane').addEventListener('click',function(e){var b=e.target.closest('[data-st]');if(!b)return;quick=b.dataset.st||null;PAGE.n=1;refresh()});
 function renderApplied(){
