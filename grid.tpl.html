@@ -7,12 +7,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="filters.css">
 {{STYLE}}
 <style>
 /* ===== реестр ===== */
 html,body{height:100%}
 body{margin:0;overflow:hidden}
-.app{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;height:100%;background:var(--paper)}
+.app{display:grid;grid-template-rows:auto auto auto minmax(0,1fr) auto;height:100%;background:var(--paper)}
 .apph{display:flex;align-items:center;gap:14px;padding:12px 20px 8px;border-bottom:1px solid var(--line)}
 .apph h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em}
 .apph .cnt{font-size:12.5px;color:var(--muted)}
@@ -27,6 +28,20 @@ body{margin:0;overflow:hidden}
 .fchip.on{border-color:var(--val);background:var(--val-soft);color:var(--val)}
 .fchip .chev{font-size:9px;color:var(--faint)}
 .filters .sp{margin-left:auto;display:flex;gap:8px}
+.fbtn{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:6px;border:1px solid var(--val);background:var(--val);color:var(--paper);font:500 12.5px var(--sans);cursor:pointer}
+.fbtn .badge{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:rgba(255,255,255,.25);font:600 11px var(--sans);display:grid;place-items:center}
+.fbtn svg{width:14px;height:14px}
+.fbtn.ghost{background:var(--paper);color:var(--ink2);border-color:var(--line)}
+.applied{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-width:0}
+.achip{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 4px 0 8px;border-radius:5px;background:var(--val-soft);color:var(--val);font-size:12px;white-space:nowrap;max-width:360px}
+.achip .l{color:var(--ink2)}
+.achip .o{font:600 11px var(--mono);color:var(--muted)}
+.achip .v{font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.achip .x{width:16px;height:16px;border-radius:3px;display:grid;place-items:center;cursor:pointer;color:var(--muted);font-size:11px;margin-left:0}
+.achip .x:hover{background:var(--paper);color:var(--bad)}
+#cf-host{display:none}
+#cf-host.on{display:block}
+.cf .cf-grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
 .gridwrap{overflow:auto;position:relative}
 .grid{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;font-size:12.5px;line-height:1.35}
 .grid th{position:sticky;top:0;z-index:2;background:var(--paper);text-align:left;font:600 12.5px var(--sans);color:var(--ink);padding:9px 8px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -89,21 +104,19 @@ body{margin:0;overflow:hidden}
 {{SVG}}
 <div class="app">
   <div class="apph"><h1>Валютные документы</h1><span class="cnt" id="cnt"></span>
-    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, <b>⧉</b> — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип</span><a href="index.html">конструктор деталки →</a></div></div>
+    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, <b>⧉</b> — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · фильтры — из vtb-filters</span><a href="index.html">конструктор деталки →</a></div></div>
   <div class="filters">
-    <label class="search"><svg width="14" height="14" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input id="q" placeholder="ID, референс, счёт, наименование…"></label>
-    <span class="fchip on">Дата <b>22–23.09.2026</b><span class="chev">▼</span></span>
-    <span class="fchip">Тип <b>все</b><span class="chev">▼</span></span>
-    <span class="fchip">Статус <b>все</b><span class="chev">▼</span></span>
-    <span class="fchip">Валюта <b>все</b><span class="chev">▼</span></span>
-    <span class="fchip">Направление <b>все</b><span class="chev">▼</span></span>
+    <button class="fbtn" id="ftoggle" aria-expanded="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4.2 5.4A1 1 0 015.1 4h13.8a1 1 0 01.8 1.6L14 12.2V18a1 1 0 01-1.5.86l-3-1.8A1 1 0 019 16.2v-4L4.3 5.6a1 1 0 01-.1-.2z"/></svg>Фильтры<span class="badge" id="fcount" hidden>0</span></button>
+    <div class="applied" id="applied"><span class="lbl">условия не заданы</span></div>
     <div class="sp"><span class="fchip">Колонки<span class="chev">▼</span></span><span class="fchip">Экспорт</span></div>
   </div>
+  <div id="cf-host" class="on"></div>
   <div class="gridwrap"><table class="grid" id="grid"></table></div>
   <div class="appf"><span id="foot"></span><span class="pg"><span>‹</span><span class="on">1</span><span>2</span><span>3</span><span>…</span><span>64</span><span>›</span></span><span class="sp">20 на странице</span></div>
 </div>
 <div id="pair" data-host></div>
 {{SCRIPT}}
+<script src="filters.js"></script>
 <script>
 (function(){
 var P=window.PI,esc=P.esc,ic=P.ic;
@@ -156,9 +169,77 @@ function rowHtml(d,i){
    '<td class="sr">'+cv(d.inS,'tag snd')+cv(d.inR,'tag rcv')+'</td></tr>';
 }
 var grid=document.getElementById('grid');
-grid.innerHTML='<thead><tr><th><input type="checkbox" aria-label="Выбрать все"></th><th></th><th>ID<span class="sub">№ · 20 вх / исх</span></th><th>Дата / Время<span class="sub">валютирование Дт / Кт</span></th><th>Тип</th><th>Направление</th><th>32<span class="sub">сумма</span></th><th>50<span class="sub">приказодатель · 70</span></th><th>52</th><th>57</th><th>58</th><th>59</th><th>Маршрут</th><th>S / R</th></tr></thead><tbody>'+ROWS.map(rowHtml).join('')+'</tbody>';
-document.getElementById('cnt').textContent=ROWS.length+' из 1 284';
-document.getElementById('foot').textContent='1–'+ROWS.length+' из 1 284 · выбрано 0';
+var HEAD='<thead><tr><th><input type="checkbox" aria-label="Выбрать все"></th><th></th><th>ID<span class="sub">№ · 20 вх / исх</span></th><th>Дата / Время<span class="sub">валютирование Дт / Кт</span></th><th>Тип</th><th>Направление</th><th>32<span class="sub">сумма</span></th><th>50<span class="sub">приказодатель · 70</span></th><th>52</th><th>57</th><th>58</th><th>59</th><th>Маршрут</th><th>S / R</th></tr></thead>';
+function drawGrid(idx){
+  grid.innerHTML=HEAD+'<tbody>'+idx.map(function(i){return rowHtml(ROWS[i],i)}).join('')+(idx.length?'':'<tr><td colspan="14" style="text-align:center;color:var(--muted);padding:28px">По заданным условиям документов нет</td></tr>')+'</tbody>';
+  document.getElementById('cnt').textContent=idx.length+(idx.length===ROWS.length?' из 1 284':' из '+ROWS.length+' на странице');
+  document.getElementById('foot').textContent=(idx.length?'1–'+idx.length:'0')+' из '+(idx.length===ROWS.length?'1 284':idx.length)+' · выбрано 0';
+  if(typeof mark==='function')mark();
+}
+drawGrid(ROWS.map(function(_,i){return i}));
+
+/* ---- фильтры: каталог для реестра (конструктив из vtb-filters), значения справочников — из строк ---- */
+function uniq(fn){var s={};ROWS.forEach(function(d){var v=fn(d);if(v)s[v]=1});return Object.keys(s).sort()}
+function lines(d,t){var f=d.f[t];return f?(f.edit||f).lines:[]}
+function bic(d,t){var L=lines(d,t);return L[L.length-1]||''}
+var ACC={
+  docId:function(d){return d.uuid},docNumber:function(d){return d.num},refIn:function(d){return d.f['20'].lines[0]},refOut:function(d){return d.r20out},
+  status:function(d){return d.status},type:function(d){return d.type},direction:function(d){return d.dir},purpose:function(d){return lines(d,'70').join(' ')},
+  created:function(d){return d.created.slice(0,10)},valueDate:function(d){return d.vd[0]},vdDt:function(d){return d.vd[2]},vdKt:function(d){return d.vd[3]},
+  amount:function(d){return d.amount.replace(/\s/g,'')},currency:function(d){return d.ccy},dtAcc:function(d){return d.dt.replace(/\s/g,'')},ktAcc:function(d){return d.kt.replace(/\s/g,'')},
+  f50name:function(d){return lines(d,'50')[0]||''},f50acc:function(d){return (d.f['50']||{}).acc||''},f59name:function(d){return lines(d,'59')[0]||''},f59acc:function(d){return (d.f['59']||{}).acc||''},
+  f52:function(d){return bic(d,'52')},f57:function(d){return bic(d,'57')},f58:function(d){return bic(d,'58')},
+  routeType:function(d){return d.route.type},routeRecv:function(d){return d.route.recv},sender:function(d){return d.inS},receiver:function(d){return d.inR}
+};
+function F(id,label,type){return {id:id,label:label,type:type||'text',dict:uniq(ACC[id]).slice(0,12)}}
+var CATALOG=[
+  {group:'Основные',fields:[F('docId','ID документа'),F('docNumber','Номер документа'),F('refIn','Поле 20 (входящее)'),F('refOut','Поле 20 (исходящее)'),F('status','Статус','select'),F('type','Тип сообщения','select'),F('direction','Направление','select'),F('purpose','Назначение (70)')]},
+  {group:'Даты',fields:[F('created','Дата документа','date'),F('valueDate','Дата валютирования','date'),F('vdDt','Валютирование по Дт','date'),F('vdKt','Валютирование по Кт','date')]},
+  {group:'Финансы',fields:[F('amount','Сумма','number'),F('currency','Валюта','select'),F('dtAcc','Счёт Дт'),F('ktAcc','Счёт Кт')]},
+  {group:'Контрагенты',fields:[F('f50name','Поле 50 (наименование)'),F('f50acc','Поле 50 (счёт)'),F('f59name','Поле 59 (наименование)'),F('f59acc','Поле 59 (счёт)')]},
+  {group:'Банки (SWIFT-коды)',fields:[F('f52','Поле 52'),F('f57','Поле 57'),F('f58','Поле 58')]},
+  {group:'Маршрут',fields:[F('routeType','Тип маршрута','select'),F('routeRecv','Receiver'),F('sender','S — отправитель'),F('receiver','R — получатель')]}
+];
+var DEMO_SETS=[
+  {id:'demo-1',name:'Входящие USD исполненные',data:{visible:['direction','currency','status'],ops:{direction:'eq',currency:'eq',status:'eq'},values:{direction:{list:[],draft:'IN'},currency:{list:[],draft:'USD'},status:{list:[],draft:'DONE'}}}},
+  {id:'demo-2',name:'Проблемные MT103/MT202',data:{visible:['type','status','amount'],ops:{type:'in',status:'in',amount:'gt'},values:{type:{list:['MT103','MT202'],draft:''},status:{list:['REJECTED','CANCELED','PENDING'],draft:''},amount:{list:[],draft:'100000'}}}}];
+function toNum(v){var n=parseFloat(String(v).replace(/\s/g,'').replace(',','.'));return isNaN(n)?null:n}
+function toDate(v){var m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(String(v).trim());if(m)return m[3]+m[2]+m[1];m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v).trim());return m?m[1]+m[2]+m[3]:null}
+function cmp(field,a,b){if(field.type==='number'){var x=toNum(a),y=toNum(b);return x==null||y==null?null:x-y}if(field.type==='date'){var p=toDate(a),q=toDate(b);return p==null||q==null?null:(p<q?-1:p>q?1:0)}return String(a).localeCompare(String(b))}
+function match(field,op,val,cond,list){
+  var v=String(val==null?'':val),lv=v.toLowerCase(),c=String(cond||'').trim(),lc=c.toLowerCase();
+  switch(op){
+    case 'contains':return lv.indexOf(lc)>=0;
+    case 'startsWith':return lv.indexOf(lc)===0;
+    case 'endsWith':return lv.slice(-lc.length)===lc;
+    case 'eq':return field.type==='number'||field.type==='date'?cmp(field,v,c)===0:lv===lc;
+    case 'ne':return field.type==='number'||field.type==='date'?cmp(field,v,c)!==0:lv!==lc;
+    case 'gt':var g=cmp(field,v,c);return g!=null&&g>0;
+    case 'lt':var l=cmp(field,v,c);return l!=null&&l<0;
+    case 'in':return list.some(function(x){return field.type==='number'||field.type==='date'?cmp(field,v,x)===0:String(x).toLowerCase()===lv});
+    case 'notIn':return !list.some(function(x){return field.type==='number'||field.type==='date'?cmp(field,v,x)===0:String(x).toLowerCase()===lv});
+  }return true;
+}
+var cf=window.CF({root:document.getElementById('cf-host'),catalog:CATALOG,defaultIds:['refIn','status','type','currency'],demoSets:DEMO_SETS,storageKey:'pi-grid-filter-sets-v1',
+  onApply:function(snap,desc){applyFilters(snap,desc)},onCancel:function(){togglePanel(false)}});
+var applied=[];
+function applyFilters(snap,desc){
+  applied=desc;
+  var idx=ROWS.map(function(_,i){return i}).filter(function(i){var d=ROWS[i];
+    return desc.every(function(c){var field=cf.FIELD_BY_ID[c.id];return match(field,c.op,ACC[c.id](d),c.values[0],c.values)})});
+  drawGrid(idx);renderApplied();
+}
+function renderApplied(){
+  var el=document.getElementById('applied'),b=document.getElementById('fcount');
+  b.hidden=!applied.length;b.textContent=applied.length;
+  el.innerHTML=applied.length?applied.map(function(c){return '<span class="achip" data-tip="'+esc(c.label+' '+c.opName.toLowerCase()+': '+c.values.join(', '))+'"><span class="l">'+esc(c.label)+'</span><span class="o">'+esc(cf.OPS[c.op].sql.split(' ')[0])+'</span><span class="v">'+esc(c.values.join(', '))+'</span><span class="x" data-rm="'+c.id+'" title="Убрать условие">✕</span></span>'}).join('')+'<span class="fchip" id="fclear" style="height:24px;font-size:12px">Сбросить</span>':'<span class="lbl">условия не заданы</span>';
+}
+document.getElementById('applied').addEventListener('click',function(e){
+  var rm=e.target.closest('[data-rm]');if(rm){cf.state.values[rm.dataset.rm]={list:[],draft:''};cf.render();applyFilters(cf.snapshot(),cf.describe());return}
+  if(e.target.closest('#fclear')){Object.keys(cf.state.values).forEach(function(k){cf.state.values[k]={list:[],draft:''}});cf.render();applyFilters(cf.snapshot(),cf.describe())}
+});
+function togglePanel(on){var h=document.getElementById('cf-host'),t=document.getElementById('ftoggle');if(on==null)on=!h.classList.contains('on');h.classList.toggle('on',on);t.setAttribute('aria-expanded',String(on))}
+document.getElementById('ftoggle').onclick=function(){togglePanel()};
 /* ---- открытие drawer ---- */
 var pair=document.getElementById('pair'),slots={A:null,B:null};
 function openDoc(i,slot){
@@ -171,7 +252,7 @@ function openDoc(i,slot){
   mark();
 }
 function closeSlot(slot){if(!slots[slot])return;slots[slot].el.remove();slots[slot]=null;mark()}
-function mark(){[].forEach.call(grid.querySelectorAll('tr.row'),function(tr){var i=+tr.dataset.i;tr.classList.toggle('selA',!!slots.A&&slots.A.row===i);tr.classList.toggle('selB',!!slots.B&&slots.B.row===i)})}
+function mark(){if(!slots)return;[].forEach.call(grid.querySelectorAll('tr.row'),function(tr){var i=+tr.dataset.i;tr.classList.toggle('selA',!!slots.A&&slots.A.row===i);tr.classList.toggle('selB',!!slots.B&&slots.B.row===i)})}
 var toast=document.createElement('div');toast.className='toast';document.body.appendChild(toast);var toastT;
 function say(t){toast.textContent=t;toast.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){toast.classList.remove('on')},1400)}
 grid.addEventListener('click',function(e){

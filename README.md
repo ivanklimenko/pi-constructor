@@ -11,3 +11,4 @@
 
 - `index.html` — конструктор деталки (единственный источник кода drawer: стили + скрипт).
 - `grid.tpl.html` → `grid.html` — реестр «Валютные документы»; собирается `python3 build.py`, который подкладывает стили и скрипт из `index.html`. Руками `grid.html` не править.
+- `filters.js`, `filters.css` — панель фильтров, вендорена из `vtb-filters/ermo-snapshot/compact-filters.*` (каталог, модификаторы-операторы, чипы «в списке», саджест, сохранённые наборы, импорт). Изменения: конфиг снаружи (`window.CF({root, catalog, defaultIds, demoSets, storageKey, onApply, onCancel})`), палитра на токенах стенда.
