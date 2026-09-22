@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="filters.css">
+<link rel="stylesheet" href="skeleton.css">
+<script src="skeleton.js"></script>
 <style>
 :root{
   --ground:#EEF1F6; --paper:#FFFFFF; --sunk:#F5F7FB; --ink:#141A29; --ink2:#3A4357; --muted:#6B7488; --faint:#7C8496;
@@ -419,7 +421,7 @@ ol.q b,ul.l b{color:var(--ink)}
 /* ===== реестр ===== */
 html,body{height:100%}
 body{margin:0;overflow:hidden}
-.app{display:grid;grid-template-rows:auto auto auto auto minmax(0,1fr) auto;height:100%;background:var(--paper)}
+.app{display:grid;grid-template-rows:auto auto auto auto auto minmax(0,1fr) auto;height:100%;background:var(--paper)}
 .apph{display:flex;align-items:center;gap:14px;padding:12px 20px 8px;border-bottom:1px solid var(--line)}
 .apph h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em}
 .apph .cnt{font-size:12.5px;color:var(--muted)}
@@ -475,6 +477,11 @@ body{margin:0;overflow:hidden}
 .achip .v{font-weight:600;overflow:hidden;text-overflow:ellipsis}
 .achip .x{width:16px;height:16px;border-radius:3px;display:grid;place-items:center;cursor:pointer;color:var(--muted);font-size:11px;margin-left:0}
 .achip .x:hover{background:var(--paper);color:var(--bad)}
+#skprog{display:none}
+#skprog.on{display:block}
+.skbtn{height:24px;padding:0 9px;border:1px solid var(--line);border-radius:6px;background:var(--paper);font:500 11.5px var(--sans);color:var(--ink2);cursor:pointer;white-space:nowrap}
+.skbtn:hover{border-color:var(--val);color:var(--val)}
+.skbtn[aria-pressed="true"]{background:var(--val-soft);color:var(--val);border-color:var(--val)}
 #cf-host{display:none}
 #cf-host.on{display:block}
 .cf .cf-grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
@@ -588,7 +595,7 @@ body.resizing{cursor:col-resize;user-select:none}
 </svg>
 <div class="app">
   <div class="apph"><h1>Валютные документы</h1><span class="cnt" id="cnt"></span>
-    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, двойной клик по ней — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · фильтры — из vtb-filters</span><a href="index.html">конструктор деталки →</a><span id="zoomctl" style="display:inline-flex;align-items:center;margin-left:10px"></span></div></div>
+    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, двойной клик по ней — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · фильтры — из vtb-filters</span><a href="index.html">конструктор деталки →</a><button type="button" class="skbtn" id="skdemo" aria-pressed="false" style="margin-left:10px" data-tip="Первое нажатие — скелетон первой загрузки, второе — обновление уже показанных данных">Скелетоны</button><span id="zoomctl" style="display:inline-flex;align-items:center;margin-left:10px"></span></div></div>
   <div class="slane" id="slane"></div>
   <div class="filters">
     <button class="fbtn" id="ftoggle" aria-expanded="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4.2 5.4A1 1 0 015.1 4h13.8a1 1 0 01.8 1.6L14 12.2V18a1 1 0 01-1.5.86l-3-1.8A1 1 0 019 16.2v-4L4.3 5.6a1 1 0 01-.1-.2z"/></svg>Фильтры<span class="badge" id="fcount" hidden>0</span></button>
@@ -596,6 +603,7 @@ body.resizing{cursor:col-resize;user-select:none}
     <div class="sp"><span class="fchip">Колонки<span class="chev">▼</span></span><span class="fchip">Экспорт</span></div>
   </div>
   <div id="cf-host" class="on"></div>
+  <div id="skprog"></div>
   <div class="gridwrap"><table class="grid" id="grid"></table></div>
   <div class="appf"><span id="foot"></span><span class="pg" id="pager"></span><label class="sp psz">На странице <select id="psize"><option>10</option><option selected>20</option><option>50</option><option>100</option></select></label></div>
 </div>
@@ -1060,8 +1068,19 @@ function complianceHtml(d){
       '<div class="tt" style="margin:6px 10px 8px;background:var(--paper)"><div class="th" style="grid-template-columns:150px 1fr 1fr"><span>Время попадания</span><span>Система контроля</span><span>Код подразделения</span></div>'+
       c.hist.map(function(h){return '<div class="tr" style="grid-template-columns:150px 1fr 1fr"><span class="tm">'+h[0]+'</span><span class="mono v">'+h[1]+'</span><span class="v">'+h[2]+'</span></div>'}).join('')+'</div></div>';
 }
+/* Большинство вкладок собирается отдельным запросом. Локальные — только те,
+   что приходят вместе с документом. */
+var TAB_LOCAL={main:1,extra:1};
+function tabLoad(di){
+  var u=ui[di];
+  if(TAB_LOCAL[u.tab]){u.loading=false;render(di);return}
+  clearTimeout(u._skt);
+  u.loading=true;render(di);
+  u._skt=setTimeout(function(){u.loading=false;render(di)},700); /* стенд: эмуляция запроса */
+}
 function viewHtml(di){
   var d=DOCS[di],u=ui[di];
+  if(u.loading)return SK.tabBody(u.tab==='tasks'?5:4);
   switch(u.tab){
     case 'extra':return xtabHtml(d);
     case 'statuses':return statusesHtml(d);
@@ -1198,7 +1217,7 @@ pair.addEventListener('click',function(e){
   var mp=e.target.closest('[data-mpu]');if(mp){var mi=+mp.dataset.mpu;u.mpu.has(mi)?u.mpu.delete(mi):u.mpu.add(mi);render(di);return}
   var au=e.target.closest('[data-audit]');if(au){var k=au.dataset.audit;u.audit.has(k)?u.audit.delete(k):u.audit.add(k);render(di);return}
   var tk=e.target.closest('[data-task]');if(tk&&!e.target.closest('.lnk')){var ti=+tk.dataset.task;u.tasks.has(ti)?u.tasks.delete(ti):u.tasks.add(ti);render(di);return}
-  var tb=e.target.closest('[data-tab]');if(tb){u.tab=tb.dataset.tab;render(di);return}
+  var tb=e.target.closest('[data-tab]');if(tb){u.tab=tb.dataset.tab;tabLoad(di);return}
   var tg=e.target.closest('[data-tg]');if(tg){u.shut[tg.dataset.tg]=!u.shut[tg.dataset.tg];render(di);return}
   if(e.target.closest('[data-all]')){u.all=!u.all;render(di);return}
   var ob=e.target.closest('[data-opts] button');
@@ -1257,7 +1276,7 @@ on('m-tx','onclick',function(){setMode('tx')});on('m-ret','onclick',function(){s
 [].forEach.call(document.querySelectorAll('[data-type]'),function(b){b.onclick=function(){
   TYPE=b.dataset.type;ui.forEach(function(u){u.editing=null});
   [].forEach.call(document.querySelectorAll('[data-type]'),function(x){x.setAttribute('aria-pressed',String(x===b))});renderAll();}});
-[].forEach.call(document.querySelectorAll('[data-tabs]'),function(b){b.onclick=function(){ui.forEach(function(u){u.tab=b.dataset.tabs});[].forEach.call(document.querySelectorAll('[data-tabs]'),function(x){x.setAttribute('aria-pressed',String(x===b))});renderAll();}});
+[].forEach.call(document.querySelectorAll('[data-tabs]'),function(b){b.onclick=function(){ui.forEach(function(u){u.tab=b.dataset.tabs});[].forEach.call(document.querySelectorAll('[data-tabs]'),function(x){x.setAttribute('aria-pressed',String(x===b))});[].forEach.call(document.querySelectorAll('.dw'),function(el){tabLoad(+el.dataset.d)});renderConfig();}});
 on('c-fold','onchange',function(e){pair.classList.toggle('no-fold',!e.target.checked)});on('c-slots','onchange',function(e){pair.classList.toggle('show-slots',e.target.checked)});
 if(document.getElementById('slots'))document.getElementById('slots').innerHTML=ACTIONS.map(function(a,k){
   return (a.danger?'<li class="gap">разделитель — разрушительные действия отдельно</li>':'')+
@@ -1428,12 +1447,58 @@ var PAGE={size:20,n:1};
 function drawGrid(idx){lastIdx=idx;
   var pages=Math.max(1,Math.ceil(idx.length/PAGE.size));if(PAGE.n>pages)PAGE.n=pages;
   var from=(PAGE.n-1)*PAGE.size,slice=idx.slice(from,from+PAGE.size);
-  grid.innerHTML=headHtml()+slice.map(function(i,k){return rowHtml(ROWS[i],i,from+k+1)}).join('')+(idx.length?'':'<tbody><tr><td colspan="16" style="text-align:center;color:var(--muted);padding:28px">По заданным условиям документов нет</td></tr></tbody>');
+  grid.innerHTML=headHtml()+slice.map(function(i,k){return rowHtml(ROWS[i],i,from+k+1)}).join('')+(idx.length?'':'<tbody><tr><td colspan="16">'+SK.empty('По заданным условиям документов нет','Сбросить фильтр')+'</td></tr></tbody>');
   document.getElementById('cnt').textContent=idx.length===ROWS.length?ROWS.length+' документов':idx.length+' из '+ROWS.length;
   renderPager(idx.length,pages);
   if(typeof mark==='function')mark();
   initResize();
 }
+/* ============ состояния загрузки ============ */
+/* Скелетон записи повторяет сетку колонок и высоту строки с данными:
+   при подмене ничего не должно сдвинуться. */
+function skRowHtml(ord){
+  var S=SK,f5='';
+  /* высоты измерены на строке с данными: основная строка записи 34px
+     (две строки по 17), вторая строка 15px, ячейки rowspan — три строки */
+  for(var k=0;k<5;k++)f5+='<td class="f5">'+S.col(S.ln((58+k*7)+'%',11),S.ln((42+k*5)+'%',9,17))+'</td>';
+  var sr='';
+  for(var j=0;j<3;j++)sr+='<td class="sr" rowspan="2">'+S.col(S.ln('72px',13),S.ln('72px',13))+'</td>';
+  return '<tbody class="row skrow" aria-busy="true"><tr>'+
+    '<td rowspan="2">'+S.sk('13px','13px','sq')+'<span class="num">'+ord+'</span></td>'+
+    '<td class="icons">'+S.col(S.ln('16px',16,20),S.ln('16px',9,14))+'</td>'+
+    '<td class="id">'+S.col(S.ln('34px',12),S.ln('96px',10,17))+'</td>'+
+    '<td rowspan="2">'+S.col(S.ln('88px',12),S.ln('62px',10),S.ln('62px',10))+'</td>'+
+    '<td rowspan="2">'+S.ln('46px',14)+'</td>'+
+    '<td rowspan="2">'+S.col(S.ln('40px',12),S.ln('78px',10))+'</td>'+
+    '<td rowspan="2"><span class="sk-col" style="align-items:flex-end">'+S.ln('94px',13)+S.ln('26px',10)+'</span></td>'+
+    f5+
+    '<td rowspan="2">'+S.col(S.ln('86px',12),S.ln('66px',10))+'</td>'+sr+
+    '</tr><tr class="purow"><td colspan="2" class="reason empty"></td>'+
+    '<td colspan="5" class="purp">'+S.ln('58%',10,15)+'</td></tr></tbody>';
+}
+function skGridHtml(n){var out=headHtml();for(var i=1;i<=n;i++)out+=skRowHtml(i);return out}
+
+var skProg=document.getElementById('skprog'),skBtn=document.getElementById('skdemo'),SKON=false;
+function skShowBar(on){skProg.innerHTML=on?SK.bar():'';skProg.classList.toggle('on',!!on);
+  document.querySelector('.gridwrap').classList.toggle('sk-dim',!!on)}
+
+/* Демонстрация для показа: первое нажатие — скелетон первой загрузки,
+   второе — возврат данных через состояние «обновляется». */
+/* кнопка пустого состояния — на существующий сброс фильтра */
+grid.addEventListener('click',function(e){
+  var r=e.target.closest('[data-sk="reset"]');if(!r)return;
+  var btn=document.querySelector('.cf [data-act="reset"]');if(btn)btn.click();
+});
+
+skBtn.onclick=function(){
+  if(!SKON){SKON=true;skBtn.setAttribute('aria-pressed','true');skBtn.textContent='Показать данные';
+    grid.innerHTML=skGridHtml(PAGE.size);initResize();return}
+  SKON=false;skBtn.setAttribute('aria-pressed','false');skBtn.textContent='Скелетоны';
+  drawGrid(lastIdx);skShowBar(true);
+  var done=SK.gate(function(){},function(){skShowBar(false)},{delay:0,min:700});
+  setTimeout(done,700);
+};
+
 function renderPager(total,pages){
   var from=total?(PAGE.n-1)*PAGE.size+1:0,to=Math.min(PAGE.n*PAGE.size,total);
   var nums=[],push=function(x){if(nums.indexOf(x)<0)nums.push(x)};

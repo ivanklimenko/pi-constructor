@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="skeleton.css">
+<script src="skeleton.js"></script>
 <style>
 :root{
   --ground:#EEF1F6; --paper:#FFFFFF; --sunk:#F5F7FB; --ink:#141A29; --ink2:#3A4357; --muted:#6B7488; --faint:#7C8496;
@@ -926,8 +928,19 @@ function complianceHtml(d){
       '<div class="tt" style="margin:6px 10px 8px;background:var(--paper)"><div class="th" style="grid-template-columns:150px 1fr 1fr"><span>Время попадания</span><span>Система контроля</span><span>Код подразделения</span></div>'+
       c.hist.map(function(h){return '<div class="tr" style="grid-template-columns:150px 1fr 1fr"><span class="tm">'+h[0]+'</span><span class="mono v">'+h[1]+'</span><span class="v">'+h[2]+'</span></div>'}).join('')+'</div></div>';
 }
+/* Большинство вкладок собирается отдельным запросом. Локальные — только те,
+   что приходят вместе с документом. */
+var TAB_LOCAL={main:1,extra:1};
+function tabLoad(di){
+  var u=ui[di];
+  if(TAB_LOCAL[u.tab]){u.loading=false;render(di);return}
+  clearTimeout(u._skt);
+  u.loading=true;render(di);
+  u._skt=setTimeout(function(){u.loading=false;render(di)},700); /* стенд: эмуляция запроса */
+}
 function viewHtml(di){
   var d=DOCS[di],u=ui[di];
+  if(u.loading)return SK.tabBody(u.tab==='tasks'?5:4);
   switch(u.tab){
     case 'extra':return xtabHtml(d);
     case 'statuses':return statusesHtml(d);
@@ -1064,7 +1077,7 @@ pair.addEventListener('click',function(e){
   var mp=e.target.closest('[data-mpu]');if(mp){var mi=+mp.dataset.mpu;u.mpu.has(mi)?u.mpu.delete(mi):u.mpu.add(mi);render(di);return}
   var au=e.target.closest('[data-audit]');if(au){var k=au.dataset.audit;u.audit.has(k)?u.audit.delete(k):u.audit.add(k);render(di);return}
   var tk=e.target.closest('[data-task]');if(tk&&!e.target.closest('.lnk')){var ti=+tk.dataset.task;u.tasks.has(ti)?u.tasks.delete(ti):u.tasks.add(ti);render(di);return}
-  var tb=e.target.closest('[data-tab]');if(tb){u.tab=tb.dataset.tab;render(di);return}
+  var tb=e.target.closest('[data-tab]');if(tb){u.tab=tb.dataset.tab;tabLoad(di);return}
   var tg=e.target.closest('[data-tg]');if(tg){u.shut[tg.dataset.tg]=!u.shut[tg.dataset.tg];render(di);return}
   if(e.target.closest('[data-all]')){u.all=!u.all;render(di);return}
   var ob=e.target.closest('[data-opts] button');
@@ -1123,7 +1136,7 @@ on('m-tx','onclick',function(){setMode('tx')});on('m-ret','onclick',function(){s
 [].forEach.call(document.querySelectorAll('[data-type]'),function(b){b.onclick=function(){
   TYPE=b.dataset.type;ui.forEach(function(u){u.editing=null});
   [].forEach.call(document.querySelectorAll('[data-type]'),function(x){x.setAttribute('aria-pressed',String(x===b))});renderAll();}});
-[].forEach.call(document.querySelectorAll('[data-tabs]'),function(b){b.onclick=function(){ui.forEach(function(u){u.tab=b.dataset.tabs});[].forEach.call(document.querySelectorAll('[data-tabs]'),function(x){x.setAttribute('aria-pressed',String(x===b))});renderAll();}});
+[].forEach.call(document.querySelectorAll('[data-tabs]'),function(b){b.onclick=function(){ui.forEach(function(u){u.tab=b.dataset.tabs});[].forEach.call(document.querySelectorAll('[data-tabs]'),function(x){x.setAttribute('aria-pressed',String(x===b))});[].forEach.call(document.querySelectorAll('.dw'),function(el){tabLoad(+el.dataset.d)});renderConfig();}});
 on('c-fold','onchange',function(e){pair.classList.toggle('no-fold',!e.target.checked)});on('c-slots','onchange',function(e){pair.classList.toggle('show-slots',e.target.checked)});
 if(document.getElementById('slots'))document.getElementById('slots').innerHTML=ACTIONS.map(function(a,k){
   return (a.danger?'<li class="gap">разделитель — разрушительные действия отдельно</li>':'')+
