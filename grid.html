@@ -443,6 +443,7 @@ body{margin:0;overflow:hidden}
 .grid .lk.off:hover{background:none}
 .grid .lk.flash{background:var(--ok-soft);color:var(--ok)}
 .grid .lks{display:flex;gap:3px;margin-top:2px}
+.grid tr.purow td{max-width:0;overflow:hidden;text-overflow:ellipsis}
 .grid tr.purow td.reason{padding:2px 8px 6px;border-bottom:1px solid var(--line2);background:var(--sunk);font:11px var(--sans);color:var(--ink2);white-space:nowrap;overflow:hidden}
 .grid tbody.row:hover tr.purow td.reason{background:var(--chip)}
 .grid tr.purow td.reason.empty,.grid tbody.row:hover tr.purow td.reason.empty{background:transparent}
@@ -483,7 +484,19 @@ body{margin:0;overflow:hidden}
 body.resizing{cursor:col-resize;user-select:none}
 .grid .sr .tag{max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .grid th{position:sticky;top:0;z-index:2;background:var(--paper);text-align:left;font:600 12.5px var(--sans);color:var(--ink);padding:9px 8px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
-.grid th .sub{display:block;font:11px var(--sans);color:var(--muted);font-weight:400}
+.grid th .sub{display:block;font:11px var(--sans);color:var(--muted);font-weight:400;min-height:14px}
+.grid th.sortable{cursor:pointer;user-select:none}
+.grid th.sortable:hover{background:var(--hover)}
+.grid th .sarrow{margin-left:4px;font-size:11px;color:var(--faint)}
+.grid th.sorted{color:var(--val)}
+.grid th.sorted .sarrow{color:var(--val)}
+.grid th.sorted .sub{color:var(--val)}
+.sortmenu{position:fixed;z-index:70;min-width:200px;background:var(--paper);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow);padding:4px 0}
+.sortmenu .smt{font:600 10.5px var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:5px 12px 4px}
+.sortmenu button{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;background:none;text-align:left;font:12.5px var(--sans);color:var(--ink2);padding:5px 12px;cursor:pointer}
+.sortmenu button:hover{background:var(--hover)}
+.sortmenu button.on{color:var(--val);font-weight:500}
+.sortmenu button.reset{border-top:1px solid var(--line2);margin-top:3px;color:var(--muted);font-size:12px}
 .grid td{padding:7px 8px 6px;border-bottom:1px solid var(--line2);vertical-align:top;white-space:nowrap}
 .grid tbody.row{cursor:default}
 .grid tbody.row:hover td{background:var(--hover)}
@@ -1318,9 +1331,9 @@ function fld(f,showName){if(!f||(!f.lines.length&&!f.acc))return '<span class="n
 /* линк-кнопка реквизита: имя фиксированной ширины вместо длинного значения; клик копирует, серая — значения нет */
 function lk(name,v){return v?'<span class="lk" data-v="'+esc(v)+'" data-tip="'+esc(v)+' — копировать">'+name+'</span>':'<span class="lk off" data-tip="'+name+': нет значения">'+name+'</span>'}
 function cv(v,cls,mw){v=String(v==null?'':v);return '<span class="cv'+(cls?' '+cls:'')+'"'+(mw?' style="max-width:'+mw+'px"':'')+' data-v="'+esc(v)+'">'+esc(v)+'</span>'}
-function rowHtml(d,i){
+function rowHtml(d,i,ord){
   var vd=d.vd,same=vd.every(function(x){return x===vd[0]}),purp=(d.f['70']||{lines:[]}).lines.join(' ');
-  return '<tbody class="row" data-i="'+i+'"><tr><td rowspan="2"><input type="checkbox" aria-label="Выбрать"><span class="num">'+(i+1)+'</span></td>'+
+  return '<tbody class="row" data-i="'+i+'"><tr><td rowspan="2"><input type="checkbox" aria-label="Выбрать"><span class="num">'+ord+'</span></td>'+
    '<td class="icons"><span class="ico open" data-open="'+i+'" data-tip="Открыть деталку · двойной клик — рядом для сравнения">'+ic('esid')+'</span><span class="stdot sc-'+SM[d.status].cls+'" data-tip="'+SM[d.status].label+' · '+d.status+'">'+(d.st==='ok'?'✓':d.st==='bad'?'✕':'·')+'</span></td>'+
    '<td class="id"><b>'+cv(d.num)+'</b><span class="lks">'+lk('uuid',d.uuid)+lk('refIn',d.f['20'].lines[0])+lk('refOut',d.r20out)+'</span></td>'+
    '<td rowspan="2">'+cv(d.created.slice(0,10))+' <span class="lbl">'+cv(d.created.slice(11,16))+'</span><span class="l2">Дт '+cv(vd[2])+'<br>Кт '+(same?cv(vd[3]):'<span style="color:var(--warn)">'+cv(vd[3])+'</span>')+'</span></td>'+
@@ -1337,7 +1350,54 @@ function rowHtml(d,i){
    '<td colspan="5" class="purp"><span class="fno" data-tip="70 · Детали платежа">70</span>'+cv(purp,'',9999)+'</td></tr></tbody>';
 }
 var grid=document.getElementById('grid');
-var HEAD='<thead><tr><th><input type="checkbox" aria-label="Выбрать все"></th><th></th><th>ID<span class="sub">№ · 20 вх / исх</span></th><th>Дата / Время<span class="sub">валютирование Дт / Кт</span></th><th>Тип</th><th>Направление</th><th>32<span class="sub">сумма</span></th><th>50<span class="sub">приказодатель · 70</span></th><th>52</th><th>57</th><th>58</th><th>59</th><th>Маршрут</th><th>S / R in</th><th>S / R out</th><th>Провайдеры</th></tr></thead>';
+/* ---- сортировка: у составной колонки несколько реквизитов — клик по заголовку открывает меню, у простой — сразу переключает ---- */
+var SORT={by:null,dir:1};
+var COLS=[
+  {t:'',sub:''},
+  {t:'',sub:'',keys:[{id:'status',l:'Статус'}]},
+  {t:'ID',sub:'№ · 20 вх / исх',keys:[{id:'docNumber',l:'Номер документа',type:'number'},{id:'refIn',l:'20 вх'},{id:'refOut',l:'20 исх'}]},
+  {t:'Дата / Время',sub:'валютирование Дт / Кт',keys:[{id:'created',l:'Дата документа',type:'date'},{id:'vdDt',l:'Валютирование Дт',type:'date'},{id:'vdKt',l:'Валютирование Кт',type:'date'}]},
+  {t:'Тип',sub:'',keys:[{id:'type',l:'Тип сообщения'}]},
+  {t:'Направление',sub:'',keys:[{id:'direction',l:'Направление'}]},
+  {t:'32',sub:'сумма',keys:[{id:'amount',l:'Сумма',type:'number'},{id:'currency',l:'Валюта'}]},
+  {t:'50',sub:'приказодатель · 70',keys:[{id:'f50name',l:'Наименование'},{id:'f50acc',l:'Счёт'},{id:'purpose',l:'Назначение (70)'}]},
+  {t:'52',sub:'',keys:[{id:'f52',l:'BIC 52'}]},
+  {t:'57',sub:'',keys:[{id:'f57',l:'BIC 57'}]},
+  {t:'58',sub:'',keys:[{id:'f58',l:'BIC 58'}]},
+  {t:'59',sub:'',keys:[{id:'f59name',l:'Наименование'},{id:'f59acc',l:'Счёт'}]},
+  {t:'Маршрут',sub:'',keys:[{id:'routeType',l:'Тип маршрута'},{id:'routeRecv',l:'Receiver'}]},
+  {t:'S / R in',sub:'',keys:[{id:'sender',l:'S in'},{id:'receiver',l:'R in'}]},
+  {t:'S / R out',sub:'',keys:[{id:'outSender',l:'S out'},{id:'outReceiver',l:'R out'}]},
+  {t:'Провайдеры',sub:'',keys:[{id:'provS',l:'Провайдер отправителя'},{id:'provR',l:'Провайдер получателя'}]}];
+function keyMeta(id){for(var c=0;c<COLS.length;c++){var k=(COLS[c].keys||[]).filter(function(x){return x.id===id})[0];if(k)return k}return null}
+function headHtml(){
+  return '<thead><tr>'+COLS.map(function(c,i){
+    if(i===0)return '<th><input type="checkbox" aria-label="Выбрать все"></th>';
+    var active=c.keys&&c.keys.some(function(k){return k.id===SORT.by}),km=active?keyMeta(SORT.by):null;
+    return '<th class="'+(c.keys?'sortable':'')+(active?' sorted':'')+'" data-col="'+i+'">'+(c.t||'')+(c.keys?'<span class="sarrow">'+(active?(SORT.dir>0?'↑':'↓'):'↕')+'</span>':'')+
+      '<span class="sub">'+(active&&c.keys.length>1?esc(km.l):esc(c.sub))+'</span></th>'}).join('')+'</tr></thead>';
+}
+function sortIdx(idx){
+  if(!SORT.by)return idx;var km=keyMeta(SORT.by),acc=ACC[SORT.by],dir=SORT.dir;
+  return idx.slice().sort(function(a,b){var va=acc(ROWS[a]),vb=acc(ROWS[b]),c;
+    if(km.type==='number')c=(toNum(va)||0)-(toNum(vb)||0);
+    else if(km.type==='date')c=String(toDate(va)||'').localeCompare(String(toDate(vb)||''));
+    else{if(!va&&vb)return 1;if(va&&!vb)return -1;c=String(va).localeCompare(String(vb),'ru')}
+    return c*dir||a-b});
+}
+function setSort(id){if(SORT.by===id)SORT.dir=-SORT.dir;else{SORT.by=id;SORT.dir=keyMeta(id).type==='date'||keyMeta(id).type==='number'?-1:1}PAGE.n=1;closeSortMenu();refresh()}
+function closeSortMenu(){var m=document.getElementById('sortmenu');if(m)m.remove()}
+grid.addEventListener('click',function(e){
+  if(e.target.closest('.rz'))return;
+  var th=e.target.closest('th.sortable');if(!th)return;
+  var c=COLS[+th.dataset.col];
+  if(c.keys.length===1){setSort(c.keys[0].id);return}
+  closeSortMenu();var r=th.getBoundingClientRect(),z=parseFloat(document.documentElement.style.zoom)||1;
+  var m=document.createElement('div');m.id='sortmenu';m.className='sortmenu';m.style.left=(r.left/z)+'px';m.style.top=(r.bottom/z+2)+'px';
+  m.innerHTML='<div class="smt">Сортировать «'+esc(c.t)+'» по</div>'+c.keys.map(function(k){var on=SORT.by===k.id;return '<button type="button" data-sort="'+k.id+'" class="'+(on?'on':'')+'">'+esc(k.l)+'<span class="sarrow">'+(on?(SORT.dir>0?'↑':'↓'):'')+'</span></button>'}).join('')+(SORT.by&&c.keys.some(function(k){return k.id===SORT.by})?'<button type="button" data-sort="" class="reset">Сбросить сортировку</button>':'');
+  document.body.appendChild(m);
+});
+document.addEventListener('click',function(e){var b=e.target.closest('#sortmenu [data-sort]');if(b){if(b.dataset.sort)setSort(b.dataset.sort);else{SORT.by=null;closeSortMenu();refresh()}return}if(!e.target.closest('#sortmenu, th.sortable'))closeSortMenu()});
 /* ---- изменяемая ширина колонок: после первого рендера фиксируем ширины, дальше тянем за границу в шапке ---- */
 var COLW=null;
 function initResize(){
@@ -1358,7 +1418,7 @@ var PAGE={size:20,n:1};
 function drawGrid(idx){lastIdx=idx;
   var pages=Math.max(1,Math.ceil(idx.length/PAGE.size));if(PAGE.n>pages)PAGE.n=pages;
   var from=(PAGE.n-1)*PAGE.size,slice=idx.slice(from,from+PAGE.size);
-  grid.innerHTML=HEAD+slice.map(function(i){return rowHtml(ROWS[i],i)}).join('')+(idx.length?'':'<tbody><tr><td colspan="16" style="text-align:center;color:var(--muted);padding:28px">По заданным условиям документов нет</td></tr></tbody>');
+  grid.innerHTML=headHtml()+slice.map(function(i,k){return rowHtml(ROWS[i],i,from+k+1)}).join('')+(idx.length?'':'<tbody><tr><td colspan="16" style="text-align:center;color:var(--muted);padding:28px">По заданным условиям документов нет</td></tr></tbody>');
   document.getElementById('cnt').textContent=idx.length===ROWS.length?ROWS.length+' документов':idx.length+' из '+ROWS.length;
   renderPager(idx.length,pages);
   if(typeof mark==='function')mark();
@@ -1428,7 +1488,7 @@ function applyFilters(snap,desc){applied=desc;PAGE.n=1;refresh()}
 function refresh(){
   var base=byPanel();
   var idx=quick?base.filter(function(i){return ROWS[i].status===quick}):base;
-  drawGrid(idx);renderApplied();renderLane(base);
+  drawGrid(sortIdx(idx));renderApplied();renderLane(base);
 }
 /* лейн статусов: счётчики по текущей выборке панели и быстрый фильтр (один статус или все) */
 function renderLane(base){
