@@ -33,7 +33,11 @@ body{margin:0;overflow:hidden}
 .slane .n{min-width:18px;height:17px;padding:0 5px;border-radius:9px;background:var(--chip);color:var(--ink2);font:600 11px var(--sans);display:grid;place-items:center}
 .slane button[aria-pressed="true"] .n{background:var(--val);color:var(--paper)}
 .slane .n.zero{color:var(--faint);background:none;border:1px solid var(--line2)}
-.sc-ok{background:var(--ok)} .sc-bad{background:var(--bad)} .sc-info{background:var(--val)} .sc-amber{background:#C98A00} .sc-purple{background:#7A4FBF} .sc-orange{background:#E07A2F} .sc-teal{background:#1A8F8A} .sc-dark{background:#3A4357} .sc-grey{background:#8A93A6} .sc-wait{background:var(--warn)}
+/* 4 семейства: в движении (синее) · внимание (красно-янтарное) · завершено успешно (зелёное) · завершено нейтрально (серое) */
+.sc-flow{background:#3A6EA5} .sc-flowl{background:#6B98C6} .sc-flowd{background:#2B5384}
+.sc-bad{background:var(--bad)} .sc-badd{background:#8C2B23} .sc-warn{background:var(--warn)}
+.sc-ok{background:var(--ok)} .sc-okl{background:#4E9E77} .sc-grey{background:#8A93A6}
+.sc-info{background:var(--val)} .sc-wait{background:var(--warn)}
 .grid .stdot{margin-left:0}
 .grid .lk{display:inline-block;font:500 10.5px/14px var(--sans);color:var(--val);cursor:copy;padding:0 2px;border-radius:3px;margin-left:-2px;letter-spacing:-.01em}
 .grid .lk:hover{background:var(--val-soft)}
@@ -136,13 +140,13 @@ body.resizing{cursor:col-resize;user-select:none}
 .grid .l2 .v{color:var(--val)}
 .grid .l2.mono{font-family:var(--mono)}
 .grid .amt{font-weight:600;font-variant-numeric:tabular-nums;text-align:right;display:block}
-.grid .amt+.l2{text-align:right;color:var(--val);font-weight:500;font-size:12px}
+.grid .amt+.l2{text-align:right;color:var(--ink2);font-weight:400;font-size:12px}
 .grid .fld{display:flex;gap:6px;align-items:baseline}
 .grid .fld .op{font:700 12px var(--mono);color:var(--opt);min-width:9px}
 .grid .fld .mono{font-size:12px;color:var(--ink)}
 .grid .fld .nm{font-size:12px;color:var(--ink)}
 .grid .cap{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-top:3px;max-width:190px;overflow:hidden;text-overflow:ellipsis}
-.grid .purp{font:10.5px var(--sans);color:var(--val);text-transform:uppercase;letter-spacing:.02em;margin-top:4px;max-width:720px;overflow:hidden;text-overflow:ellipsis}
+.grid .purp{font:10.5px var(--sans);color:var(--ink2);text-transform:uppercase;letter-spacing:.02em;margin-top:4px;max-width:720px;overflow:hidden;text-overflow:ellipsis}
 .grid .dir{display:flex;gap:5px;align-items:center;color:var(--ink)}
 .grid .dir svg{width:13px;height:13px;color:var(--muted)}
 .grid .dir .dg{width:13px;text-align:center;color:var(--muted);font-size:12px}
@@ -194,8 +198,8 @@ var AMT=[['1 250 000.00','USD'],['1 249 965.00','USD'],['84 300.00','EUR'],['12 
 var TYPES=['MT103','MT103','MT202','MT103','MT199','MT202COV','MT103','MT103','MT202','MT103','MT199','MT103'];
 /* Статусы системы — порядок как в лейне на проме */
 var STATUS_META=[
-  ['IN_PROGRESS','В работе','info'],['TO_EXPORT','К экспорту','amber'],['PROCESSING','В обработке','purple'],['ERROR','Ошибка','bad'],
-  ['DEFERRED','Отложенный','orange'],['EXPORTED','Экспортирован','teal'],['INVALID','INVALID','dark'],['REJECTED','Отказ','grey'],['DONE','Обработан','ok']];
+  ['IN_PROGRESS','В работе','flow'],['TO_EXPORT','К экспорту','flowl'],['PROCESSING','В обработке','flowd'],['ERROR','Ошибка','bad'],
+  ['DEFERRED','Отложенный','warn'],['EXPORTED','Экспортирован','okl'],['INVALID','INVALID','badd'],['REJECTED','Отказ','grey'],['DONE','Обработан','ok']];
 var SM={};STATUS_META.forEach(function(x){SM[x[0]]={label:x[1],cls:x[2]}});
 function drawerSt(code){return code==='DONE'||code==='EXPORTED'?'ok':(code==='ERROR'||code==='INVALID'||code==='REJECTED')?'bad':'wait'}
 var STS=['DONE','IN_PROGRESS','DONE','ERROR','DONE','TO_EXPORT','PROCESSING','DEFERRED','EXPORTED','REJECTED','DONE','IN_PROGRESS'];

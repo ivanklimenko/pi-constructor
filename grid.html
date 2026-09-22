@@ -10,8 +10,8 @@
 <link rel="stylesheet" href="filters.css">
 <style>
 :root{
-  --ground:#EEF1F6; --paper:#FFFFFF; --sunk:#F5F7FB; --ink:#141A29; --ink2:#3A4357; --muted:#6B7488; --faint:#A3AABA;
-  --line:#DCE1EA; --line2:#EAEEF4; --val:#1D4ED0; --val-soft:#E8EEFD; --hover:#F3F6FD; --opt:#B0247A; --opt-soft:#FBE8F3;
+  --ground:#EEF1F6; --paper:#FFFFFF; --sunk:#F5F7FB; --ink:#141A29; --ink2:#3A4357; --muted:#6B7488; --faint:#7C8496;
+  --line:#DCE1EA; --line2:#EAEEF4; --val:#3A6EA5; --val-soft:#E9EFF7; --hover:#F2F6FA; --opt:#B0247A; --opt-soft:#FBE8F3;
   --ok:#17844B; --ok-soft:#E3F5EA; --bad:#C2372E; --bad-soft:#FCE6E4; --warn:#A8620B; --warn-soft:#FDF1DD; --warn-row:#FFF9EE;
   --chip:#EEF0F4; --fold:#D0342C;
   --shadow:0 1px 2px rgba(20,26,41,.06),0 8px 28px rgba(20,26,41,.08);
@@ -19,15 +19,15 @@
   --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --ground:#0E121A; --paper:#161B26; --sunk:#1B2130; --ink:#E6E9F1; --ink2:#C3C9D6; --muted:#949DB0; --faint:#5F687C;
-  --line:#2A3243; --line2:#222938; --val:#8DB0FF; --val-soft:#1E2B4D; --hover:#1C2335; --opt:#F07CC0; --opt-soft:#3A1830;
+  --ground:#0E121A; --paper:#161B26; --sunk:#1B2130; --ink:#E6E9F1; --ink2:#C3C9D6; --muted:#949DB0; --faint:#8A93A6;
+  --line:#2A3243; --line2:#222938; --val:#8FB8E0; --val-soft:#1E2B3E; --hover:#1B2331; --opt:#F07CC0; --opt-soft:#3A1830;
   --ok:#52CC8A; --ok-soft:#173526; --bad:#FF7A70; --bad-soft:#3D1B19; --warn:#F0B44E; --warn-soft:#3A2B12; --warn-row:#2A2216;
   --chip:#232A39; --fold:#FF6B61;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.35);
 }}
 :root[data-theme="dark"]{
-  --ground:#0E121A; --paper:#161B26; --sunk:#1B2130; --ink:#E6E9F1; --ink2:#C3C9D6; --muted:#949DB0; --faint:#5F687C;
-  --line:#2A3243; --line2:#222938; --val:#8DB0FF; --val-soft:#1E2B4D; --hover:#1C2335; --opt:#F07CC0; --opt-soft:#3A1830;
+  --ground:#0E121A; --paper:#161B26; --sunk:#1B2130; --ink:#E6E9F1; --ink2:#C3C9D6; --muted:#949DB0; --faint:#8A93A6;
+  --line:#2A3243; --line2:#222938; --val:#8FB8E0; --val-soft:#1E2B3E; --hover:#1B2331; --opt:#F07CC0; --opt-soft:#3A1830;
   --ok:#52CC8A; --ok-soft:#173526; --bad:#FF7A70; --bad-soft:#3D1B19; --warn:#F0B44E; --warn-soft:#3A2B12; --warn-row:#2A2216;
   --chip:#232A39; --fold:#FF6B61;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.35);
@@ -435,7 +435,11 @@ body{margin:0;overflow:hidden}
 .slane .n{min-width:18px;height:17px;padding:0 5px;border-radius:9px;background:var(--chip);color:var(--ink2);font:600 11px var(--sans);display:grid;place-items:center}
 .slane button[aria-pressed="true"] .n{background:var(--val);color:var(--paper)}
 .slane .n.zero{color:var(--faint);background:none;border:1px solid var(--line2)}
-.sc-ok{background:var(--ok)} .sc-bad{background:var(--bad)} .sc-info{background:var(--val)} .sc-amber{background:#C98A00} .sc-purple{background:#7A4FBF} .sc-orange{background:#E07A2F} .sc-teal{background:#1A8F8A} .sc-dark{background:#3A4357} .sc-grey{background:#8A93A6} .sc-wait{background:var(--warn)}
+/* 4 семейства: в движении (синее) · внимание (красно-янтарное) · завершено успешно (зелёное) · завершено нейтрально (серое) */
+.sc-flow{background:#3A6EA5} .sc-flowl{background:#6B98C6} .sc-flowd{background:#2B5384}
+.sc-bad{background:var(--bad)} .sc-badd{background:#8C2B23} .sc-warn{background:var(--warn)}
+.sc-ok{background:var(--ok)} .sc-okl{background:#4E9E77} .sc-grey{background:#8A93A6}
+.sc-info{background:var(--val)} .sc-wait{background:var(--warn)}
 .grid .stdot{margin-left:0}
 .grid .lk{display:inline-block;font:500 10.5px/14px var(--sans);color:var(--val);cursor:copy;padding:0 2px;border-radius:3px;margin-left:-2px;letter-spacing:-.01em}
 .grid .lk:hover{background:var(--val-soft)}
@@ -538,13 +542,13 @@ body.resizing{cursor:col-resize;user-select:none}
 .grid .l2 .v{color:var(--val)}
 .grid .l2.mono{font-family:var(--mono)}
 .grid .amt{font-weight:600;font-variant-numeric:tabular-nums;text-align:right;display:block}
-.grid .amt+.l2{text-align:right;color:var(--val);font-weight:500;font-size:12px}
+.grid .amt+.l2{text-align:right;color:var(--ink2);font-weight:400;font-size:12px}
 .grid .fld{display:flex;gap:6px;align-items:baseline}
 .grid .fld .op{font:700 12px var(--mono);color:var(--opt);min-width:9px}
 .grid .fld .mono{font-size:12px;color:var(--ink)}
 .grid .fld .nm{font-size:12px;color:var(--ink)}
 .grid .cap{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;margin-top:3px;max-width:190px;overflow:hidden;text-overflow:ellipsis}
-.grid .purp{font:10.5px var(--sans);color:var(--val);text-transform:uppercase;letter-spacing:.02em;margin-top:4px;max-width:720px;overflow:hidden;text-overflow:ellipsis}
+.grid .purp{font:10.5px var(--sans);color:var(--ink2);text-transform:uppercase;letter-spacing:.02em;margin-top:4px;max-width:720px;overflow:hidden;text-overflow:ellipsis}
 .grid .dir{display:flex;gap:5px;align-items:center;color:var(--ink)}
 .grid .dir svg{width:13px;height:13px;color:var(--muted)}
 .grid .dir .dg{width:13px;text-align:center;color:var(--muted);font-size:12px}
@@ -1294,8 +1298,8 @@ var AMT=[['1 250 000.00','USD'],['1 249 965.00','USD'],['84 300.00','EUR'],['12 
 var TYPES=['MT103','MT103','MT202','MT103','MT199','MT202COV','MT103','MT103','MT202','MT103','MT199','MT103'];
 /* Статусы системы — порядок как в лейне на проме */
 var STATUS_META=[
-  ['IN_PROGRESS','В работе','info'],['TO_EXPORT','К экспорту','amber'],['PROCESSING','В обработке','purple'],['ERROR','Ошибка','bad'],
-  ['DEFERRED','Отложенный','orange'],['EXPORTED','Экспортирован','teal'],['INVALID','INVALID','dark'],['REJECTED','Отказ','grey'],['DONE','Обработан','ok']];
+  ['IN_PROGRESS','В работе','flow'],['TO_EXPORT','К экспорту','flowl'],['PROCESSING','В обработке','flowd'],['ERROR','Ошибка','bad'],
+  ['DEFERRED','Отложенный','warn'],['EXPORTED','Экспортирован','okl'],['INVALID','INVALID','badd'],['REJECTED','Отказ','grey'],['DONE','Обработан','ok']];
 var SM={};STATUS_META.forEach(function(x){SM[x[0]]={label:x[1],cls:x[2]}});
 function drawerSt(code){return code==='DONE'||code==='EXPORTED'?'ok':(code==='ERROR'||code==='INVALID'||code==='REJECTED')?'bad':'wait'}
 var STS=['DONE','IN_PROGRESS','DONE','ERROR','DONE','TO_EXPORT','PROCESSING','DEFERRED','EXPORTED','REJECTED','DONE','IN_PROGRESS'];
