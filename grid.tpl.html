@@ -156,7 +156,10 @@ body.resizing{cursor:col-resize;user-select:none}
 .grid .dir{display:flex;gap:5px;align-items:center;color:var(--ink)}
 .grid .dir svg{width:13px;height:13px;color:var(--muted)}
 .grid .dir .dg{width:13px;text-align:center;color:var(--muted);font-size:12.5px}
-/* S/R и провайдеры: без рамок. Роль подписывает служебный токен, значение остаётся значением */
+/* S/R: без рамок, роль подписывает служебный токен S:/R: */
+/* Провайдеры — короткие коды систем, а не реквизиты: тег отделяет их от значений */
+.grid .prov .tag{display:block;width:max-content;margin-bottom:3px;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.grid .tag.snd{color:var(--warn);border-color:var(--warn)} .grid .tag.rcv{color:var(--ok);border-color:var(--ok)}
 .grid .srl{display:block;white-space:nowrap;line-height:17px}
 .grid .srl .k{display:inline-block;width:14px;font:11px var(--sans);color:var(--faint)}
 .grid .srl .cv{font:12.5px var(--mono);color:var(--ink);max-width:none}
@@ -220,6 +223,10 @@ var REASONS=['Отправлен запрос в СУБО Контроль(2700)
 var REASON_BY_ST={DEFERRED:[4,5,6,3,8,0,2,1],ERROR:[7],REJECTED:[7,3]};
 /* направление — два реквизита: группа (IN / OUT / TRANSIT / OTHER) и название направления */
 var DIRS=[['IN','входящий от ЕРС на клиента'],['OUT','исходящий возврат'],['OUT','исходящий межбанковский'],['IN','входящий от ЕРС на клиента'],['OTHER','уведомление, свободный формат'],['OUT','исходящий с покрытием'],['IN','входящий от корреспондента'],['OUT','исходящий клиентский'],['TRANSIT','транзит через корсчёт'],['OUT','исходящий клиентский'],['OTHER','запрос по документу'],['TRANSIT','транзит на другой банк']];
+/* пул маршрутов и составные части счёта — данные стенда, всё вымышленное */
+var ACC_PFX=['30114','30110','30109','47422','30111'],
+    CCYN={USD:'840',EUR:'978',CNY:'156',AMD:'051',RUB:'810'},
+    RT=[['NOSTRO','BCLHLV22XXX'],['NOSTRO','HSTBDEHHXXX'],['LORO','MRDNGB2LXXX'],['INTERNAL','VKRBRU8KXXX'],['NOSTRO','NRDIRUMMXXX']];
 var ROWS=[];
 var N_ROWS=87;
 for(var i=0;i<N_ROWS;i++){
@@ -241,6 +248,10 @@ for(var i=0;i<N_ROWS;i++){
   base.f['70']={lines:PURP[i%6].match(/.{1,35}(?=\s|$)|.{1,35}/g)};
   base.inS=b1[1];base.inR=b2[1];base.outS=b2[1];base.outR=b1[1];
   var PROV=['ЕРС','LORO','NOSTRO','SUBOUL','VTO'];base.provS=DIRS[k][0]==='IN'?PROV[i%2?3:0]:PROV[4];base.provR=DIRS[k][0]==='IN'?PROV[4]:PROV[1+(i%3===0?1:0)];
+  /* счёт маршрута: балансовый счёт + код валюты документа + филиал + номер */
+  var rt=RT[i%5];
+  base.route={type:rt[0],recv:rt[1],desc:base.route.desc,text:base.route.text,
+    acc:ACC_PFX[i%5]+(CCYN[base.ccy]||'810')+String((i*3)%10)+String(1000+(i*37+261)%9000)+String(1000000+(i*7919+430157)%9000000)};
   base.tabsOff=i%2?['Нотификации','Стриминг','MPU']:['MPU'];
   ROWS.push(base);
 }
@@ -280,7 +291,7 @@ function rowHtml(d,i,ord){
    '<td rowspan="2">'+acct(d.route.acc)+'<span class="l2">'+cv(d.route.type)+' → '+cv(d.route.recv)+'</span></td>'+
    '<td class="sr" rowspan="2">'+srPair(d.inS,d.inR)+'</td>'+
    '<td class="sr" rowspan="2">'+srPair(d.outS,d.outR)+'</td>'+
-   '<td class="sr" rowspan="2">'+srPair(d.provS,d.provR)+'</td></tr>'+
+   '<td class="sr prov" rowspan="2">'+cv(d.provS,'tag snd')+cv(d.provR,'tag rcv')+'</td></tr>'+
    '<tr class="purow"><td colspan="2" class="reason'+(d.reason?'':' empty')+'">'+(d.reason?'<div class="inner"><span class="sd sc-'+SM[d.status].cls+'"></span>'+cv(d.reason)+'</div>':'')+'</td>'+
    '<td colspan="5" class="purp"><div class="inner"><span class="fno" data-tip="70 · Детали платежа">70</span>'+cv(purp)+'</div></td></tr></tbody>';
 }

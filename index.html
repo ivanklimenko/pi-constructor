@@ -815,13 +815,16 @@ function heroHtml(d,p,di){
     '21':function(){return '<div><span class="lbl" data-tip="21 · '+esc(FIELDS['21'].name)+'">21</span><span class="hv mono v" style="font-size:12.5px">'+esc((d.f['21'].lines[0])||'—')+'</span></div>'},
     '71A':function(){return '<div><span class="lbl" data-tip="71A · '+esc(FIELDS['71A'].name)+'">71A</span><span class="hv">'+esc(d.f['71A'].lines[0])+'</span></div>'},
     'vd':function(){
-      var u=ui[di],right=same?'<span class="same" title="Вх, Исх, по Дт и по Кт совпадают">✓</span>'
-            :'<span class="diff" title="'+names.map(function(n,k){return n+': '+vd[k]}).join('\n')+'">'+diffs.join(', ')+'</span>';
+      /* В hero только управляющая дата. Три информационные не показываем:
+         они уводят внимание и при расхождении наезжают на сумму.
+         Их значения остаются в подсказке. */
+      var u=ui[di],allTip=names.map(function(n,k){return n+': '+vd[k]}).join('\n'),
+          right=same?'<span class="same" title="Вх, Исх, по Дт и по Кт совпадают">✓</span>':'';
       if(u&&u.vdEdit)
         return '<div class="vd"><span class="lbl">Валютирование</span>'+
           '<input type="date" class="vdinp" data-vd-input aria-label="Дата валютирования" value="'+ruToIso(u.vdDraft||vd[0])+'" min="'+ruToIso(d.created.slice(0,10))+'">'+
           '<button type="button" class="vdx" data-vd-cancel>Отмена</button></div>';
-      return '<div class="vd'+(d.vdEdit?' edited':'')+'"'+(d.vdEdit?' title="Было '+d.vdEdit.was+' · '+esc(d.vdEdit.who)+', '+d.vdEdit.when+'"':'')+'>'+
+      return '<div class="vd'+(d.vdEdit?' edited':'')+'" title="'+esc(allTip+(d.vdEdit?'\nБыло '+d.vdEdit.was+' · '+d.vdEdit.who+', '+d.vdEdit.when:''))+'">'+
         '<span class="lbl">Валютирование</span><span class="hv">'+vd[0]+'</span>'+(d.vdEdit?'<span class="mark"></span>':'')+right+
         '<span class="pen" data-vd-edit role="button" tabindex="0" data-tip="Изменить дату валютирования">'+ic('edit')+'</span></div>';
     },
