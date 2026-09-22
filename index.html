@@ -196,6 +196,18 @@ a.lnk:hover{text-decoration:underline}
 .xrow{display:flex;flex-wrap:wrap;gap:3px 16px;padding:4px 8px;border:1px solid var(--line);border-radius:4px;white-space:nowrap}
 .xrow .fno{margin-right:3px}
 .xrow .nl{color:var(--faint)}
+.tabs{position:relative;overflow:hidden;flex-wrap:nowrap}
+.tabs span{flex:none}
+.tabs .tdiv{width:1px;background:var(--line);margin:7px 6px;padding:0}
+.tabs .off{color:var(--faint);cursor:default}
+.tabs .off:hover{color:var(--faint)}
+.tabs .more{margin-left:auto;cursor:pointer;color:var(--muted);font-weight:600;letter-spacing:.1em}
+.tabs .more:hover{color:var(--ink)}
+.tabmenu{position:absolute;right:14px;top:100%;margin-top:-1px;background:var(--paper);border:1px solid var(--line);border-radius:5px;box-shadow:var(--shadow);z-index:40;min-width:180px;padding:4px 0}
+.tabmenu span{display:block;padding:5px 12px;font-size:12.5px;color:var(--ink2);cursor:pointer}
+.tabmenu span:hover{background:var(--hover)}
+.tabmenu span.off{color:var(--faint);cursor:default}
+.tabmenu span.off:hover{background:none}
 .tabs span[data-tab]{cursor:pointer}
 .tabs span[data-tab]:hover{color:var(--ink)}
 .xg{border:1px solid var(--line);border-radius:5px}
@@ -369,7 +381,12 @@ var PROFILES={
     grid:[], text:['79']}
 };
 
-/* 3. Вкладка «Доп. поля»: группы строк. cols — что показывать слева: 'tag' (номер, название в подсказке) или 'name'. tag — номер поля, items — пары «подпись → ключ данных».
+/* 3. Вкладки: фиксированный порядок. Активные (есть данные/доступ) идут первой группой в этом порядке,
+      неактивные — второй группой, тем же порядком. Если не помещаются — хвост второй группы уходит в «•••». */
+var TABS=['Общие данные','Доп. поля','Статусы','Связанные документы','Задачи','Нотификации','Исходный текст','Стримминг','MPU','Аудит'];
+var TAB_KEY={'Общие данные':'main','Доп. поля':'extra'};
+
+/* 4. Вкладка «Доп. поля»: группы строк. cols — что показывать слева: 'tag' (номер, название в подсказке) или 'name'. tag — номер поля, items — пары «подпись → ключ данных».
       Ключи: f.<tag>[.n] — n-я часть строки поля, d.<prop> — свойство документа, vd.<i> — i-я дата валютирования. */
 var XTAB=[
   {title:'SWIFT-поля',cols:'tag',rows:[
@@ -415,7 +432,7 @@ var TX6=[
  {dir:'CREDIT',st:'EXECUTED',acc:'70601840100000000519',reg:'00020_CommissionIncome',time:'2026-09-22 07:35:01.121Z',amount:'35.00',ccy:'USD'},
  {dir:'DEBIT',st:'PENDING',acc:'47422840500000000311',reg:'00030_FxConversion',time:'—',amount:'1 148 300.00',ccy:'EUR'}];
 var DOCS=[
- {status:'DONE',st:'ok',dirTxt:'входящий от ЕРС на клиента',uuid:'19ea6301-209c-4185-9a9f-6619d79f8a97',uetr:'eb6305c9-1f8c-41e3-a3b2-6d7e9f2a4c10',created:'22.09.2026 07:31:45',
+ {status:'DONE',st:'ok',dirTxt:'входящий от ЕРС на клиента',tabsOff:['Задачи','Стримминг','MPU'],uuid:'19ea6301-209c-4185-9a9f-6619d79f8a97',uetr:'eb6305c9-1f8c-41e3-a3b2-6d7e9f2a4c10',created:'22.09.2026 07:31:45',
   num:'417',numDate:'22.09.26',amount:'1 250 000.00',ccy:'USD',vd:['22.09.2026','22.09.2026','22.09.2026','22.09.2026'],
   inS:'NRDIRUMMXXX',inR:'VKRBRU8KXXX',outS:'VKRBRU8KXXX',outR:'BCLHLV22XXX',r20out:'VK2609220000417',
   dt:'30110 840 7 0000 0001842',kt:'40817 840 1 0005 0017762',
@@ -429,7 +446,7 @@ var DOCS=[
      '79':{lines:['RE YOUR MT103 FX2609220000417 DD 22.09.2026','AMOUNT USD 1250000,00','PLS BE ADVISED THAT BENEFICIARY ACCOUNT','40817840100050017762 IS CLOSED.','KINDLY AUTHORIZE US TO RETURN THE FUNDS','LESS OUR CHARGES USD 35,00','OR PROVIDE AMENDED BENEFICIARY DETAILS.','BEST REGARDS','PAYMENTS DEPT, VOSTOCHNY KREDIT BANK']},
      'B.50':cl(P50),'B.59':cl(P59),'B.52':cl(B52),'B.57':cl(B57),'B.56':cl(B56),'B.70':{lines:T70},'B.72':{lines:['/INS/ NRDIRUMMXXX','/BNF/ COVER FOR FX2609220000417']},'B.33B':{lines:['EUR 1148300,00']}}
  },
- {status:'NEW',st:'wait',dirTxt:'исходящий возврат',uuid:'7c02b9e4-51aa-4f0e-8d13-2b7f0c9e41d5',uetr:'4a1d7e20-9b3f-4c58-8e61-0f2c5d7a9b33',created:'23.09.2026 09:02:11',
+ {status:'NEW',st:'wait',dirTxt:'исходящий возврат',tabsOff:['Связанные документы','Нотификации','Исходный текст','Стримминг','Аудит'],uuid:'7c02b9e4-51aa-4f0e-8d13-2b7f0c9e41d5',uetr:'4a1d7e20-9b3f-4c58-8e61-0f2c5d7a9b33',created:'23.09.2026 09:02:11',
   num:'18',numDate:'23.09.26',amount:'1 249 965.00',ccy:'USD',vd:['23.09.2026','23.09.2026','23.09.2026','24.09.2026'],
   inS:'—',inR:'—',outS:'VKRBRU8KXXX',outR:'NRDIRUMMXXX',r20out:'RT2609230000018',
   dt:'40817 840 1 0005 0017762',kt:'30110 840 7 0000 0001842',
@@ -549,6 +566,26 @@ function xtabHtml(d){
         return '<span>'+(it[0]?'<span class="lbl"'+(FIELDS[it[0]]?' data-tip="'+it[0]+' · '+esc(FIELDS[it[0]].name)+'"':'')+'>'+esc(it[0])+'</span>':'')+(v?'<span class="'+(isDate&&!vdSame&&v!==d.vd[0]?'v diffd':'v')+(/^[A-Z0-9-]{8,}$/i.test(v)&&!isDate?' mono':'')+'">'+esc(v)+'</span>':'<span class="nl">—</span>')+'</span>'}).join('');
       return '<div class="xr">'+(g.cols==='name'?'<span class="nm" title="'+esc(name)+'">'+esc(name)+'</span>':fnoHtml(r.tag))+'<span class="kv">'+kv+(r.len?'<span class="len">'+r.len+' симв.</span>':'')+'</span></div>'}).join('')+'</div>'}).join('');
 }
+function tabsHtml(d,u){
+  var off=d.tabsOff||[];
+  var act=TABS.filter(function(t){return off.indexOf(t)<0}),ina=TABS.filter(function(t){return off.indexOf(t)>=0});
+  function one(t,isOff){var k=TAB_KEY[t];return '<span class="'+(isOff?'off':'')+(k&&u.tab===k?' on':'')+'"'+(k&&!isOff?' data-tab="'+k+'"':'')+' data-name="'+esc(t)+'"'+(isOff?' data-tip="Нет данных"':'')+'>'+esc(t)+'</span>'}
+  return '<div class="tabs">'+act.map(function(t){return one(t,false)}).join('')+(ina.length?'<span class="tdiv"></span>'+ina.map(function(t){return one(t,true)}).join(''):'')+'</div>';
+}
+/* если вкладки не помещаются — убираем хвост (сначала неактивные) в меню «•••» */
+function fitTabs(el){
+  var bar=el.querySelector('.tabs');if(!bar)return;
+  var items=[].slice.call(bar.querySelectorAll('span[data-name]')),hidden=[];
+  var more=document.createElement('span');more.className='more';more.textContent='•••';bar.appendChild(more);
+  var guard=0;
+  while(bar.scrollWidth>bar.clientWidth&&items.length>1&&guard++<20){
+    var v=items.pop();hidden.unshift(v);v.remove();
+  }
+  var div=bar.querySelector('.tdiv');if(div&&!bar.querySelector('.off'))div.remove();
+  if(!hidden.length){more.remove();return}
+  more.textContent='••• '+hidden.length;
+  more.dataset.menu=JSON.stringify(hidden.map(function(v){return {n:v.dataset.name,off:v.classList.contains('off'),k:v.dataset.tab||''}}));
+}
 function render(di){
   var d=DOCS[di],u=ui[di],p=PROFILES[TYPE],el=document.querySelector('.dw[data-d="'+di+'"]');if(!el)return;
   var B={
@@ -576,13 +613,13 @@ function render(di){
   '<div class="lane"><span class="tag mt">'+TYPE+'</span><span class="st '+d.st+'">'+d.status+'</span><span class="kind">'+p.title+' · '+d.dirTxt+'</span>'+
     '<div class="acts">'+ACTIONS.map(function(a,k){
       return (a.danger?'<span class="sep"></span>':'')+'<button class="ib'+(a.danger?' danger':'')+'" aria-label="'+a.t+'">'+ic(a.id)+'<span class="slot">'+(k+1)+'</span><span class="tip">'+a.t+(a.k?' · '+a.k:'')+'</span></button>'}).join('')+'</div></div>'+
-  '<div class="tabs"><span data-tab="main" class="'+(u.tab==='main'?'on':'')+'">Общие данные</span><span data-tab="extra" class="'+(u.tab==='extra'?'on':'')+'">Доп. поля</span><span>SWIFT</span><span>Связанные документы</span><span>MPU</span><span>Notif-n</span><span>Comission</span></div>'+
+  tabsHtml(d,u)+
   (u.tab==='extra'?'<div class="db">'+xtabHtml(d)+'</div>':'<div class="db">'+heroHtml(d,p)+p.blocks.map(function(b){return B[b]()}).join('')+
    '<div class="fh"><h5>Поля '+TYPE+'</h5>'+(p.grid.length?'<span class="lbl">отправитель слева · получатель справа</span>':'')+(hasGrid?'<a class="lnk" data-all>'+(u.all?'Свернуть поля':'Развернуть поля')+'</a>':'')+'</div>'+
    '<div class="fg'+(u.all?' allopen':'')+'">'+gridHtml(di,p.grid)+textHtml(di,p.text)+'</div>'+extraHtml(di,p.extra)+
    (p.seqB?'<div class="fh seqb"><h5>'+p.seqB.title+'</h5></div><div class="fg'+(u.all?' allopen':'')+'">'+gridHtml(di,p.seqB.grid)+textHtml(di,p.seqB.text)+'</div>'+extraHtml(di,p.seqB.extra):'')+
   '</div>');
-  el.innerHTML=h;meter();
+  el.innerHTML=h;fitTabs(el);meter();
 }
 function renderAll(){[].forEach.call(document.querySelectorAll('.dw'),function(el){render(+el.dataset.d)});renderConfig();}
 
@@ -595,6 +632,11 @@ pair.addEventListener('click',function(e){
   var dw=e.target.closest('.dw');if(!dw)return;var di=+dw.dataset.d,d=DOCS[di],u=ui[di];
   var cp=e.target.closest('.cp');
   if(cp){try{navigator.clipboard.writeText(cp.dataset.copy).then(function(){cp.textContent='✓';setTimeout(function(){cp.textContent='⧉'},1200)},function(){})}catch(_){};return}
+  var mr=e.target.closest('.more');
+  if(mr){var old=dw.querySelector('.tabmenu');if(old){old.remove();return}
+    var list=JSON.parse(mr.dataset.menu),m=document.createElement('div');m.className='tabmenu';
+    m.innerHTML=list.map(function(x){return '<span class="'+(x.off?'off':'')+'"'+(x.k?' data-tab="'+x.k+'"':'')+'>'+esc(x.n)+(x.off?' <span class="lbl">— нет данных</span>':'')+'</span>'}).join('');
+    mr.parentNode.appendChild(m);return}
   var tb=e.target.closest('[data-tab]');if(tb){u.tab=tb.dataset.tab;render(di);return}
   var tg=e.target.closest('[data-tg]');if(tg){u.shut[tg.dataset.tg]=!u.shut[tg.dataset.tg];render(di);return}
   if(e.target.closest('[data-all]')){u.all=!u.all;render(di);return}
@@ -621,6 +663,7 @@ pair.addEventListener('click',function(e){
   var c=e.target.closest('[data-no]');
   if(c){var no=c.dataset.no;u.open.has(no)?u.open.delete(no):u.open.add(no);render(di);var n=dw.querySelector('[data-no="'+no+'"]');if(n)n.focus();}
 });
+document.addEventListener('click',function(e){if(!e.target.closest('.more,.tabmenu'))[].forEach.call(document.querySelectorAll('.tabmenu'),function(m){m.remove()})});
 pair.addEventListener('keydown',function(e){var c=e.target.closest&&e.target.closest('[data-no][tabindex]');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();c.click();}});
 pair.addEventListener('input',function(e){if(!e.target.matches('[data-ln]'))return;var fe=e.target.closest('.fe'),n=0;fe.querySelectorAll('[data-ln]').forEach(function(x){n+=x.value.length});fe.querySelector('[data-cnt]').textContent=n+'/140';});
 
