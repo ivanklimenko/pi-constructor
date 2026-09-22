@@ -906,16 +906,17 @@ function accRowHtml(d,u,side){
     '<span class="mono v cut"'+(ed?' data-tip="Было '+accFmt(ed.was)+' · '+esc(ed.who)+', '+ed.when+'"':'')+'>'+val+'</span>'+
     (ed?'<span class="mk2"></span><span class="rv" data-accrevert="'+side+'" data-tip="Вернуть исходное">↺</span>':'')+
     '<span class="pen" data-accedit="'+side+'" data-tip="Изменить счёт '+lbl+'" role="button" tabindex="0">'+ic('edit')+'</span></span></span>';
-  if(e){var q=u.accEdit.q,raw=accRaw(q),bad=raw.length&&!/^\d{20}$/.test(raw),src=accSource(d,side);
-    h+='<div class="acced" data-accbox="'+side+'"><div class="inwrap"><input id="acc-'+side+'" class="'+(bad&&raw.length===20?'bad':'')+'" value="'+esc(q)+'" placeholder="20 цифр" autocomplete="off" aria-label="Счёт '+lbl+'">'+
+  if(e){var q=u.accEdit.q,raw=accRaw(q),bad=!!u.accEdit.err,src=accSource(d,side);
+    h+='<div class="acced" data-accbox="'+side+'"><div class="inwrap"><input id="acc-'+side+'" class="'+(bad?'bad':'')+'" value="'+esc(q)+'" placeholder="20 цифр" autocomplete="off" aria-label="Счёт '+lbl+'">'+
       sugHtml(d,side,q,u.accEdit.sel)+'</div>'+
-      '<div class="hint"><span'+(bad?' class="bad"':'')+'>'+(bad?'Счёт — 20 цифр, введено '+raw.length:(side==='kt'?'Карточка клиента · '+d.ccy+' · '+src.length+' сч.':'Счета банка · '+d.ccy+' · '+src.length+' сч.'))+'</span><span>↑↓ Enter · Esc</span></div></div>';
+      '<div class="hint"><span'+(bad?' class="bad"':'')+'>'+(bad?u.accEdit.err:(side==='kt'?'Только из карточки клиента · '+d.ccy+' · '+src.length+' сч.':'Только из счетов банка · '+d.ccy+' · '+src.length+' сч.'))+'</span><span>↑↓ Enter · Esc</span></div></div>';
   }
   return h;
 }
 function accCommit(di,side,raw){
   var d=DOCS[di],u=ui[di];raw=accRaw(raw);
-  if(!/^\d{20}$/.test(raw)){u.accEdit.q=raw;render(di);var i=document.getElementById('acc-'+side);if(i){i.focus();i.classList.add('bad')}return}
+  var inList=accSource(d,side).some(function(a){return a.acc===raw});
+  if(!inList){u.accEdit.q=raw;u.accEdit.err=side==='kt'?'Счёт не из карточки клиента — выберите из списка':'Счёт не из списка счетов банка — выберите из списка';render(di);var i=document.getElementById('acc-'+side);if(i){i.focus();i.classList.add('bad')}return}
   var was=d[side+'Edit']?d[side+'Edit'].was:d[side];
   if(accRaw(was)===raw)delete d[side+'Edit'];else d[side+'Edit']={was:was,who:'Вы',when:new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).replace(',','')};
   d[side]=accFmt(raw);u.accEdit=null;render(di);
@@ -1022,8 +1023,8 @@ function validate(fe){
 pair.addEventListener('input',function(e){var fe=e.target.closest('.fe');if(fe)validate(fe);
   var box=e.target.closest('.acced');if(box){var dw=box.closest('.dw'),di=+dw.dataset.d,u=ui[di],d=DOCS[di];u.accEdit.q=e.target.value.replace(/[^\d\s]/g,'');u.accEdit.sel=-1;
     var old=box.querySelector('.sug');if(old)old.remove();box.querySelector('input').insertAdjacentHTML('afterend',sugHtml(d,u.accEdit.side,u.accEdit.q,-1));
-    var raw=accRaw(u.accEdit.q),bad=raw.length&&!/^\d{20}$/.test(raw),hint=box.querySelector('.hint span');e.target.classList.toggle('bad',!!bad&&raw.length>=20);
-    if(hint){hint.textContent=bad?'Счёт — 20 цифр, введено '+raw.length:(u.accEdit.side==='kt'?'Карточка клиента · '+d.ccy+' · '+accSource(d,'kt').length+' сч.':'Счета банка · '+d.ccy+' · '+accSource(d,'dt').length+' сч.');hint.className=bad?'bad':''}}
+    u.accEdit.err=null;var hint=box.querySelector('.hint span');e.target.classList.remove('bad');
+    if(hint){hint.textContent=u.accEdit.side==='kt'?'Только из карточки клиента · '+d.ccy+' · '+accSource(d,'kt').length+' сч.':'Только из счетов банка · '+d.ccy+' · '+accSource(d,'dt').length+' сч.';hint.className=''}}
 });
 pair.addEventListener('keydown',function(e){var box=e.target.closest&&e.target.closest('.acced');if(!box)return;var dw=box.closest('.dw'),di=+dw.dataset.d,u=ui[di],d=DOCS[di];
   var items=box.querySelectorAll('.si[data-acc]');
