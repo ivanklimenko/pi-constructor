@@ -203,8 +203,9 @@ a.lnk:hover{text-decoration:underline}
 .tabs .off:hover{color:var(--faint)}
 .tabs .more{margin-left:auto;cursor:pointer;color:var(--muted);font-weight:600;letter-spacing:.1em}
 .tabs .more:hover{color:var(--ink)}
-.tabmenu{position:absolute;right:14px;top:100%;margin-top:-1px;background:var(--paper);border:1px solid var(--line);border-radius:5px;box-shadow:var(--shadow);z-index:40;min-width:180px;padding:4px 0}
-.tabmenu span{display:block;padding:5px 12px;font-size:12.5px;color:var(--ink2);cursor:pointer}
+.tabmenu{position:absolute;right:14px;background:var(--paper);border:1px solid var(--line);border-radius:5px;box-shadow:var(--shadow);z-index:40;min-width:180px;padding:4px 0}
+.tabmenu span{display:block;padding:5px 12px;font-size:12.5px;color:var(--ink2);cursor:pointer;white-space:nowrap}
+.tabmenu span .lbl{display:inline;padding:0;margin-left:4px}
 .tabmenu span:hover{background:var(--hover)}
 .tabmenu span.off{color:var(--faint);cursor:default}
 .tabmenu span.off:hover{background:none}
@@ -636,7 +637,7 @@ pair.addEventListener('click',function(e){
   if(mr){var old=dw.querySelector('.tabmenu');if(old){old.remove();return}
     var list=JSON.parse(mr.dataset.menu),m=document.createElement('div');m.className='tabmenu';
     m.innerHTML=list.map(function(x){return '<span class="'+(x.off?'off':'')+'"'+(x.k?' data-tab="'+x.k+'"':'')+'>'+esc(x.n)+(x.off?' <span class="lbl">— нет данных</span>':'')+'</span>'}).join('');
-    mr.parentNode.appendChild(m);return}
+    var bar=mr.parentNode;m.style.top=(bar.offsetTop+bar.offsetHeight-1)+'px';dw.appendChild(m);return}
   var tb=e.target.closest('[data-tab]');if(tb){u.tab=tb.dataset.tab;render(di);return}
   var tg=e.target.closest('[data-tg]');if(tg){u.shut[tg.dataset.tg]=!u.shut[tg.dataset.tg];render(di);return}
   if(e.target.closest('[data-all]')){u.all=!u.all;render(di);return}
