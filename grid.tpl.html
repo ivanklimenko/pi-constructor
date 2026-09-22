@@ -43,6 +43,9 @@ body{margin:0;overflow:hidden}
 .grid .lks{display:flex;gap:3px;margin-top:2px}
 .grid tr.purow td.reason{padding:2px 8px 6px;border-bottom:1px solid var(--line2);background:var(--sunk);font:11px var(--sans);color:var(--ink2);white-space:nowrap;overflow:hidden}
 .grid tbody.row:hover tr.purow td.reason{background:var(--chip)}
+.grid tr.purow td.reason.empty,.grid tbody.row:hover tr.purow td.reason.empty{background:transparent}
+.grid td.icons{white-space:nowrap}
+.grid td.icons .stdot{margin-left:4px}
 .grid tr.purow td.reason .sd{display:inline-block;width:7px;height:7px;border-radius:50%;margin:0 6px 1px 2px;vertical-align:middle}
 .grid tr.purow td.reason .cv{max-width:100%}
 .filters{display:flex;align-items:center;gap:8px;padding:8px 20px;border-bottom:1px solid var(--line);background:var(--sunk);font-size:12.5px}
@@ -128,8 +131,6 @@ body.resizing{cursor:col-resize;user-select:none}
 .grid .dir svg{width:13px;height:13px;color:var(--muted)}
 .grid .sr .tag{display:block;width:max-content;margin-bottom:3px}
 .grid .tag.snd{color:var(--warn);border-color:var(--warn)} .grid .tag.rcv{color:var(--ok);border-color:var(--ok)}
-.grid .cmp{opacity:.35}
-.grid tbody.row:hover .cmp{opacity:1}
 .grid .nl{color:var(--faint)}
 .appf{display:flex;align-items:center;gap:14px;padding:7px 20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);background:var(--sunk)}
 .appf .pg{display:inline-flex;gap:2px}
@@ -151,7 +152,7 @@ body.resizing{cursor:col-resize;user-select:none}
 {{SVG}}
 <div class="app">
   <div class="apph"><h1>Валютные документы</h1><span class="cnt" id="cnt"></span>
-    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, <b>⧉</b> — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · фильтры — из vtb-filters</span><a href="index.html">конструктор деталки →</a><span id="zoomctl" style="display:inline-flex;align-items:center;margin-left:10px"></span></div></div>
+    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, двойной клик по ней — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · фильтры — из vtb-filters</span><a href="index.html">конструктор деталки →</a><span id="zoomctl" style="display:inline-flex;align-items:center;margin-left:10px"></span></div></div>
   <div class="slane" id="slane"></div>
   <div class="filters">
     <button class="fbtn" id="ftoggle" aria-expanded="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4.2 5.4A1 1 0 015.1 4h13.8a1 1 0 01.8 1.6L14 12.2V18a1 1 0 01-1.5.86l-3-1.8A1 1 0 019 16.2v-4L4.3 5.6a1 1 0 01-.1-.2z"/></svg>Фильтры<span class="badge" id="fcount" hidden>0</span></button>
@@ -182,7 +183,8 @@ var SM={};STATUS_META.forEach(function(x){SM[x[0]]={label:x[1],cls:x[2]}});
 function drawerSt(code){return code==='DONE'||code==='EXPORTED'?'ok':(code==='ERROR'||code==='INVALID'||code==='REJECTED')?'bad':'wait'}
 var STS=['DONE','IN_PROGRESS','DONE','ERROR','DONE','TO_EXPORT','PROCESSING','DEFERRED','EXPORTED','REJECTED','DONE','IN_PROGRESS'];
 var REASONS=['Отправлен запрос в СУБО Контроль(2700)','Документ отправлен в ЕРС','Документ на контроле ДККФМ','Ожидание решения сотрудника','Документ с будущей датой исполнения','Ожидание обработки основного документа от Лоро','В очереди ожидания средств','Возврат на закрытый счёт. Поиск исходящего документа','Ожидание ответа от ВКО'];
-var REASON_BY_ST={IN_PROGRESS:[3,8],TO_EXPORT:[1],PROCESSING:[0,2],DEFERRED:[4,5,6],ERROR:[7],INVALID:[7]};
+/* причина статуса бывает только у Отложенный / Ошибка / Отказ */
+var REASON_BY_ST={DEFERRED:[4,5,6,3,8,0,2,1],ERROR:[7],REJECTED:[7,3]};
 var DIRS=[['IN','входящий от ЕРС на клиента'],['OUT','исходящий возврат'],['OUT','исходящий межбанковский'],['IN','входящий от ЕРС на клиента'],['OUT','исходящий, свободный формат'],['OUT','исходящий с покрытием'],['IN','входящий от корреспондента'],['OUT','исходящий клиентский'],['IN','входящий межбанковский'],['OUT','исходящий клиентский'],['IN','входящий, свободный формат'],['IN','входящий от ЕРС на клиента']];
 var ROWS=[];
 var N_ROWS=87;
@@ -219,9 +221,9 @@ function cv(v,cls,mw){v=String(v==null?'':v);return '<span class="cv'+(cls?' '+c
 function rowHtml(d,i){
   var vd=d.vd,same=vd.every(function(x){return x===vd[0]}),purp=(d.f['70']||{lines:[]}).lines.join(' ');
   return '<tbody class="row" data-i="'+i+'"><tr><td rowspan="2"><input type="checkbox" aria-label="Выбрать"><span class="num">'+(i+1)+'</span></td>'+
-   '<td><span class="ico open" data-open="'+i+'" data-tip="Открыть деталку">'+ic('esid')+'</span><span class="stdot sc-'+SM[d.status].cls+'" data-tip="'+SM[d.status].label+' · '+d.status+'">'+(d.st==='ok'?'✓':d.st==='bad'?'✕':'·')+'</span><br><span class="ico cmp" data-cmp="'+i+'" data-tip="Открыть рядом для сравнения" style="margin-top:4px">⧉</span></td>'+
+   '<td class="icons"><span class="ico open" data-open="'+i+'" data-tip="Открыть деталку · двойной клик — рядом для сравнения">'+ic('esid')+'</span><span class="stdot sc-'+SM[d.status].cls+'" data-tip="'+SM[d.status].label+' · '+d.status+'">'+(d.st==='ok'?'✓':d.st==='bad'?'✕':'·')+'</span></td>'+
    '<td class="id"><b>'+cv(d.num)+'</b><span class="lks">'+lk('uuid',d.uuid)+lk('refIn',d.f['20'].lines[0])+lk('refOut',d.r20out)+'</span></td>'+
-   '<td>'+cv(d.created.slice(0,10))+' <span class="lbl">'+cv(d.created.slice(11,16))+'</span><span class="l2">Дт '+cv(vd[2])+'<br>Кт '+(same?cv(vd[3]):'<span style="color:var(--warn)">'+cv(vd[3])+'</span>')+'</span></td>'+
+   '<td rowspan="2">'+cv(d.created.slice(0,10))+' <span class="lbl">'+cv(d.created.slice(11,16))+'</span><span class="l2">Дт '+cv(vd[2])+'<br>Кт '+(same?cv(vd[3]):'<span style="color:var(--warn)">'+cv(vd[3])+'</span>')+'</span></td>'+
    '<td rowspan="2">'+cv(d.type,'tag mt')+'</td>'+
    '<td rowspan="2"><span class="dir">'+ic(d.dir==='IN'?'down':'kt')+cv(d.dir)+'</span><span class="l2">'+cv(d.dirTxt,'',105)+'</span></td>'+
    '<td rowspan="2"><span class="amt">'+cv(d.amount)+'</span><span class="l2">'+cv(d.ccy)+'</span></td>'+
@@ -231,7 +233,7 @@ function rowHtml(d,i){
    '<td class="sr" rowspan="2">'+cv(d.inS,'tag snd')+cv(d.inR,'tag rcv')+'</td>'+
    '<td class="sr" rowspan="2">'+cv(d.outS,'tag snd')+cv(d.outR,'tag rcv')+'</td>'+
    '<td class="sr" rowspan="2">'+cv(d.provS,'tag snd')+cv(d.provR,'tag rcv')+'</td></tr>'+
-   '<tr class="purow"><td colspan="3" class="reason">'+(d.reason?'<span class="sd sc-'+SM[d.status].cls+'"></span>'+cv(d.reason,'',9999):'')+'</td>'+
+   '<tr class="purow"><td colspan="2" class="reason'+(d.reason?'':' empty')+'">'+(d.reason?'<span class="sd sc-'+SM[d.status].cls+'"></span>'+cv(d.reason,'',9999):'')+'</td>'+
    '<td colspan="5" class="purp"><span class="fno" data-tip="70 · Детали платежа">70</span>'+cv(purp,'',9999)+'</td></tr></tbody>';
 }
 var grid=document.getElementById('grid');
@@ -361,12 +363,15 @@ function openDoc(i,slot){
 }
 function closeSlot(slot){if(!slots[slot])return;slots[slot].el.remove();slots[slot]=null;mark()}
 function mark(){if(!slots)return;[].forEach.call(grid.querySelectorAll('tbody.row'),function(tr){var i=+tr.dataset.i;tr.classList.toggle('selA',!!slots.A&&slots.A.row===i);tr.classList.toggle('selB',!!slots.B&&slots.B.row===i)})}
+var openT=null;
+grid.addEventListener('dblclick',function(e){var op=e.target.closest('[data-open]');if(!op)return;clearTimeout(openT);openDoc(+op.dataset.open,'B')});
 var toast=document.createElement('div');toast.className='toast';document.body.appendChild(toast);var toastT;
 function say(t){toast.textContent=t;toast.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){toast.classList.remove('on')},1400)}
 grid.addEventListener('click',function(e){
   if(e.target.closest('input[type=checkbox]'))return;
-  var op=e.target.closest('[data-open]');if(op){openDoc(+op.dataset.open,e.shiftKey?'B':'A');return}
-  var cm=e.target.closest('[data-cmp]');if(cm){openDoc(+cm.dataset.cmp,'B');return}
+  var op=e.target.closest('[data-open]');if(op){var oi=+op.dataset.open;if(e.shiftKey){openDoc(oi,'B');return}
+    /* одиночный клик — drawer A, двойной — B рядом; ждём 220 мс, чтобы отличить */
+    clearTimeout(openT);openT=setTimeout(function(){openDoc(oi,'A')},220);return}
   var v=e.target.closest('.cv,.lk:not(.off)');if(v){var val=v.dataset.v;try{navigator.clipboard.writeText(val).then(function(){},function(){})}catch(_){}
     v.classList.add('flash');setTimeout(function(){v.classList.remove('flash')},600);say('Скопировано: '+val);}
 });
