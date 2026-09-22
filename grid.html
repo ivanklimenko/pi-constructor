@@ -560,6 +560,9 @@ body.resizing{cursor:col-resize;user-select:none}
 .grid .srl{display:block;white-space:nowrap;line-height:17px}
 .grid .srl .k{display:inline-block;width:14px;font:11px var(--sans);color:var(--faint)}
 .grid .srl .cv{font:12.5px var(--mono);color:var(--ink);max-width:none}
+/* счёт в маршруте: первые 8 знаков (6–8 — код валюты) … последние 3 */
+.grid .acct b{font-weight:600;color:var(--ink)}
+.grid .acct .e{color:var(--faint);padding:0 1px}
 .grid .nl{color:var(--faint)}
 .appf{display:flex;align-items:center;gap:14px;padding:7px 20px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);background:var(--sunk)}
 .appf .pg{display:inline-flex;gap:2px}
@@ -1360,6 +1363,14 @@ function lk(name,v){return v?'<span class="lk" data-v="'+esc(v)+'" data-tip="'+e
 function cv(v,cls,mw){v=String(v==null?'':v);return '<span class="cv'+(cls?' '+cls:'')+'"'+(mw?' style="max-width:'+mw+'px"':'')+' data-v="'+esc(v)+'">'+esc(v)+'</span>'}
 function dirIco(g){return g==='IN'?ic('down'):g==='OUT'?ic('kt'):g==='TRANSIT'?'<span class="dg">⇄</span>':'<span class="dg">◦</span>'}
 /* отправитель/получатель: «S:» и «R:» — служебная подпись роли, не данные */
+/* Счёт показываем сокращённо, копируется и всплывает полный.
+   Знаки 6–8 — код валюты, поэтому выделены. */
+function acct(v){
+  v=String(v==null?'':v);
+  if(v.length<12)return cv(v,'mono',110);
+  return '<span class="cv mono acct" data-short data-v="'+esc(v)+'">'+
+         esc(v.slice(0,5))+'<b>'+esc(v.slice(5,8))+'</b><span class="e">…</span>'+esc(v.slice(-3))+'</span>';
+}
 function srPair(s,r){
   return '<span class="srl"><span class="k">S:</span>'+cv(s)+'</span>'+
          '<span class="srl"><span class="k">R:</span>'+cv(r)+'</span>';
@@ -1375,7 +1386,7 @@ function rowHtml(d,i,ord){
    '<td rowspan="2"><span class="amt">'+cv(d.amount)+'</span><span class="l2">'+cv(d.ccy)+'</span></td>'+
    '<td class="f5">'+fld(d.f['50'])+'</td>'+
    '<td class="f5">'+fld(d.f['52'])+'</td><td class="f5">'+fld(d.f['57'])+'</td><td class="f5">'+fld(d.f['58'])+'</td><td class="f5">'+fld(d.f['59'])+'</td>'+
-   '<td rowspan="2">'+cv(d.route.acc,'mono',110)+'<span class="l2">'+cv(d.route.type)+' → '+cv(d.route.recv)+'</span></td>'+
+   '<td rowspan="2">'+acct(d.route.acc)+'<span class="l2">'+cv(d.route.type)+' → '+cv(d.route.recv)+'</span></td>'+
    '<td class="sr" rowspan="2">'+srPair(d.inS,d.inR)+'</td>'+
    '<td class="sr" rowspan="2">'+srPair(d.outS,d.outR)+'</td>'+
    '<td class="sr" rowspan="2">'+srPair(d.provS,d.provR)+'</td></tr>'+
@@ -1621,7 +1632,7 @@ var gtip=document.createElement('div');gtip.id='gtip';document.body.appendChild(
 function showTip(el,text){var z=parseFloat(document.documentElement.style.zoom)||1,r=el.getBoundingClientRect(),L=r.left/z,T=r.top/z,W=r.width/z,B=r.bottom/z;gtip.textContent=text;gtip.classList.add('on');var w=gtip.offsetWidth,x=Math.max(6,Math.min(innerWidth/z-w-6,L+W/2-w/2)),y=T-gtip.offsetHeight-5;if(y<4)y=B+5;gtip.style.left=x+'px';gtip.style.top=y+'px'}
 function hideTip(){gtip.classList.remove('on')}
 grid.addEventListener('mouseover',function(e){
-  var v=e.target.closest('.cv');if(v){if(v.scrollWidth>v.clientWidth+1)showTip(v,v.dataset.v);else hideTip();return}
+  var v=e.target.closest('.cv');if(v){if(v.hasAttribute('data-short')||v.scrollWidth>v.clientWidth+1)showTip(v,v.dataset.v);else hideTip();return}
   var t=e.target.closest('[data-tip]');if(t){showTip(t,t.dataset.tip);return}
   hideTip();
 });
