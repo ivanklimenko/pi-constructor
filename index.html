@@ -193,6 +193,8 @@ a.lnk:hover{text-decoration:underline}
 .cell.null .eye{visibility:hidden}
 .full{display:none;grid-column:3/-1;font:12px/1.45 var(--mono);color:var(--val);white-space:pre-wrap;margin:2px 0 3px;padding-top:3px;border-top:1px dashed var(--line)}
 .cell.open .full{display:block}
+.cell.open{align-content:start}
+.cell.open>*{align-self:center}
 .cell .full{grid-column:3/-1}
 .cell.open .sc{visibility:hidden}
 .cell .ed{display:none;grid-column:3/-1;justify-self:start;font:500 11px var(--sans);color:var(--val);background:none;border:0;padding:0;cursor:pointer;margin-bottom:2px}
@@ -604,6 +606,13 @@ function fitTabs(el){
   more.textContent='••• '+hidden.length;
   more.dataset.menu=JSON.stringify(hidden.map(function(v){return {n:v.dataset.name,off:v.classList.contains('off'),k:v.dataset.tab||''}}));
 }
+/* сосед по строке сетки: раскрываем/сворачиваем парой, иначе соседняя карточка растягивается пустой */
+function rowMates(tag){
+  var p=PROFILES[TYPE],rows=p.grid.concat(p.seqB?p.seqB.grid:[]),out=[tag];
+  rows.forEach(function(r){var tags=r.map(spec).filter(Boolean).map(function(x){return x.tag});if(tags.indexOf(tag)>=0)out=tags});
+  [p.text,p.seqB?p.seqB.text:[]].forEach(function(t){if(t&&t.length>1&&t.indexOf(tag)>=0)out=t});
+  return out;
+}
 function render(di){
   var d=DOCS[di],u=ui[di],p=PROFILES[TYPE],el=document.querySelector('.dw[data-d="'+di+'"]');if(!el)return;
   var B={
@@ -673,13 +682,13 @@ pair.addEventListener('click',function(e){
       var sel=fe.querySelector('[data-opts] [aria-pressed="true"]'),opt=sel?sel.dataset.o:f.opt;
       if((opt||'')===(f.opt||'')&&(acc||'')===(f.acc||'')&&lines.join('\n')===f.lines.join('\n'))delete f.edit;
       else f.edit={opt:opt,acc:acc,lines:lines,who:'Вы',when:new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).replace(',','')};
-      u.editing=null;u.open.add(no);render(di);
+      u.editing=null;rowMates(no).forEach(function(t){if(!isNull(d.f[t]))u.open.add(t)});render(di);
     }
     return;
   }
   if(e.target.closest('.fe'))return;
   var c=e.target.closest('[data-no]');
-  if(c){var no=c.dataset.no;u.open.has(no)?u.open.delete(no):u.open.add(no);render(di);var n=dw.querySelector('[data-no="'+no+'"]');if(n)n.focus();}
+  if(c){var no=c.dataset.no,opening=!u.open.has(no),mates=rowMates(no);mates.forEach(function(t){var f=d.f[t];if(opening){if(!isNull(f))u.open.add(t)}else u.open.delete(t)});render(di);var n=dw.querySelector('[data-no="'+no+'"]');if(n)n.focus();}
 });
 document.addEventListener('click',function(e){if(!e.target.closest('.more,.tabmenu'))[].forEach.call(document.querySelectorAll('.tabmenu'),function(m){m.remove()})});
 pair.addEventListener('keydown',function(e){var c=e.target.closest&&e.target.closest('.pen,[data-no][tabindex]');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();c.click();}});
