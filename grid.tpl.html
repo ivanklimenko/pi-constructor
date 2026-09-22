@@ -41,7 +41,10 @@ body{margin:0;overflow:hidden}
 .grid .lk.off:hover{background:none}
 .grid .lk.flash{background:var(--ok-soft);color:var(--ok)}
 .grid .lks{display:flex;gap:3px;margin-top:2px}
-.grid .reason{font-size:11.5px;color:var(--ink2)}
+.grid tr.purow td.reason{padding:2px 8px 6px;border-bottom:1px solid var(--line2);background:var(--sunk);font:11px var(--sans);color:var(--ink2);white-space:nowrap;overflow:hidden}
+.grid tbody.row:hover tr.purow td.reason{background:var(--chip)}
+.grid tr.purow td.reason .sd{display:inline-block;width:7px;height:7px;border-radius:50%;margin:0 6px 1px 2px;vertical-align:middle}
+.grid tr.purow td.reason .cv{max-width:100%}
 .filters{display:flex;align-items:center;gap:8px;padding:8px 20px;border-bottom:1px solid var(--line);background:var(--sunk);font-size:12.5px}
 .search{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:6px;background:var(--paper);padding:0 8px;height:28px;width:280px;color:var(--muted)}
 .search input{border:0;outline:0;background:none;font:12.5px var(--sans);color:var(--ink);flex:1}
@@ -216,12 +219,11 @@ function cv(v,cls,mw){v=String(v==null?'':v);return '<span class="cv'+(cls?' '+c
 function rowHtml(d,i){
   var vd=d.vd,same=vd.every(function(x){return x===vd[0]}),purp=(d.f['70']||{lines:[]}).lines.join(' ');
   return '<tbody class="row" data-i="'+i+'"><tr><td rowspan="2"><input type="checkbox" aria-label="Выбрать"><span class="num">'+(i+1)+'</span></td>'+
-   '<td rowspan="2"><span class="ico open" data-open="'+i+'" data-tip="Открыть деталку">'+ic('esid')+'</span><span class="stdot sc-'+SM[d.status].cls+'" data-tip="'+SM[d.status].label+' · '+d.status+'">'+(d.st==='ok'?'✓':d.st==='bad'?'✕':'·')+'</span><br><span class="ico cmp" data-cmp="'+i+'" data-tip="Открыть рядом для сравнения" style="margin-top:4px">⧉</span></td>'+
-   '<td class="id" rowspan="2"><b>'+cv(d.num)+'</b><span class="lks">'+lk('uuid',d.uuid)+lk('refIn',d.f['20'].lines[0])+lk('refOut',d.r20out)+'</span></td>'+
-   '<td rowspan="2">'+cv(d.created.slice(0,10))+' <span class="lbl">'+cv(d.created.slice(11,16))+'</span><span class="l2">Дт '+cv(vd[2])+'<br>Кт '+(same?cv(vd[3]):'<span style="color:var(--warn)">'+cv(vd[3])+'</span>')+'</span></td>'+
+   '<td><span class="ico open" data-open="'+i+'" data-tip="Открыть деталку">'+ic('esid')+'</span><span class="stdot sc-'+SM[d.status].cls+'" data-tip="'+SM[d.status].label+' · '+d.status+'">'+(d.st==='ok'?'✓':d.st==='bad'?'✕':'·')+'</span><br><span class="ico cmp" data-cmp="'+i+'" data-tip="Открыть рядом для сравнения" style="margin-top:4px">⧉</span></td>'+
+   '<td class="id"><b>'+cv(d.num)+'</b><span class="lks">'+lk('uuid',d.uuid)+lk('refIn',d.f['20'].lines[0])+lk('refOut',d.r20out)+'</span></td>'+
+   '<td>'+cv(d.created.slice(0,10))+' <span class="lbl">'+cv(d.created.slice(11,16))+'</span><span class="l2">Дт '+cv(vd[2])+'<br>Кт '+(same?cv(vd[3]):'<span style="color:var(--warn)">'+cv(vd[3])+'</span>')+'</span></td>'+
    '<td rowspan="2">'+cv(d.type,'tag mt')+'</td>'+
    '<td rowspan="2"><span class="dir">'+ic(d.dir==='IN'?'down':'kt')+cv(d.dir)+'</span><span class="l2">'+cv(d.dirTxt,'',105)+'</span></td>'+
-   '<td rowspan="2" class="reason">'+(d.reason?cv(d.reason,'',170):'<span class="nl">—</span>')+'</td>'+
    '<td rowspan="2"><span class="amt">'+cv(d.amount)+'</span><span class="l2">'+cv(d.ccy)+'</span></td>'+
    '<td class="f5">'+fld(d.f['50'])+'</td>'+
    '<td class="f5">'+fld(d.f['52'])+'</td><td class="f5">'+fld(d.f['57'])+'</td><td class="f5">'+fld(d.f['58'])+'</td><td class="f5">'+fld(d.f['59'])+'</td>'+
@@ -229,10 +231,11 @@ function rowHtml(d,i){
    '<td class="sr" rowspan="2">'+cv(d.inS,'tag snd')+cv(d.inR,'tag rcv')+'</td>'+
    '<td class="sr" rowspan="2">'+cv(d.outS,'tag snd')+cv(d.outR,'tag rcv')+'</td>'+
    '<td class="sr" rowspan="2">'+cv(d.provS,'tag snd')+cv(d.provR,'tag rcv')+'</td></tr>'+
-   '<tr class="purow"><td colspan="5" class="purp"><span class="fno" data-tip="70 · Детали платежа">70</span>'+cv(purp,'',9999)+'</td></tr></tbody>';
+   '<tr class="purow"><td colspan="3" class="reason">'+(d.reason?'<span class="sd sc-'+SM[d.status].cls+'"></span>'+cv(d.reason,'',9999):'')+'</td>'+
+   '<td colspan="5" class="purp"><span class="fno" data-tip="70 · Детали платежа">70</span>'+cv(purp,'',9999)+'</td></tr></tbody>';
 }
 var grid=document.getElementById('grid');
-var HEAD='<thead><tr><th><input type="checkbox" aria-label="Выбрать все"></th><th></th><th>ID<span class="sub">№ · 20 вх / исх</span></th><th>Дата / Время<span class="sub">валютирование Дт / Кт</span></th><th>Тип</th><th>Направление</th><th>Причина статуса</th><th>32<span class="sub">сумма</span></th><th>50<span class="sub">приказодатель · 70</span></th><th>52</th><th>57</th><th>58</th><th>59</th><th>Маршрут</th><th>S / R in</th><th>S / R out</th><th>Провайдеры</th></tr></thead>';
+var HEAD='<thead><tr><th><input type="checkbox" aria-label="Выбрать все"></th><th></th><th>ID<span class="sub">№ · 20 вх / исх</span></th><th>Дата / Время<span class="sub">валютирование Дт / Кт</span></th><th>Тип</th><th>Направление</th><th>32<span class="sub">сумма</span></th><th>50<span class="sub">приказодатель · 70</span></th><th>52</th><th>57</th><th>58</th><th>59</th><th>Маршрут</th><th>S / R in</th><th>S / R out</th><th>Провайдеры</th></tr></thead>';
 /* ---- изменяемая ширина колонок: после первого рендера фиксируем ширины, дальше тянем за границу в шапке ---- */
 var COLW=null;
 function initResize(){
@@ -253,7 +256,7 @@ var PAGE={size:20,n:1};
 function drawGrid(idx){lastIdx=idx;
   var pages=Math.max(1,Math.ceil(idx.length/PAGE.size));if(PAGE.n>pages)PAGE.n=pages;
   var from=(PAGE.n-1)*PAGE.size,slice=idx.slice(from,from+PAGE.size);
-  grid.innerHTML=HEAD+slice.map(function(i){return rowHtml(ROWS[i],i)}).join('')+(idx.length?'':'<tbody><tr><td colspan="17" style="text-align:center;color:var(--muted);padding:28px">По заданным условиям документов нет</td></tr></tbody>');
+  grid.innerHTML=HEAD+slice.map(function(i){return rowHtml(ROWS[i],i)}).join('')+(idx.length?'':'<tbody><tr><td colspan="16" style="text-align:center;color:var(--muted);padding:28px">По заданным условиям документов нет</td></tr></tbody>');
   document.getElementById('cnt').textContent=idx.length===ROWS.length?ROWS.length+' документов':idx.length+' из '+ROWS.length;
   renderPager(idx.length,pages);
   if(typeof mark==='function')mark();
