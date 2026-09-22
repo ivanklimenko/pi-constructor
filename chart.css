@@ -1,0 +1,76 @@
+/* ============================================================
+   График динамики — компонент дизайн-кита.
+   Единый график: все статусы в одних осях, шкала считается по
+   видимым рядам. Скрыл лишние — оставшиеся растянулись на всю
+   высоту, и конкретный статус читается крупно.
+   ============================================================ */
+
+/* Цвета линий — собственные шаги под каждую тему, а не инверсия светлых.
+   Проверено к поверхности: светлые >= 3:1 к белому, тёмные >= 3:1 к #161B26.
+   Прямой перенос светлых на тёмный давал 2.19 (#2B5384) и 2.04 (#8C2B23). */
+:root{--st-flow:#3A6EA5;--st-flowl:#6B98C6;--st-flowd:#2B5384;--st-bad:#C2372E;--st-badd:#8C2B23;
+      --st-warn:#A8620B;--st-ok:#17844B;--st-okl:#4E9E77;--st-grey:#8A93A6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --st-flow:#7FA9D8;--st-flowl:#A9C4E4;--st-flowd:#5B8CC4;--st-bad:#FF7A70;--st-badd:#E0655C;
+  --st-warn:#F0B44E;--st-ok:#52CC8A;--st-okl:#8ADCB0;--st-grey:#A7B0C2}}
+:root[data-theme="dark"]{
+  --st-flow:#7FA9D8;--st-flowl:#A9C4E4;--st-flowd:#5B8CC4;--st-bad:#FF7A70;--st-badd:#E0655C;
+  --st-warn:#F0B44E;--st-ok:#52CC8A;--st-okl:#8ADCB0;--st-grey:#A7B0C2}
+
+.ch{border-bottom:1px solid var(--line);background:var(--paper)}
+.ch-head{display:flex;align-items:center;gap:10px;padding:8px 20px 0}
+.ch-head h3{margin:0;font:600 12.5px var(--sans);color:var(--ink)}
+.ch-head .sub{font:11px var(--sans);color:var(--muted)}
+.ch-head .sp{margin-left:auto;display:flex;align-items:center;gap:8px}
+.ch-head .at{font:11px var(--sans);color:var(--faint);font-variant-numeric:tabular-nums}
+
+/* переключатель диапазона */
+.ch-range{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--paper);height:24px}
+.ch-range button{font:500 11.5px var(--sans);color:var(--ink2);background:none;border:0;padding:0 9px;cursor:pointer}
+.ch-range button+button{border-left:1px solid var(--line)}
+.ch-range button[aria-pressed="true"]{background:var(--val-soft);color:var(--val)}
+.ch-x{border:0;background:none;color:var(--muted);cursor:pointer;font:16px/1 var(--sans);padding:0 4px}
+.ch-x:hover{color:var(--val)}
+
+/* поле графика */
+.ch-plot{padding:4px 20px 0}
+/* высота подобрана так, чтобы блок графика занимал столько же,
+   сколько занимала сетка из девяти панелей (~212 px) */
+.ch-svg{display:block;width:100%;height:116px;overflow:visible}
+.ch .ln{fill:none;stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
+.ch .gl{stroke:var(--line2);stroke-width:1;vector-effect:non-scaling-stroke}
+.ch .ax{font:10.5px var(--sans);fill:var(--muted)}
+/* подпись конца линии — при <= 4 рядах идентичность не держится на цвете */
+.ch .endlab{font:600 10.5px var(--sans)}
+.ch .cross{stroke:var(--faint);stroke-width:1;vector-effect:non-scaling-stroke;display:none}
+.ch .knob{display:none}
+.ch.hover .cross,.ch.hover .knob{display:block}
+.ch-none{height:116px;display:grid;place-items:center;font:12.5px var(--sans);color:var(--muted)}
+
+/* легенда: она же переключатель рядов */
+.ch-leg{display:flex;flex-wrap:wrap;gap:4px;padding:6px 20px 8px}
+.ch-leg .lg{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;border:1px solid var(--line);
+            border-radius:11px;background:var(--paper);font:11.5px var(--sans);color:var(--ink2);cursor:pointer}
+.ch-leg .lg b{font:600 11.5px var(--sans);color:var(--ink);font-variant-numeric:tabular-nums}
+.ch-leg .lg .dot{width:8px;height:8px;border-radius:50%}
+.ch-leg .lg:hover{border-color:var(--val)}
+.ch-leg .lg:focus-visible{outline:2px solid var(--val);outline-offset:1px}
+.ch-leg .lg[aria-pressed="false"]{color:var(--faint)}
+.ch-leg .lg[aria-pressed="false"] b{color:var(--faint);font-weight:400}
+.ch-leg .all{color:var(--val);border-style:dashed}
+
+/* подсказка под перекрестием: время и значения видимых рядов */
+.ch-tip{position:fixed;z-index:80;background:var(--ink);color:var(--paper);font:11px/1.45 var(--sans);
+        padding:5px 8px;border-radius:5px;pointer-events:none;opacity:0;transition:opacity .1s;min-width:150px}
+.ch-tip.on{opacity:1}
+.ch-tip i{display:block;font-style:normal;color:var(--faint);font-size:10.5px;margin-bottom:2px;font-variant-numeric:tabular-nums}
+.ch-tip span{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.ch-tip em{width:7px;height:7px;border-radius:50%;flex:none}
+.ch-tip b{margin-left:auto;font-weight:600;font-variant-numeric:tabular-nums}
+
+/* таблица значений — тот же ряд словами */
+.ch-tbl{padding:0 20px 10px}
+.ch-tbl summary{font:11.5px var(--sans);color:var(--val);cursor:pointer;width:max-content}
+.ch-tbl table{border-collapse:collapse;margin-top:6px;font:11px var(--sans);color:var(--ink2)}
+.ch-tbl th,.ch-tbl td{border:1px solid var(--line2);padding:2px 6px;text-align:right;font-variant-numeric:tabular-nums}
+.ch-tbl th{color:var(--muted);font-weight:500;text-align:left;white-space:nowrap}

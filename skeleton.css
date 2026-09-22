@@ -1,0 +1,60 @@
+/* ============================================================
+   Состояния загрузки — компонент дизайн-кита.
+   Только CSS-токены (--chip / --line / --val / --paper / --muted),
+   к разметке конкретной страницы не привязан.
+
+   Пороги показа задаёт SK.gate() в skeleton.js:
+   появиться не раньше 200 мс, прожить не меньше 400 мс.
+   ============================================================ */
+
+/* ---- плашка-заглушка: повторяет геометрию будущих данных ---- */
+.sk{display:inline-block;height:11px;border-radius:3px;background:var(--chip);vertical-align:middle;
+    animation:sk-pulse 1.4s ease-in-out infinite}
+.sk.dot{border-radius:50%}
+.sk.sq{border-radius:4px}
+/* соседние плашки не должны пульсировать в унисон — иначе поле «дышит» целиком */
+.sk:nth-child(2n){animation-delay:.18s}
+.sk:nth-child(3n){animation-delay:.32s}
+@keyframes sk-pulse{0%,100%{opacity:1}50%{opacity:.55}}
+@media (prefers-reduced-motion:reduce){.sk{animation:none;opacity:.75}}
+
+/* ---- строчный бокс: плашка занимает ту же высоту, что строка текста ----
+   Высоту задаёт бокс, а не плашка: иначе скелетон ниже данных и при
+   подмене таблица подпрыгивает. ---- */
+.sk-ln{display:flex;align-items:center}
+.sk-col{display:flex;flex-direction:column}
+.sk-line{display:flex;align-items:center;gap:6px}
+.sk-stack{display:flex;flex-direction:column;gap:4px}
+
+/* ---- неопределённый прогресс: перезагрузка данных, которые уже показаны ---- */
+.skbar{position:relative;height:2px;background:var(--line2);overflow:hidden}
+.skbar i{position:absolute;inset:0;width:38%;background:var(--val);border-radius:2px;
+         animation:sk-slide 1.15s cubic-bezier(.65,.02,.35,1) infinite}
+@keyframes sk-slide{0%{left:-40%}100%{left:100%}}
+@media (prefers-reduced-motion:reduce){.skbar i{animation:none;left:0;width:100%;opacity:.5}}
+
+/* данные под прогрессом гаснут и не принимают клики, но остаются на месте */
+.sk-dim{opacity:.5;pointer-events:none;transition:opacity .15s}
+
+/* ---- спиннер: только внутри кнопки и как признак «дольше обычного» ---- */
+.skspin{display:inline-block;width:14px;height:14px;border:2px solid var(--line);
+        border-top-color:var(--val);border-radius:50%;animation:sk-spin .7s linear infinite;vertical-align:-2px}
+@keyframes sk-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.skspin{animation-duration:2s}}
+
+/* ждущая кнопка: ширина зафиксирована заранее, чтобы не дёргалась */
+.sk-wait{position:relative;color:transparent!important}
+.sk-wait .skspin{position:absolute;left:50%;top:50%;margin:-7px 0 0 -7px}
+
+/* ---- «дольше обычного»: подставляется поверх скелетона после 3 с ---- */
+.sk-late{display:flex;align-items:center;gap:8px;justify-content:center;padding:14px 0;
+         font:12.5px var(--sans);color:var(--muted)}
+
+/* ---- соседние состояния: пусто и ошибка. Высота как у заполненного блока ---- */
+.sk-empty,.sk-error{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+                    padding:48px 20px;text-align:center;font:12.5px var(--sans);color:var(--muted)}
+.sk-empty b,.sk-error b{display:block;font:600 14px var(--sans);color:var(--ink)}
+.sk-error b{color:var(--bad)}
+.sk-empty button,.sk-error button{height:28px;padding:0 12px;border-radius:6px;border:1px solid var(--line);
+                                  background:var(--paper);font:500 12.5px var(--sans);color:var(--ink2);cursor:pointer}
+.sk-empty button:hover,.sk-error button:hover{border-color:var(--val);color:var(--val)}
