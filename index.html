@@ -352,6 +352,10 @@ a.lnk:hover{text-decoration:underline}
 .btn{font:500 11.5px var(--sans);border-radius:4px;padding:3px 10px;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink2)}
 .btn.pri{background:var(--val);border-color:var(--val);color:var(--paper)}
 
+.zoomctl{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--paper);height:24px}
+.zoomctl button{font:500 11.5px var(--sans);color:var(--ink2);background:none;border:0;padding:0 8px;cursor:pointer}
+.zoomctl button+button{border-left:1px solid var(--line)}
+.zoomctl button[aria-pressed="true"]{background:var(--val-soft);color:var(--val)}
 /* ===== doc parts ===== */
 .tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
 table{border-collapse:collapse;width:100%;font-size:14px;min-width:760px}
@@ -404,7 +408,7 @@ ol.q b,ul.l b{color:var(--ink)}
   </defs>
 </svg>
 <div class="wrap only">
-  <div class="topline"><b>Валютная платёжная инструкция — конструктор</b><a class="lnk" href="grid.html" style="font-size:13px">реестр «Валютные документы» →</a><span class="lbl">макет · drawer 800 px · клик по полю — полное содержимое, «Изменить» в раскрытом поле — правка</span></div>
+  <div class="topline"><b>Валютная платёжная инструкция — конструктор</b><a class="lnk" href="grid.html" style="font-size:13px">реестр «Валютные документы» →</a><span id="zoomctl" style="margin-left:auto;display:inline-flex;align-items:center"></span><span class="lbl">макет · drawer 800 px · клик по полю — полное содержимое, «Изменить» в раскрытом поле — правка</span></div>
   <div class="toolbar">
       <div class="seg" role="group" aria-label="Режим">
         <button id="m-tx" aria-pressed="true">Транзакции свёрнуты / развёрнуты</button>
@@ -437,6 +441,23 @@ ol.q b,ul.l b{color:var(--ink)}
     <div class="stage"><div class="pair" id="pair"></div></div>
   <div hidden><span id="st-h"></span><ol id="slots"></ol><span id="reg"></span><pre id="prof"></pre><span id="prof-name"></span><span id="reg-cnt"></span></div>
 </div>
+<script>
+/* Масштаб стенда: на 2K при 100% мелко — по умолчанию 125% для экранов шире 2200 px, выбор запоминается */
+(function(){
+  var KEY='pi-zoom',ZOOMS=[1,1.1,1.25];
+  var saved=null;try{saved=parseFloat(localStorage.getItem(KEY))||null}catch(_){}
+  var z=saved||(screen.width>=2200?1.25:1);
+  function apply(v){z=v;document.documentElement.style.zoom=v;try{localStorage.setItem(KEY,String(v))}catch(_){}
+    [].forEach.call(document.querySelectorAll('.zoomctl button'),function(b){b.setAttribute('aria-pressed',String(parseFloat(b.dataset.z)===v))})}
+  document.addEventListener('DOMContentLoaded',function(){
+    var host=document.getElementById('zoomctl');if(!host)return;
+    host.innerHTML='<span class="lbl" style="margin-right:6px">Масштаб</span><span class="zoomctl">'+ZOOMS.map(function(v){return '<button type="button" data-z="'+v+'" title="Масштаб стенда '+Math.round(v*100)+'%">'+Math.round(v*100)+'%</button>'}).join('')+'</span>';
+    host.addEventListener('click',function(e){var b=e.target.closest('[data-z]');if(b)apply(parseFloat(b.dataset.z))});
+    apply(z);
+  });
+  document.documentElement.style.zoom=z;
+})();
+</script>
 <script>
 (function(){
 /* ===================== КОНФИГ ===================== */

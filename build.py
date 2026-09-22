@@ -7,7 +7,7 @@ def cut(s,a,b):
     i=s.index(a); j=s.index(b,i)+len(b); return s[i:j]
 style=cut(idx,'<style>','</style>')
 svg=cut(idx,'<svg width="0"','</svg>')
-script=cut(idx,'<script>','</script>')
+script=idx[idx.index('<script>'):idx.rindex('</script>')+len('</script>')]
 out=tpl.replace('{{STYLE}}',style).replace('{{SVG}}',svg).replace('{{SCRIPT}}',script)
 open(os.path.join(d,'grid.html'),'w',encoding='utf-8').write(out)
 print('grid.html',len(out))

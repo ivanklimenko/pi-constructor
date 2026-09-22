@@ -10,6 +10,10 @@
 <link rel="stylesheet" href="filters.css">
 {{STYLE}}
 <style>
+.zoomctl{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--paper);height:24px}
+.zoomctl button{font:500 11.5px var(--sans);color:var(--ink2);background:none;border:0;padding:0 8px;cursor:pointer}
+.zoomctl button+button{border-left:1px solid var(--line)}
+.zoomctl button[aria-pressed="true"]{background:var(--val-soft);color:var(--val)}
 /* ===== реестр ===== */
 html,body{height:100%}
 body{margin:0;overflow:hidden}
@@ -126,7 +130,7 @@ body.resizing{cursor:col-resize;user-select:none}
 {{SVG}}
 <div class="app">
   <div class="apph"><h1>Валютные документы</h1><span class="cnt" id="cnt"></span>
-    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, <b>⧉</b> — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · фильтры — из vtb-filters</span><a href="index.html">конструктор деталки →</a></div></div>
+    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, <b>⧉</b> — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · фильтры — из vtb-filters</span><a href="index.html">конструктор деталки →</a><span id="zoomctl" style="display:inline-flex;align-items:center;margin-left:10px"></span></div></div>
   <div class="filters">
     <button class="fbtn" id="ftoggle" aria-expanded="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4.2 5.4A1 1 0 015.1 4h13.8a1 1 0 01.8 1.6L14 12.2V18a1 1 0 01-1.5.86l-3-1.8A1 1 0 019 16.2v-4L4.3 5.6a1 1 0 01-.1-.2z"/></svg>Фильтры<span class="badge" id="fcount" hidden>0</span></button>
     <div class="applied" id="applied"><span class="lbl">условия не заданы</span></div>
@@ -323,7 +327,7 @@ grid.addEventListener('click',function(e){
 });
 /* один плавающий тултип на страницу: не режется шапкой и соседними колонками (внутри td overflow:hidden) */
 var gtip=document.createElement('div');gtip.id='gtip';document.body.appendChild(gtip);
-function showTip(el,text){var r=el.getBoundingClientRect();gtip.textContent=text;gtip.classList.add('on');var w=gtip.offsetWidth,x=Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2)),y=r.top-gtip.offsetHeight-5;if(y<4)y=r.bottom+5;gtip.style.left=x+'px';gtip.style.top=y+'px'}
+function showTip(el,text){var z=parseFloat(document.documentElement.style.zoom)||1,r=el.getBoundingClientRect(),L=r.left/z,T=r.top/z,W=r.width/z,B=r.bottom/z;gtip.textContent=text;gtip.classList.add('on');var w=gtip.offsetWidth,x=Math.max(6,Math.min(innerWidth/z-w-6,L+W/2-w/2)),y=T-gtip.offsetHeight-5;if(y<4)y=B+5;gtip.style.left=x+'px';gtip.style.top=y+'px'}
 function hideTip(){gtip.classList.remove('on')}
 grid.addEventListener('mouseover',function(e){
   var v=e.target.closest('.cv');if(v){if(v.scrollWidth>v.clientWidth+1)showTip(v,v.dataset.v);else hideTip();return}
