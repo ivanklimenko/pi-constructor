@@ -243,6 +243,47 @@ a.lnk:hover{text-decoration:underline}
 [data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 5px);left:0;background:var(--ink);color:var(--paper);font:500 11px/1.3 var(--sans);letter-spacing:0;text-transform:none;padding:3px 7px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .1s .15s;z-index:30}
 [data-tip]:hover::after,[data-tip]:focus-visible::after{opacity:1}
 .cell .op[data-tip]::after,.xr .kv .lbl[data-tip]::after{left:50%;transform:translateX(-50%)}
+/* прочие вкладки */
+.tt{border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.tt .th,.tt .tr{display:grid;gap:0 10px;align-items:center;padding:0 10px;min-height:24px;border-bottom:1px solid var(--line2)}
+.tt .th{background:var(--sunk);font:600 10.5px var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);min-height:22px}
+.tt .tr:last-child{border-bottom:0}
+.tt .tr:hover{background:var(--hover)}
+.tt .n{color:var(--faint);font:11px var(--mono);text-align:right}
+.tt .tm{font:11.5px var(--mono);color:var(--ink2);white-space:nowrap}
+.tt .tm b{font-weight:500;color:var(--ink)}
+.tt .code{font:12px var(--mono);color:var(--val);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tt .code .suf{color:var(--muted)}
+.tt .code .suf.end{color:var(--ok)}
+.tt .code .fin{color:var(--ok);font-weight:600}
+.tt .reason{color:var(--warn);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tt .empty{padding:14px 10px;color:var(--muted);font-size:12px;text-align:center}
+.tt .dur{font:10.5px var(--mono);color:var(--faint);text-align:right}
+.tt .dur.slow{color:var(--warn)}
+.tbar{display:flex;align-items:center;gap:10px;min-height:26px}
+.tbar .lbl{margin-right:auto}
+.tk{display:grid;grid-template-columns:14px 100px auto minmax(0,1fr) auto 14px;gap:0 10px;align-items:center;padding:3px 10px;border-bottom:1px solid var(--line2);cursor:pointer;min-height:26px}
+.tk:last-child{border-bottom:0}
+.tk:hover{background:var(--hover)}
+.tk .dot{width:9px;height:9px;border-radius:50%;justify-self:center}
+.tk .dot.ok{background:var(--ok)} .tk .dot.info{background:var(--val)} .tk .dot.warn{background:var(--warn)}
+.tk .txt{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tk.open{grid-template-rows:auto auto;align-items:start;padding-bottom:6px}
+.tk.open .txt{white-space:normal}
+.tk .hist{grid-column:2/-1;display:grid;grid-template-columns:70px minmax(0,1fr);gap:1px 10px;margin-top:4px;padding-top:4px;border-top:1px dashed var(--line);font-size:11.5px}
+.tk .hist .tm{font:11px var(--mono);color:var(--muted)}
+.tk .chev{color:var(--faint);font-size:10px}
+.tk.open .chev{transform:rotate(180deg)}
+.au{border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.au .ah{display:flex;align-items:center;gap:8px;padding:0 10px;min-height:25px;border-bottom:1px solid var(--line2);cursor:pointer;font:500 12px var(--mono);color:var(--ink)}
+.au .ah:hover{background:var(--hover)}
+.au .ah .lbl{margin-left:auto;font:11px var(--mono)}
+.au .ah .chev{color:var(--faint);font-size:10px;width:12px}
+.au .ah.open .chev{transform:rotate(180deg)}
+.au pre{margin:0;padding:6px 10px 8px 30px;font:11.5px/1.45 var(--mono);color:var(--ink2);background:var(--sunk);border-bottom:1px solid var(--line2);white-space:pre-wrap;word-break:break-all}
+.au pre .k{color:var(--bad)} .au pre .s{color:var(--ok)} .au pre .num{color:var(--val)} .au pre .nul{color:var(--muted)}
+.au>*:last-child{border-bottom:0}
+.stub{border:1px dashed var(--line);border-radius:5px;padding:26px 10px;text-align:center;color:var(--muted);font-size:12.5px}
 .fh.seqb{margin-top:6px;padding-top:8px;border-top:2px solid var(--line)}
 .regt td:first-child{font-family:var(--mono)}
 .regt tr.use td{background:var(--val-soft)}
@@ -337,8 +378,13 @@ ol.q b,ul.l b{color:var(--ink)}
         <button data-type="MT199" aria-pressed="false">MT199</button>
       </div>
       <div class="seg" role="group" aria-label="Вкладка">
-        <button data-tabs="main" aria-pressed="true">Общие данные</button>
+        <button data-tabs="main" aria-pressed="true">Общие</button>
         <button data-tabs="extra" aria-pressed="false">Доп. поля</button>
+        <button data-tabs="statuses" aria-pressed="false">Статусы</button>
+        <button data-tabs="tasks" aria-pressed="false">Задачи</button>
+        <button data-tabs="stream" aria-pressed="false">Стриминг</button>
+        <button data-tabs="notif" aria-pressed="false">Нотификации</button>
+        <button data-tabs="audit" aria-pressed="false">Аудит</button>
       </div>
       <label class="chk"><input type="checkbox" id="c-slots"> Показать слоты лейна</label>
       <label class="chk"><input type="checkbox" id="c-fold" checked> Линия 1080p</label>
@@ -401,8 +447,8 @@ var PROFILES={
 
 /* 3. Вкладки: фиксированный порядок. Активные (есть данные/доступ) идут первой группой в этом порядке,
       неактивные — второй группой, тем же порядком. Если не помещаются — хвост второй группы уходит в «•••». */
-var TABS=['Общие данные','Доп. поля','Статусы','Связанные документы','Задачи','Нотификации','Исходный текст','Стримминг','MPU','Аудит'];
-var TAB_KEY={'Общие данные':'main','Доп. поля':'extra'};
+var TABS=['Общие данные','Доп. поля','Статусы','Связанные документы','Задачи','Нотификации','Исходный текст','Стриминг','MPU','Аудит'];
+var TAB_KEY={'Общие данные':'main','Доп. поля':'extra','Статусы':'statuses','Связанные документы':'linked','Задачи':'tasks','Нотификации':'notif','Исходный текст':'source','Стриминг':'stream','MPU':'mpu','Аудит':'audit'};
 
 /* 4. Вкладка «Доп. поля»: группы строк. cols — что показывать слева: 'tag' (номер, название в подсказке) или 'name'. tag — номер поля, items — пары «подпись → ключ данных».
       Ключи: f.<tag>[.n] — n-я часть строки поля, d.<prop> — свойство документа, vd.<i> — i-я дата валютирования. */
@@ -450,7 +496,42 @@ var TX6=[
  {dir:'CREDIT',st:'EXECUTED',acc:'70601840100000000519',reg:'00020_CommissionIncome',time:'2026-09-22 07:35:01.121Z',amount:'35.00',ccy:'USD'},
  {dir:'DEBIT',st:'PENDING',acc:'47422840500000000311',reg:'00030_FxConversion',time:'—',amount:'1 148 300.00',ccy:'EUR'}];
 var DOCS=[
- {status:'DONE',st:'ok',dirTxt:'входящий от ЕРС на клиента',tabsOff:['Задачи','Стримминг','MPU'],uuid:'19ea6301-209c-4185-9a9f-6619d79f8a97',uetr:'eb6305c9-1f8c-41e3-a3b2-6d7e9f2a4c10',created:'22.09.2026 07:31:45',
+ {status:'DONE',st:'ok',dirTxt:'входящий от ЕРС на клиента',tabsOff:['MPU'],uuid:'19ea6301-209c-4185-9a9f-6619d79f8a97',
+  statuses:[
+   ['2026-09-22 07:31:45.241','—','pmts-curr-duplicate-checker.end',''],
+   ['2026-09-22 07:31:45.642','SC_CURR_INCOMING','pmts-curr-in-checks.start',''],
+   ['2026-09-22 07:31:47.542','SC_CURR_INCOMING','pmts-curr-in-checks.end',''],
+   ['2026-09-22 07:31:48.141','SC_CURR_INCOMING','pmts-curr-in-routing.start','Ожидание решения сотрудника'],
+   ['2026-09-22 07:33:20.383','SC_CURR_INCOMING','pmts-curr-in-routing.end',''],
+   ['2026-09-22 07:33:21.709','SC_CURR_CREDIT_CLIENT','pmts-curr-crediting-client.start',''],
+   ['2026-09-22 07:33:22.957','SC_CURR_CREDIT_CLIENT','pmts-curr-crediting-client.end',''],
+   ['2026-09-22 07:33:23.413','SC_CURR_CREDIT_CLIENT','pmts-curr-general-postprocess.start',''],
+   ['2026-09-22 07:33:24.312','SC_CURR_CREDIT_CLIENT','pmts-curr-general-postprocess.end',''],
+   ['2026-09-22 07:35:00.814','SC_CURR_CREDIT_CLIENT','pmts-curr-accounting-sgm.start',''],
+   ['2026-09-22 07:35:01.820','SC_CURR_CREDIT_CLIENT','pmts-curr-accounting-sgm.end',''],
+   ['2026-09-22 07:35:01.915','SC_CURR_CREDIT_CLIENT','pmts.finish','']],
+  tasks:[
+   {st:'ok',type:'PAYMENT_INSTRUCTION',at:'2026-09-22 07:31:59',text:'Требуется подтвердить маршрут; требуется утвердить зачисление по клиентскому счёту 40817840100050017762',who:'Петрова А. С.',done:'2026-09-22 07:33:20',hist:[['07:31:59','Создана: pmts-curr-in-routing'],['07:32:40','Взята в работу: Петрова А. С.'],['07:33:20','Решение: маршрут подтверждён, зачисление утверждено']]},
+   {st:'info',type:'PAYMENT_INSTRUCTION',at:'2026-09-22 07:35:02',text:'Комиссия USD 35,00 удержана по тарифу OUR; проверить корректность тарифного плана клиента',who:'',done:'',hist:[['07:35:02','Создана: pmts-curr-accounting-sgm']]}],
+  stream:[
+   ['2026-09-22 07:33:24.795','UPP','УПП','pmts_curr_event_crediting_end','SENT',1],
+   ['2026-09-22 07:35:01.866','UPP','УПП','pmts_curr_event_account_end','SENT',1],
+   ['2026-09-22 07:35:01.902','DWH','Хранилище','pmts_curr_event_finish','SENT',2]],
+  notif:[
+   ['2026-09-22 07:31:46.000',3,'TIMEOUT','accepted'],
+   ['2026-09-22 07:33:25.000',1,'OK','confirmCOT'],
+   ['2026-09-22 07:35:02.000',3,'TIMEOUT','confirmCredit']],
+  audit:{
+   commonSection:{creationDate:'2026-09-22T04:31:45.051765Z',paymentServiceProvider:'SUBOUL',paymentFlow:null,paymentInitiatorSystem:'ERS.ERS_1',sourceSystem:'OPS',resending:false},
+   documentSection:{docReferenceIn:'FX2609220000417',docReferenceOut:'VK2609220000417',messageType:'MT103',amount:1250000.00,currency:'USD',valueDate:'2026-09-22',uetr:'eb6305c9-1f8c-41e3-a3b2-6d7e9f2a4c10'},
+   originalDocumentSection:{receivedAt:'2026-09-22T04:31:44Z',sender:'NRDIRUMMXXX',receiver:'VKRBRU8KXXX',rawLength:612,hash:'sha256:9f3c…a1e0'},
+   statusSections:{count:12,last:'pmts.finish',lastAt:'2026-09-22T04:35:01.915Z'},
+   accountingSection:{debitAccount:'30110840700000001842',creditAccount:'40817840100050017762',postings:6,executed:4,canceled:1,pending:1},
+   paymentTransactionSections:{transactionId:'cf03cfd4-246d-4669-889f-63bc1af67574',registers:['00000_NostroUSD','00010_ClientCurrent','00020_CommissionIncome','00030_FxConversion']},
+   taskSections:{open:1,closed:1,lastAssignee:'Петрова А. С.'},
+   outgoingRoutingSections:{routeType:'NOSTRO',nostroAccount:'30114840900000000517',receiver:'BCLHLV22XXX',rule:'USD_EU_COUNTERPARTIES_V3'},
+   controlAttributesSection:{complianceCheck:'PASSED',sanctionsCheck:'PASSED',duplicateCheck:'PASSED',manualReview:true},
+   manualOperationRecordsSection:{records:1,last:{at:'2026-09-22T07:42:00Z',user:'Петрова А. С.',field:'57',action:'EDIT'}}},uetr:'eb6305c9-1f8c-41e3-a3b2-6d7e9f2a4c10',created:'22.09.2026 07:31:45',
   num:'417',numDate:'22.09.26',amount:'1 250 000.00',ccy:'USD',vd:['22.09.2026','22.09.2026','22.09.2026','22.09.2026'],
   inS:'NRDIRUMMXXX',inR:'VKRBRU8KXXX',outS:'VKRBRU8KXXX',outR:'BCLHLV22XXX',r20out:'VK2609220000417',
   dt:'30110 840 7 0000 0001842',kt:'40817 840 1 0005 0017762',
@@ -464,7 +545,20 @@ var DOCS=[
      '79':{lines:['RE YOUR MT103 FX2609220000417 DD 22.09.2026','AMOUNT USD 1250000,00','PLS BE ADVISED THAT BENEFICIARY ACCOUNT','40817840100050017762 IS CLOSED.','KINDLY AUTHORIZE US TO RETURN THE FUNDS','LESS OUR CHARGES USD 35,00','OR PROVIDE AMENDED BENEFICIARY DETAILS.','BEST REGARDS','PAYMENTS DEPT, VOSTOCHNY KREDIT BANK']},
      'B.50':cl(P50),'B.59':cl(P59),'B.52':cl(B52),'B.57':cl(B57),'B.56':cl(B56),'B.70':{lines:T70},'B.72':{lines:['/INS/ NRDIRUMMXXX','/BNF/ COVER FOR FX2609220000417']},'B.33B':{lines:['EUR 1148300,00']}}
  },
- {status:'NEW',st:'wait',dirTxt:'исходящий возврат',tabsOff:['Связанные документы','Нотификации','Исходный текст','Стримминг','Аудит'],uuid:'7c02b9e4-51aa-4f0e-8d13-2b7f0c9e41d5',uetr:'4a1d7e20-9b3f-4c58-8e61-0f2c5d7a9b33',created:'23.09.2026 09:02:11',
+ {status:'NEW',st:'wait',dirTxt:'исходящий возврат',tabsOff:['Связанные документы','Нотификации','Исходный текст','Стриминг','MPU'],uuid:'7c02b9e4-51aa-4f0e-8d13-2b7f0c9e41d5',
+  statuses:[
+   ['2026-09-23 09:02:11.104','—','pmts-curr-duplicate-checker.end',''],
+   ['2026-09-23 09:02:11.530','SC_CURR_OUTGOING','pmts-curr-out-checks.start',''],
+   ['2026-09-23 09:02:13.008','SC_CURR_OUTGOING','pmts-curr-out-checks.end',''],
+   ['2026-09-23 09:02:13.442','SC_CURR_OUTGOING','pmts-curr-out-routing.start','Ожидание решения сотрудника']],
+  tasks:[{st:'info',type:'PAYMENT_INSTRUCTION',at:'2026-09-23 09:02:13',text:'Требуется подтвердить маршрут возврата; требуется подтверждение контролёра на списание',who:'',done:'',hist:[['09:02:13','Создана: pmts-curr-out-routing']]}],
+  stream:[],notif:[],
+  audit:{
+   commonSection:{creationDate:'2026-09-23T06:02:11.104Z',paymentServiceProvider:'SUBOUL',paymentFlow:'RETURN',paymentInitiatorSystem:'PMTS.MANUAL',sourceSystem:'OPS',resending:false,originalDocumentId:'19ea6301-209c-4185-9a9f-6619d79f8a97'},
+   documentSection:{docReferenceIn:'RT2609230000018',relatedReference:'FX2609220000417',messageType:'MT103',amount:1249965.00,currency:'USD',valueDate:'2026-09-23'},
+   statusSections:{count:4,last:'pmts-curr-out-routing.start',lastAt:'2026-09-23T06:02:13.442Z'},
+   taskSections:{open:1,closed:0},
+   controlAttributesSection:{complianceCheck:'PENDING',sanctionsCheck:'PASSED',duplicateCheck:'PASSED',manualReview:true}},uetr:'4a1d7e20-9b3f-4c58-8e61-0f2c5d7a9b33',created:'23.09.2026 09:02:11',
   num:'18',numDate:'23.09.26',amount:'1 249 965.00',ccy:'USD',vd:['23.09.2026','23.09.2026','23.09.2026','24.09.2026'],
   inS:'—',inR:'—',outS:'VKRBRU8KXXX',outR:'NRDIRUMMXXX',r20out:'RT2609230000018',
   dt:'40817 840 1 0005 0017762',kt:'30110 840 7 0000 0001842',
@@ -481,7 +575,7 @@ var DOCS=[
 ];
 DOCS.push(cl(DOCS[0]));
 var TYPE='MT103';
-function mkui(tx){return {open:new Set(),editing:null,all:false,shut:{tx:tx},tab:'main'}}
+function mkui(tx){return {open:new Set(),editing:null,all:false,shut:{tx:tx},tab:'main',audit:new Set(['commonSection']),tasks:new Set()}}
 var ui=[mkui(true),mkui(true),mkui(false)];
 
 /* ===================== ОТРИСОВКА ===================== */
@@ -613,6 +707,55 @@ function rowMates(tag){
   [p.text,p.seqB?p.seqB.text:[]].forEach(function(t){if(t&&t.length>1&&t.indexOf(tag)>=0)out=t});
   return out;
 }
+/* ---- остальные вкладки ---- */
+function tmHtml(t){var m=/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2}:\d{2})(\.\d+)?/.exec(t||'');return m?'<span class="tm" data-tip="'+esc(t)+'">'+m[3]+'.'+m[2]+' <b>'+m[4]+'</b>'+(m[5]?'<span style="color:var(--faint)">'+m[5].slice(0,4)+'</span>':'')+'</span>':'<span class="tm">'+esc(t||'—')+'</span>'}
+function ms(t){return new Date((t||'').replace(' ','T')+'Z').getTime()}
+function dur(a,b){var d=ms(b)-ms(a);if(isNaN(d)||d<0)return '';if(d<1000)return d+' мс';if(d<60000)return (d/1000).toFixed(1)+' с';if(d<3600000)return Math.round(d/60000)+' мин';return (d/3600000).toFixed(1)+' ч'}
+function codeHtml(c){var m=/^(.*)\.(start|end)$/.exec(c);if(c==='pmts.finish')return '<span class="code fin">'+esc(c)+'</span>';return m?'<span class="code">'+esc(m[1])+'<span class="suf '+m[2]+'">.'+m[2]+'</span></span>':'<span class="code">'+esc(c)+'</span>'}
+function statusesHtml(d){
+  var rows=d.statuses||[];if(!rows.length)return '<div class="tt"><div class="empty">Статусов нет</div></div>';
+  return '<div class="tt"><div class="th" style="grid-template-columns:22px 118px 150px 262px minmax(0,1fr) 50px"><span></span><span>Дата/время</span><span>Маршрут</span><span>Статус</span><span>Причина</span><span style="text-align:right">Δ</span></div>'+
+    rows.map(function(r,i){var prev=rows[i-1],dd=prev?dur(prev[0],r[0]):'',slow=prev&&ms(r[0])-ms(prev[0])>30000;
+      return '<div class="tr" style="grid-template-columns:22px 118px 150px 262px minmax(0,1fr) 50px"><span class="n">'+(i+1)+'</span>'+tmHtml(r[0])+'<span>'+(r[1]&&r[1]!=='—'?'<span class="tag">'+esc(r[1])+'</span>':'<span class="nl">—</span>')+'</span>'+codeHtml(r[2])+'<span class="reason" title="'+esc(r[3])+'">'+esc(r[3])+'</span><span class="dur'+(slow?' slow':'')+'">'+dd+'</span></div>'}).join('')+'</div>';
+}
+function tasksHtml(d,u){
+  var rows=d.tasks||[];
+  return '<div class="tbar"><span class="lbl">'+rows.length+' задач'+(rows.filter(function(t){return !t.done}).length?', открытых '+rows.filter(function(t){return !t.done}).length:'')+'</span><button class="btn">Перейти в блок «Ручные отклонения»</button></div>'+
+    (rows.length?'<div class="tt">'+rows.map(function(t,i){var op=u.tasks.has(i);
+      return '<div class="tk'+(op?' open':'')+'" data-task="'+i+'"><span class="dot '+(t.done?'ok':t.st)+'" data-tip="'+(t.done?'Выполнена':'Открыта')+'"></span>'+tmHtml(t.at)+'<span class="tag">'+esc(t.type)+'</span><span class="txt">'+esc(t.text)+'</span><a class="lnk" style="font-size:12px">История</a><span class="chev">▼</span>'+
+        (op?'<div class="hist">'+t.hist.map(function(h){return '<span class="tm">'+h[0]+'</span><span>'+esc(h[1])+'</span>'}).join('')+(t.done?'<span class="tm">'+t.done.slice(11)+'</span><span class="v">Закрыта · '+esc(t.who)+'</span>':'')+'</div>':'')+'</div>'}).join('')+'</div>':'<div class="tt"><div class="empty">Задач нет</div></div>');
+}
+function streamHtml(d){
+  var rows=d.stream||[];if(!rows.length)return '<div class="tt"><div class="empty">Событий стриминга нет</div></div>';
+  var cols='22px 120px 60px 90px minmax(0,1fr) 70px 60px';
+  return '<div class="tt"><div class="th" style="grid-template-columns:'+cols+'"><span></span><span>Дата/время</span><span>Код ИС</span><span>ИС куда</span><span>Событие</span><span>Статус</span><span style="text-align:right">Попытки</span></div>'+
+    rows.map(function(r,i){return '<div class="tr" style="grid-template-columns:'+cols+'"><span class="n">'+(i+1)+'</span>'+tmHtml(r[0])+'<span><span class="tag mt">'+esc(r[1])+'</span></span><span class="lbl" style="font-size:12px">'+esc(r[2])+'</span><span class="code">'+esc(r[3])+'</span><span><span class="st '+(r[4]==='SENT'?'ok':'wait')+'">'+esc(r[4])+'</span></span><span class="n" style="color:var(--ink2)">'+r[5]+'</span></div>'}).join('')+'</div>';
+}
+function notifHtml(d){
+  var rows=d.notif||[];
+  var cols='22px 120px 70px 90px 120px minmax(0,1fr)';
+  return '<div class="tbar"><span class="lbl">'+rows.length+' отправок'+(rows.filter(function(r){return r[2]!=='OK'}).length?', с ошибкой '+rows.filter(function(r){return r[2]!=='OK'}).length:'')+'</span><button class="btn">Переотправить</button></div>'+
+    (rows.length?'<div class="tt"><div class="th" style="grid-template-columns:'+cols+'"><span></span><span>Дата/время</span><span>Попытки</span><span>Статус</span><span>Код ответа</span><span></span></div>'+
+    rows.map(function(r,i){return '<div class="tr" style="grid-template-columns:'+cols+'"><span class="n">'+(i+1)+'</span>'+tmHtml(r[0])+'<span class="n" style="text-align:left;color:var(--ink2)">'+r[1]+'</span><span><span class="st '+(r[2]==='OK'?'ok':'bad')+'">'+esc(r[2])+'</span></span><span><span class="tag mt">'+esc(r[3])+'</span></span><a class="lnk" style="font-size:12px;justify-self:end">Исходное сообщение</a></div>'}).join('')+'</div>':'<div class="tt"><div class="empty">Нотификаций нет</div></div>');
+}
+function jsonHtml(o){return JSON.stringify(o,null,2).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]}).replace(/("[^"]*")(\s*:)?/g,function(m,q,c){return c?'<span class="k">'+q+'</span>'+c:'<span class="s">'+q+'</span>'}).replace(/\b(-?\d+\.?\d*)(?=,|\n|$)/g,'<span class="num">$1</span>').replace(/\b(null|true|false)\b/g,'<span class="nul">$1</span>')}
+function auditHtml(d,u){
+  var a=d.audit||{},keys=Object.keys(a);if(!keys.length)return '<div class="tt"><div class="empty">Аудит пуст</div></div>';
+  return '<div class="au">'+keys.map(function(k){var op=u.audit.has(k),v=a[k],n=Object.keys(v).length;
+    return '<div class="ah'+(op?' open':'')+'" data-audit="'+k+'"><span class="chev">▼</span>'+esc(k)+'<span class="lbl">'+n+' '+(n===1?'ключ':n<5?'ключа':'ключей')+'</span></div>'+(op?'<pre>'+jsonHtml(v)+'</pre>':'')}).join('')+'</div>';
+}
+function viewHtml(di){
+  var d=DOCS[di],u=ui[di];
+  switch(u.tab){
+    case 'extra':return xtabHtml(d);
+    case 'statuses':return statusesHtml(d);
+    case 'tasks':return tasksHtml(d,u);
+    case 'stream':return streamHtml(d);
+    case 'notif':return notifHtml(d);
+    case 'audit':return auditHtml(d,u);
+    default:return '<div class="stub">Вкладка «'+esc(TABS.filter(function(t){return TAB_KEY[t]===u.tab})[0]||u.tab)+'» — макет ещё не рисовали</div>';
+  }
+}
 function render(di){
   var d=DOCS[di],u=ui[di],p=PROFILES[TYPE],el=document.querySelector('.dw[data-d="'+di+'"]');if(!el)return;
   var B={
@@ -641,7 +784,7 @@ function render(di){
     '<div class="acts">'+ACTIONS.map(function(a,k){
       return (a.danger?'<span class="sep"></span>':'')+'<button class="ib'+(a.danger?' danger':'')+'" aria-label="'+a.t+'">'+ic(a.id)+'<span class="slot">'+(k+1)+'</span><span class="tip">'+a.t+(a.k?' · '+a.k:'')+'</span></button>'}).join('')+'</div></div>'+
   tabsHtml(d,u)+
-  (u.tab==='extra'?'<div class="db">'+xtabHtml(d)+'</div>':'<div class="db">'+heroHtml(d,p)+p.blocks.map(function(b){return B[b]()}).join('')+
+  (u.tab!=='main'?'<div class="db">'+viewHtml(di)+'</div>':'<div class="db">'+heroHtml(d,p)+p.blocks.map(function(b){return B[b]()}).join('')+
    '<div class="fh"><h5>Поля '+TYPE+'</h5>'+(p.grid.length?'<span class="lbl">отправитель слева · получатель справа</span>':'')+(hasGrid?'<a class="lnk" data-all>'+(u.all?'Свернуть поля':'Развернуть поля')+'</a>':'')+'</div>'+
    '<div class="fg'+(u.all?' allopen':'')+'">'+gridHtml(di,p.grid)+textHtml(di,p.text)+'</div>'+extraHtml(di,p.extra)+
    (p.seqB?'<div class="fh seqb"><h5>'+p.seqB.title+'</h5></div><div class="fg'+(u.all?' allopen':'')+'">'+gridHtml(di,p.seqB.grid)+textHtml(di,p.seqB.text)+'</div>'+extraHtml(di,p.seqB.extra):'')+
@@ -664,6 +807,8 @@ pair.addEventListener('click',function(e){
     var list=JSON.parse(mr.dataset.menu),m=document.createElement('div');m.className='tabmenu';
     m.innerHTML=list.map(function(x){return '<span class="'+(x.off?'off':'')+'"'+(x.k?' data-tab="'+x.k+'"':'')+'>'+esc(x.n)+(x.off?' <span class="lbl">— нет данных</span>':'')+'</span>'}).join('');
     var bar=mr.parentNode;m.style.top=(bar.offsetTop+bar.offsetHeight-1)+'px';dw.appendChild(m);return}
+  var au=e.target.closest('[data-audit]');if(au){var k=au.dataset.audit;u.audit.has(k)?u.audit.delete(k):u.audit.add(k);render(di);return}
+  var tk=e.target.closest('[data-task]');if(tk&&!e.target.closest('.lnk')){var ti=+tk.dataset.task;u.tasks.has(ti)?u.tasks.delete(ti):u.tasks.add(ti);render(di);return}
   var tb=e.target.closest('[data-tab]');if(tb){u.tab=tb.dataset.tab;render(di);return}
   var tg=e.target.closest('[data-tg]');if(tg){u.shut[tg.dataset.tg]=!u.shut[tg.dataset.tg];render(di);return}
   if(e.target.closest('[data-all]')){u.all=!u.all;render(di);return}
