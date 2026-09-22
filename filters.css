@@ -505,3 +505,56 @@
 @media (max-width: 1100px) {
   .cf-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* ===== Стенд ПИ: модификатор поиска — отдельная пилюля рядом с инпутом; плотность реестра ===== */
+.cf { padding: 10px 16px 8px; }
+.cf .cf-grid { gap: 10px 16px; }
+.cf .cf-field { gap: 3px; }
+.cf .cf-label { font-size: 11px; line-height: 14px; color: var(--muted, #74767b); }
+.cf .cf-control {
+  height: 28px;
+  gap: 6px;
+  align-items: center;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.cf .cf-control:focus-within { border-color: transparent; box-shadow: none; }
+.cf .cf-op {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 28px;
+  height: 22px;
+  padding: 0 7px;
+  border: 1px solid var(--line, #d5d7da);
+  border-radius: 11px;
+  background: var(--sunk, #f4f5f7);
+  color: var(--ink2, #3a4357);
+  font-family: var(--mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+}
+.cf .cf-op:hover { background: var(--val-soft, #eaf1ff); border-color: var(--val, #0d69f2); color: var(--val, #0d69f2); }
+.cf .cf-op svg { width: 14px; height: 14px; }
+.cf .cf-op-sym { font-size: 12px; }
+.cf .cf-value {
+  height: 28px;
+  padding: 1px 8px;
+  border: 1px solid var(--line, #d5d7da);
+  border-radius: 6px;
+  background: var(--paper, #fff);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.cf .cf-value::-webkit-scrollbar { display: none; }
+.cf .cf-control:focus-within .cf-value { border-color: var(--val, #0d69f2); box-shadow: 0 0 0 2px var(--val-soft, #eaf1ff); }
+.cf .cf-value input { height: 24px; font-size: 12.5px; min-width: 60px; }
+.cf .cf-chip { padding: 0 6px; font-size: 11.5px; line-height: 18px; border-radius: 4px; background: var(--val-soft, #f3f8ff); border-color: transparent; color: var(--val, #0d69f2); font-family: var(--mono, monospace); }
+.cf .cf-suggest { left: 0; top: calc(100% + 3px); }
+.cf .cf-menu { top: calc(100% + 3px); }
+.cf .cf-add { font-size: 12.5px; margin-top: 8px; }
+.cf .cf-actions { margin-top: 8px; padding-top: 8px; }
+.cf .cf-btn { height: 28px; padding: 0 12px; font-size: 12.5px; border-radius: 6px; }
+.cf .cf-icon-btn { width: 28px; height: 28px; border-radius: 6px; }

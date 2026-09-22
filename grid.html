@@ -428,18 +428,32 @@ body.resizing{cursor:col-resize;user-select:none}
 .grid th{position:sticky;top:0;z-index:2;background:var(--paper);text-align:left;font:600 12.5px var(--sans);color:var(--ink);padding:9px 8px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
 .grid th .sub{display:block;font:11px var(--sans);color:var(--muted);font-weight:400}
 .grid td{padding:7px 8px 6px;border-bottom:1px solid var(--line2);vertical-align:top;white-space:nowrap}
-.grid tr.row{cursor:default}
+.grid tbody.row{cursor:default}
+.grid tbody.row:hover td{background:var(--hover)}
+.grid tbody.row.selA td{background:var(--val-soft)}
+.grid tbody.row.selA td:first-child{box-shadow:inset 3px 0 0 var(--val)}
+.grid tbody.row.selB td{background:var(--warn-row)}
+.grid tbody.row.selB td:first-child{box-shadow:inset 3px 0 0 var(--warn)}
+.grid tr.purow td.purp{padding:2px 8px 6px;border-bottom:1px solid var(--line2);background:var(--sunk);font:11px var(--sans);color:var(--ink2);text-transform:none;letter-spacing:0;max-width:none;margin:0;display:table-cell}
+.grid tbody.row:hover tr.purow td.purp{background:var(--chip)}
+.grid tr.purow .fno{font:600 10.5px var(--mono);color:var(--muted);margin-right:8px;cursor:help}
+.grid tr.purow .cv{max-width:100%}
+.grid tbody.row tr:first-child td:not([rowspan]){border-bottom:0;padding-bottom:2px}
+.grid [data-tip]::after{display:none}
+#gtip{position:fixed;z-index:80;background:var(--ink);color:var(--paper);font:500 11px/1.3 var(--sans);padding:3px 7px;border-radius:4px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .1s;max-width:70vw;overflow:hidden;text-overflow:ellipsis}
+#gtip.on{opacity:1}
+.appf .pg button{min-width:24px;height:22px;padding:0 6px;border:0;border-radius:4px;background:none;cursor:pointer;color:var(--ink2);font:12px var(--sans)}
+.appf .pg button:hover{background:var(--hover)}
+.appf .pg button.on{background:var(--val);color:var(--paper)}
+.appf .pg button[disabled]{color:var(--faint);cursor:default;background:none}
+.appf .pg .gap{color:var(--faint);padding:0 2px}
+.appf .psz select{height:22px;border:1px solid var(--line);border-radius:4px;background:var(--paper);font:12px var(--sans);color:var(--ink2);margin-left:4px}
 .cv{display:inline-block;max-width:220px;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom;cursor:copy;border-radius:3px;padding:0 2px;margin:0 -2px}
 .cv:hover{background:var(--val-soft)}
 .cv.flash{background:var(--ok-soft);color:var(--ok)}
 .toast{position:fixed;left:20px;bottom:44px;z-index:60;background:var(--ink);color:var(--paper);font:12px var(--sans);padding:6px 10px;border-radius:5px;box-shadow:var(--shadow);opacity:0;transition:opacity .15s;pointer-events:none;max-width:60vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .toast.on{opacity:1}
 .grid .ico.open{color:var(--val)}
-.grid tr.row:hover td{background:var(--hover)}
-.grid tr.row.selA td{background:var(--val-soft)}
-.grid tr.row.selA td:first-child{box-shadow:inset 3px 0 0 var(--val)}
-.grid tr.row.selB td{background:var(--warn-row)}
-.grid tr.row.selB td:first-child{box-shadow:inset 3px 0 0 var(--warn)}
 .grid .num{display:block;font-size:10.5px;color:var(--faint);margin-top:3px;text-align:center}
 .grid .ico{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:4px;color:var(--muted);vertical-align:middle;cursor:pointer}
 .grid .ico:hover{background:var(--paper);color:var(--val);box-shadow:0 0 0 1px var(--line)}
@@ -463,7 +477,7 @@ body.resizing{cursor:col-resize;user-select:none}
 .grid .sr .tag{display:block;width:max-content;margin-bottom:3px}
 .grid .tag.snd{color:var(--warn);border-color:var(--warn)} .grid .tag.rcv{color:var(--ok);border-color:var(--ok)}
 .grid .cmp{opacity:.35}
-.grid tr.row:hover .cmp{opacity:1}
+.grid tbody.row:hover .cmp{opacity:1}
 .grid .nl{color:var(--faint)}
 .appf{display:flex;align-items:center;gap:14px;padding:7px 20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);background:var(--sunk)}
 .appf .pg{display:inline-flex;gap:2px}
@@ -508,7 +522,7 @@ body.resizing{cursor:col-resize;user-select:none}
   </div>
   <div id="cf-host" class="on"></div>
   <div class="gridwrap"><table class="grid" id="grid"></table></div>
-  <div class="appf"><span id="foot"></span><span class="pg"><span>‹</span><span class="on">1</span><span>2</span><span>3</span><span>…</span><span>64</span><span>›</span></span><span class="sp">20 на странице</span></div>
+  <div class="appf"><span id="foot"></span><span class="pg" id="pager"></span><label class="sp psz">На странице <select id="psize"><option>10</option><option selected>20</option><option>50</option><option>100</option></select></label></div>
 </div>
 <div id="pair" data-host></div>
 <script>
@@ -1155,23 +1169,24 @@ var TYPES=['MT103','MT103','MT202','MT103','MT199','MT202COV','MT103','MT103','M
 var STS=[['DONE','ok'],['NEW','wait'],['DONE','ok'],['REJECTED','bad'],['DONE','ok'],['DONE','ok'],['PENDING','wait'],['DONE','ok'],['DONE','ok'],['CANCELED','bad'],['DONE','ok'],['NEW','wait']];
 var DIRS=[['IN','входящий от ЕРС на клиента'],['OUT','исходящий возврат'],['OUT','исходящий межбанковский'],['IN','входящий от ЕРС на клиента'],['OUT','исходящий, свободный формат'],['OUT','исходящий с покрытием'],['IN','входящий от корреспондента'],['OUT','исходящий клиентский'],['IN','входящий межбанковский'],['OUT','исходящий клиентский'],['IN','входящий, свободный формат'],['IN','входящий от ЕРС на клиента']];
 var ROWS=[];
-for(var i=0;i<12;i++){
+var N_ROWS=87;
+for(var i=0;i<N_ROWS;i++){
   var base=P.cl(P.DOCS[i%2===0?0:1]),n1=NAMES[i%6],n2=NAMES[(i+1)%6],b1=BANKS[i%6],b2=BANKS[(i+2)%6];
-  base.type=TYPES[i];base.status=STS[i][0];base.st=STS[i][1];base.dirTxt=DIRS[i][1];base.dir=DIRS[i][0];
-  base.amount=AMT[i][0];base.ccy=AMT[i][1];
-  var dd=(22+(i>7?1:0)),hh=String(7+(i*3)%11).padStart(2,'0'),mm=String((i*17)%60).padStart(2,'0');
+  var k=i%12;base.type=TYPES[k];base.status=STS[k][0];base.st=STS[k][1];base.dirTxt=DIRS[k][1];base.dir=DIRS[k][0];
+  base.amount=AMT[(i*7)%12][0];base.ccy=AMT[(i*7)%12][1];
+  var dd=(22+(i%12>7?1:0)),hh=String(7+(i*3)%11).padStart(2,'0'),mm=String((i*17)%60).padStart(2,'0');
   base.created=dd+'.09.2026 '+hh+':'+mm+':'+String((i*7)%60).padStart(2,'0');base.num=String(400+i*3);base.numDate=dd+'.09.26';
   base.vd=[dd+'.09.2026',dd+'.09.2026',dd+'.09.2026',(i%5===3?(dd+1):dd)+'.09.2026'];
-  base.uuid=(i<10?'0':'')+i+'e'+base.uuid.slice(3);
-  var ref=(DIRS[i][0]==='IN'?'FX':'VK')+'26092'+dd%10+'00000'+String(400+i*3);
-  base.f['20']={lines:[ref]};base.r20out=(DIRS[i][0]==='IN'?'VK':'FX')+ref.slice(2);
+  base.uuid=String(i).padStart(2,'0')+'e'+base.uuid.slice(3);
+  var ref=(DIRS[k][0]==='IN'?'FX':'VK')+'26092'+dd%10+'0000'+String(400+i*3).padStart(4,'0');
+  base.f['20']={lines:[ref]};base.r20out=(DIRS[k][0]==='IN'?'VK':'FX')+ref.slice(2);
   base.f['50']={opt:'F',acc:n1[1],lines:[n1[0],'ULITSA PROFSOYUZNAYA 83-1-214','RU/ MOSCOW, 117279']};
   base.f['59']={opt:'F',acc:n2[1],lines:[n2[0],'PROSPEKT MIRA 101-2-45','RU/ MOSCOW, 129085']};
   base.f['52']={opt:'A',lines:[b1[0],b1[1]]};base.f['57']={opt:'A',lines:[b2[0],b2[1]]};
   base.f['58']=base.type.indexOf('MT202')===0?{opt:'A',lines:[b2[0],b2[1]]}:{lines:[]};
   base.f['70']={lines:PURP[i%6].match(/.{1,35}(?=\s|$)|.{1,35}/g)};
   base.inS=b1[1];base.inR=b2[1];base.outS=b2[1];base.outR=b1[1];
-  var PROV=['ЕРС','LORO','NOSTRO','SUBOUL','VTO'];base.provS=DIRS[i][0]==='IN'?PROV[i%2?3:0]:PROV[4];base.provR=DIRS[i][0]==='IN'?PROV[4]:PROV[1+(i%3===0?1:0)];
+  var PROV=['ЕРС','LORO','NOSTRO','SUBOUL','VTO'];base.provS=DIRS[k][0]==='IN'?PROV[i%2?3:0]:PROV[4];base.provR=DIRS[k][0]==='IN'?PROV[4]:PROV[1+(i%3===0?1:0)];
   base.tabsOff=i%2?['Нотификации','Стриминг','MPU']:['MPU'];
   ROWS.push(base);
 }
@@ -1182,20 +1197,21 @@ function fld(f,showName){if(!f||(!f.lines.length&&!f.acc))return '<span class="n
   return '<div class="fld"><span class="op">'+(c.opt||'')+'</span>'+cv(main,'mono',130)+'</div>'+(cap?'<span class="cap">'+cv(cap,'',125)+'</span>':'')}
 function cv(v,cls,mw){v=String(v==null?'':v);return '<span class="cv'+(cls?' '+cls:'')+'"'+(mw?' style="max-width:'+mw+'px"':'')+' data-v="'+esc(v)+'">'+esc(v)+'</span>'}
 function rowHtml(d,i){
-  var vd=d.vd,same=vd.every(function(x){return x===vd[0]});
-  return '<tr class="row" data-i="'+i+'"><td><input type="checkbox" aria-label="Выбрать"><span class="num">'+(i+1)+'</span></td>'+
-   '<td><span class="ico open" data-open="'+i+'" data-tip="Открыть деталку">'+ic('esid')+'</span><span class="stdot '+d.st+'" data-tip="'+d.status+'">'+(d.st==='ok'?'✓':d.st==='bad'?'✕':'·')+'</span><br><span class="ico cmp" data-cmp="'+i+'" data-tip="Открыть рядом для сравнения" style="margin-top:4px">⧉</span></td>'+
-   '<td class="id"><b>'+cv(d.num)+'</b><span class="l2 mono">'+cv(d.f['20'].lines[0])+'<br>'+cv(d.r20out)+'</span></td>'+
-   '<td>'+cv(d.created.slice(0,10))+' <span class="lbl">'+cv(d.created.slice(11,16))+'</span><span class="l2">Дт '+cv(vd[2])+'<br>Кт '+(same?cv(vd[3]):'<span style="color:var(--warn)">'+cv(vd[3])+'</span>')+'</span></td>'+
-   '<td>'+cv(d.type,'tag mt')+'</td>'+
-   '<td><span class="dir">'+ic(d.dir==='IN'?'down':'kt')+cv(d.dir)+'</span><span class="l2">'+cv(d.dirTxt,'',105)+'</span></td>'+
-   '<td><span class="amt">'+cv(d.amount)+'</span><span class="l2">'+cv(d.ccy)+'</span></td>'+
-   '<td>'+fld(d.f['50'])+'<div class="purp">'+cv((d.f['70']||{lines:[]}).lines.join(' '),'',250)+'</div></td>'+
-   '<td>'+fld(d.f['52'])+'</td><td>'+fld(d.f['57'])+'</td><td>'+fld(d.f['58'])+'</td><td>'+fld(d.f['59'])+'</td>'+
-   '<td>'+cv(d.route.acc,'mono',110)+'<span class="l2">'+cv(d.route.type)+' → '+cv(d.route.recv)+'</span></td>'+
-   '<td class="sr">'+cv(d.inS,'tag snd')+cv(d.inR,'tag rcv')+'</td>'+
-   '<td class="sr">'+cv(d.outS,'tag snd')+cv(d.outR,'tag rcv')+'</td>'+
-   '<td class="sr">'+cv(d.provS,'tag snd')+cv(d.provR,'tag rcv')+'</td></tr>';
+  var vd=d.vd,same=vd.every(function(x){return x===vd[0]}),purp=(d.f['70']||{lines:[]}).lines.join(' ');
+  return '<tbody class="row" data-i="'+i+'"><tr><td rowspan="2"><input type="checkbox" aria-label="Выбрать"><span class="num">'+(i+1)+'</span></td>'+
+   '<td rowspan="2"><span class="ico open" data-open="'+i+'" data-tip="Открыть деталку">'+ic('esid')+'</span><span class="stdot '+d.st+'" data-tip="'+d.status+'">'+(d.st==='ok'?'✓':d.st==='bad'?'✕':'·')+'</span><br><span class="ico cmp" data-cmp="'+i+'" data-tip="Открыть рядом для сравнения" style="margin-top:4px">⧉</span></td>'+
+   '<td class="id" rowspan="2"><b>'+cv(d.num)+'</b><span class="l2 mono">'+cv(d.f['20'].lines[0])+'<br>'+cv(d.r20out)+'</span></td>'+
+   '<td rowspan="2">'+cv(d.created.slice(0,10))+' <span class="lbl">'+cv(d.created.slice(11,16))+'</span><span class="l2">Дт '+cv(vd[2])+'<br>Кт '+(same?cv(vd[3]):'<span style="color:var(--warn)">'+cv(vd[3])+'</span>')+'</span></td>'+
+   '<td rowspan="2">'+cv(d.type,'tag mt')+'</td>'+
+   '<td rowspan="2"><span class="dir">'+ic(d.dir==='IN'?'down':'kt')+cv(d.dir)+'</span><span class="l2">'+cv(d.dirTxt,'',105)+'</span></td>'+
+   '<td rowspan="2"><span class="amt">'+cv(d.amount)+'</span><span class="l2">'+cv(d.ccy)+'</span></td>'+
+   '<td class="f5">'+fld(d.f['50'])+'</td>'+
+   '<td class="f5">'+fld(d.f['52'])+'</td><td class="f5">'+fld(d.f['57'])+'</td><td class="f5">'+fld(d.f['58'])+'</td><td class="f5">'+fld(d.f['59'])+'</td>'+
+   '<td rowspan="2">'+cv(d.route.acc,'mono',110)+'<span class="l2">'+cv(d.route.type)+' → '+cv(d.route.recv)+'</span></td>'+
+   '<td class="sr" rowspan="2">'+cv(d.inS,'tag snd')+cv(d.inR,'tag rcv')+'</td>'+
+   '<td class="sr" rowspan="2">'+cv(d.outS,'tag snd')+cv(d.outR,'tag rcv')+'</td>'+
+   '<td class="sr" rowspan="2">'+cv(d.provS,'tag snd')+cv(d.provR,'tag rcv')+'</td></tr>'+
+   '<tr class="purow"><td colspan="5" class="purp"><span class="fno" data-tip="70 · Детали платежа">70</span>'+cv(purp,'',9999)+'</td></tr></tbody>';
 }
 var grid=document.getElementById('grid');
 var HEAD='<thead><tr><th><input type="checkbox" aria-label="Выбрать все"></th><th></th><th>ID<span class="sub">№ · 20 вх / исх</span></th><th>Дата / Время<span class="sub">валютирование Дт / Кт</span></th><th>Тип</th><th>Направление</th><th>32<span class="sub">сумма</span></th><th>50<span class="sub">приказодатель · 70</span></th><th>52</th><th>57</th><th>58</th><th>59</th><th>Маршрут</th><th>S / R in</th><th>S / R out</th><th>Провайдеры</th></tr></thead>';
@@ -1215,13 +1231,27 @@ grid.addEventListener('mousedown',function(e){var h=e.target.closest('.rz');if(!
 });
 grid.addEventListener('dblclick',function(e){var h=e.target.closest('.rz');if(!h)return;var i=+h.dataset.col;COLW=null;grid.classList.remove('fixed');[].forEach.call(grid.querySelectorAll('thead th'),function(th){th.style.width=''});grid.style.width='';drawGrid(lastIdx)});
 var lastIdx=[];
+var PAGE={size:20,n:1};
 function drawGrid(idx){lastIdx=idx;
-  grid.innerHTML=HEAD+'<tbody>'+idx.map(function(i){return rowHtml(ROWS[i],i)}).join('')+(idx.length?'':'<tr><td colspan="16" style="text-align:center;color:var(--muted);padding:28px">По заданным условиям документов нет</td></tr>')+'</tbody>';
-  document.getElementById('cnt').textContent=idx.length+(idx.length===ROWS.length?' из 1 284':' из '+ROWS.length+' на странице');
-  document.getElementById('foot').textContent=(idx.length?'1–'+idx.length:'0')+' из '+(idx.length===ROWS.length?'1 284':idx.length)+' · выбрано 0';
+  var pages=Math.max(1,Math.ceil(idx.length/PAGE.size));if(PAGE.n>pages)PAGE.n=pages;
+  var from=(PAGE.n-1)*PAGE.size,slice=idx.slice(from,from+PAGE.size);
+  grid.innerHTML=HEAD+slice.map(function(i){return rowHtml(ROWS[i],i)}).join('')+(idx.length?'':'<tbody><tr><td colspan="16" style="text-align:center;color:var(--muted);padding:28px">По заданным условиям документов нет</td></tr></tbody>');
+  document.getElementById('cnt').textContent=idx.length===ROWS.length?ROWS.length+' документов':idx.length+' из '+ROWS.length;
+  renderPager(idx.length,pages);
   if(typeof mark==='function')mark();
   initResize();
 }
+function renderPager(total,pages){
+  var from=total?(PAGE.n-1)*PAGE.size+1:0,to=Math.min(PAGE.n*PAGE.size,total);
+  var nums=[],push=function(x){if(nums.indexOf(x)<0)nums.push(x)};
+  push(1);for(var p=PAGE.n-1;p<=PAGE.n+1;p++)if(p>1&&p<pages)push(p);if(pages>1)push(pages);
+  nums.sort(function(a,b){return a-b});
+  var html='',prev=0;nums.forEach(function(p){if(p-prev>1)html+='<span class="gap">…</span>';html+='<button type="button" class="'+(p===PAGE.n?'on':'')+'" data-page="'+p+'">'+p+'</button>';prev=p});
+  document.getElementById('foot').innerHTML='<span>'+from+'–'+to+' из '+total+' · выбрано 0</span>';
+  document.getElementById('pager').innerHTML='<button type="button" data-page="'+(PAGE.n-1)+'" '+(PAGE.n<=1?'disabled':'')+' aria-label="Назад">‹</button>'+html+'<button type="button" data-page="'+(PAGE.n+1)+'" '+(PAGE.n>=pages?'disabled':'')+' aria-label="Вперёд">›</button>';
+}
+document.getElementById('pager').addEventListener('click',function(e){var b=e.target.closest('[data-page]');if(!b||b.disabled)return;PAGE.n=+b.dataset.page;drawGrid(lastIdx);document.querySelector('.gridwrap').scrollTop=0});
+document.getElementById('psize').addEventListener('change',function(e){PAGE.size=+e.target.value;PAGE.n=1;drawGrid(lastIdx)});
 drawGrid(ROWS.map(function(_,i){return i}));
 
 /* ---- фильтры: каталог для реестра (конструктив из vtb-filters), значения справочников — из строк ---- */
@@ -1271,7 +1301,7 @@ var cf=window.CF({root:document.getElementById('cf-host'),catalog:CATALOG,defaul
   onApply:function(snap,desc){applyFilters(snap,desc)},onCancel:function(){togglePanel(false)}});
 var applied=[];
 function applyFilters(snap,desc){
-  applied=desc;
+  applied=desc;PAGE.n=1;
   var idx=ROWS.map(function(_,i){return i}).filter(function(i){var d=ROWS[i];
     return desc.every(function(c){var field=cf.FIELD_BY_ID[c.id];return match(field,c.op,ACC[c.id](d),c.values[0],c.values)})});
   drawGrid(idx);renderApplied();
@@ -1299,7 +1329,7 @@ function openDoc(i,slot){
   mark();
 }
 function closeSlot(slot){if(!slots[slot])return;slots[slot].el.remove();slots[slot]=null;mark()}
-function mark(){if(!slots)return;[].forEach.call(grid.querySelectorAll('tr.row'),function(tr){var i=+tr.dataset.i;tr.classList.toggle('selA',!!slots.A&&slots.A.row===i);tr.classList.toggle('selB',!!slots.B&&slots.B.row===i)})}
+function mark(){if(!slots)return;[].forEach.call(grid.querySelectorAll('tbody.row'),function(tr){var i=+tr.dataset.i;tr.classList.toggle('selA',!!slots.A&&slots.A.row===i);tr.classList.toggle('selB',!!slots.B&&slots.B.row===i)})}
 var toast=document.createElement('div');toast.className='toast';document.body.appendChild(toast);var toastT;
 function say(t){toast.textContent=t;toast.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){toast.classList.remove('on')},1400)}
 grid.addEventListener('click',function(e){
@@ -1309,8 +1339,17 @@ grid.addEventListener('click',function(e){
   var v=e.target.closest('.cv');if(v){var val=v.dataset.v;try{navigator.clipboard.writeText(val).then(function(){},function(){})}catch(_){}
     v.classList.add('flash');setTimeout(function(){v.classList.remove('flash')},600);say('Скопировано: '+val);}
 });
-/* тултип с полным значением — только если значение обрезано */
-grid.addEventListener('mouseover',function(e){var v=e.target.closest('.cv');if(!v)return;if(v.scrollWidth>v.clientWidth+1)v.setAttribute('data-tip',v.dataset.v);else v.removeAttribute('data-tip')});
+/* один плавающий тултип на страницу: не режется шапкой и соседними колонками (внутри td overflow:hidden) */
+var gtip=document.createElement('div');gtip.id='gtip';document.body.appendChild(gtip);
+function showTip(el,text){var r=el.getBoundingClientRect();gtip.textContent=text;gtip.classList.add('on');var w=gtip.offsetWidth,x=Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2)),y=r.top-gtip.offsetHeight-5;if(y<4)y=r.bottom+5;gtip.style.left=x+'px';gtip.style.top=y+'px'}
+function hideTip(){gtip.classList.remove('on')}
+grid.addEventListener('mouseover',function(e){
+  var v=e.target.closest('.cv');if(v){if(v.scrollWidth>v.clientWidth+1)showTip(v,v.dataset.v);else hideTip();return}
+  var t=e.target.closest('[data-tip]');if(t){showTip(t,t.dataset.tip);return}
+  hideTip();
+});
+grid.addEventListener('mouseleave',hideTip);
+document.querySelector('.gridwrap').addEventListener('scroll',hideTip);
 pair.addEventListener('click',function(e){var x=e.target.closest('.x');if(x){var dw=x.closest('.dw');closeSlot(dw.dataset.slot)}});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!(e.target.closest&&e.target.closest('.acced,.fe,input'))){if(slots.B)closeSlot('B');else closeSlot('A')}});
 /* повторный рендер drawer (после правок) затирает метку слота — возвращаем */
