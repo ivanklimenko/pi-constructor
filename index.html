@@ -297,6 +297,33 @@ a.lnk:hover{text-decoration:underline}
 .xg.byname.cp-kv .xr{grid-template-columns:230px minmax(0,1fr)}
 .xr .kv .st{font-size:10px}
 .stub{border:1px dashed var(--line);border-radius:5px;padding:26px 10px;text-align:center;color:var(--muted);font-size:12.5px}
+/* правка счетов Дт/Кт */
+.accrow{display:contents}
+.accrow .val{display:flex;align-items:center;gap:4px;min-width:0}
+.accrow .val .mono{flex:1}
+.accrow .pen{opacity:0}
+.msgs>div:hover .accrow .pen{opacity:1}
+.accrow.edited .mono{color:var(--warn)}
+.accrow.edited .mk2{width:7px;height:7px;border-radius:50%;background:var(--warn);flex:none}
+.accrow .rv{opacity:0;color:var(--muted);cursor:pointer;font-size:12px;line-height:1;padding:0 2px}
+.msgs>div:hover .accrow .rv{opacity:1}
+.accrow .rv:hover{color:var(--val)}
+.acced{position:relative;grid-column:1/-1;margin:2px 0 0}
+.acced .inwrap{position:relative}
+.acced input{width:100%;font:12px var(--mono);letter-spacing:.02em;color:var(--ink);background:var(--paper);border:1px solid var(--val);border-radius:3px;padding:2px 6px;height:22px}
+.acced input:focus{outline:none;box-shadow:0 0 0 2px var(--val-soft)}
+.acced input.bad{border-color:var(--bad)}
+.acced .hint{font-size:10.5px;color:var(--muted);margin-top:2px;display:flex;justify-content:space-between}
+.acced .hint .bad{color:var(--bad)}
+.sug{position:absolute;left:0;top:100%;margin-top:2px;width:max(100%,320px);background:var(--paper);border:1px solid var(--line);border-radius:4px;box-shadow:var(--shadow);z-index:40;min-width:300px}
+.sug .si{display:grid;grid-template-columns:minmax(0,1fr) 34px 120px;gap:0 8px;align-items:center;padding:3px 8px;min-height:24px;cursor:pointer;font-size:11.5px}
+.sug .si+.si{border-top:1px solid var(--line2)}
+.sug .si:hover,.sug .si.on{background:var(--hover)}
+.sug .si .mono{font-size:12px;color:var(--ink)}
+.sug .si .mono b{color:var(--val);font-weight:600}
+.sug .si .kind{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sug .si.more{color:var(--muted);cursor:default;font-size:10.5px;display:block;background:var(--sunk)}
+.sug .si.none{color:var(--bad);cursor:default;display:block}
 .fh.seqb{margin-top:6px;padding-top:8px;border-top:2px solid var(--line)}
 .regt td:first-child{font-family:var(--mono)}
 .regt tr.use td{background:var(--val-soft)}
@@ -486,6 +513,22 @@ var XTAB=[
     {tag:'',name:'по Дт',items:[['','vd.2']]},{tag:'',name:'по Кт',items:[['','vd.3']]}]}
 ];
 
+/* 5. Источники саджеста счетов. На проме: Кт — запрос в «Карточку клиента» с фильтром по валюте (10–15 счетов),
+      Дт — счета банка. Дальнейшее сужение по набранным цифрам — на фронте, показываем до SUGGEST_MAX. */
+var SUGGEST_MAX=5;
+var CLIENT_ACCOUNTS=[
+  {acc:'40817840100050017762',ccy:'USD',kind:'Текущий'},{acc:'40817840400050017763',ccy:'USD',kind:'Текущий'},
+  {acc:'40820840700050017764',ccy:'USD',kind:'Текущий (нерез.)'},{acc:'42301840200050017765',ccy:'USD',kind:'Депозит'},
+  {acc:'40817840500050017766',ccy:'USD',kind:'Транзитный'},{acc:'47422840800050017767',ccy:'USD',kind:'Конверсионный'},
+  {acc:'40817978100050017768',ccy:'EUR',kind:'Текущий'},{acc:'40817978400050017769',ccy:'EUR',kind:'Транзитный'},{acc:'42301978700050017770',ccy:'EUR',kind:'Депозит'},
+  {acc:'40817810000050017771',ccy:'RUB',kind:'Текущий'},{acc:'40817810300050017772',ccy:'RUB',kind:'Текущий'},{acc:'42301810600050017773',ccy:'RUB',kind:'Депозит'},
+  {acc:'40817156900050017774',ccy:'CNY',kind:'Текущий'}];
+var BANK_ACCOUNTS=[
+  {acc:'30110840700000001842',ccy:'USD',kind:'Ностро · NRDIRUMMXXX'},{acc:'30114840900000000517',ccy:'USD',kind:'Ностро · BCLHLV22XXX'},
+  {acc:'30110840000000002210',ccy:'USD',kind:'Ностро · HSTBDEHHXXX'},{acc:'47422840500000000311',ccy:'USD',kind:'Конверсионный'},
+  {acc:'70601840100000000519',ccy:'USD',kind:'Доходы · комиссии'},{acc:'30110978300000001845',ccy:'EUR',kind:'Ностро · CESEDEFFXXX'},
+  {acc:'30110810600000001848',ccy:'RUB',kind:'Корсчёт ЦБ'}];
+
 /* ===================== ДАННЫЕ ===================== */
 var ACTIONS=[
   {id:'refresh',t:'Обновить',k:'F5'},{id:'edit',t:'Редактировать',k:'E'},{id:'esid',t:'Создать ЭСИД по документу'},
@@ -619,7 +662,7 @@ var DOCS=[
 ];
 DOCS.push(cl(DOCS[0]));
 var TYPE='MT103';
-function mkui(tx){return {open:new Set(),editing:null,all:false,shut:{tx:tx},tab:'main',audit:new Set(['commonSection']),tasks:new Set(),linked:new Set([0]),src:new Set(['swiftMessage']),mpu:new Set([0])}}
+function mkui(tx){return {open:new Set(),editing:null,all:false,shut:{tx:tx},tab:'main',audit:new Set(['commonSection']),tasks:new Set(),linked:new Set([0]),src:new Set(['swiftMessage']),mpu:new Set([0]),accEdit:null}}
 var ui=[mkui(true),mkui(true),mkui(false)];
 
 /* ===================== ОТРИСОВКА ===================== */
@@ -845,13 +888,45 @@ function viewHtml(di){
     default:return '<div class="stub">Вкладка «'+esc(TABS.filter(function(t){return TAB_KEY[t]===u.tab})[0]||u.tab)+'» — макет ещё не рисовали</div>';
   }
 }
+/* ---- счета Дт/Кт: правка с саджестом ---- */
+function accRaw(v){return String(v||'').replace(/\s/g,'')}
+function accFmt(r){r=accRaw(r);return r.length===20?r.slice(0,5)+' '+r.slice(5,8)+' '+r.slice(8,9)+' '+r.slice(9,13)+' '+r.slice(13):r}
+function accSource(d,side){return (side==='kt'?CLIENT_ACCOUNTS:BANK_ACCOUNTS).filter(function(a){return a.ccy===d.ccy})}
+function accMatches(d,side,q){q=accRaw(q);return accSource(d,side).filter(function(a){return !q||a.acc.indexOf(q)>=0})}
+function sugHtml(d,side,q,sel){
+  var all=accMatches(d,side,q),list=all.slice(0,SUGGEST_MAX),qq=accRaw(q);
+  if(!all.length)return '<div class="sug"><div class="si none">В карточке нет счетов '+d.ccy+', содержащих «'+esc(qq)+'»</div></div>';
+  return '<div class="sug">'+list.map(function(a,i){var acc=a.acc,k=qq?acc.indexOf(qq):-1,h=k>=0?esc(acc.slice(0,k))+'<b>'+esc(qq)+'</b>'+esc(acc.slice(k+qq.length)):esc(acc);
+    return '<div class="si'+(i===sel?' on':'')+'" data-acc="'+acc+'"><span class="mono">'+h+'</span><span class="tag mt">'+a.ccy+'</span><span class="kind" title="'+esc(a.kind)+'">'+esc(a.kind)+'</span></div>'}).join('')+
+    (all.length>list.length?'<div class="si more">ещё '+(all.length-list.length)+' — уточните номер</div>':'')+'</div>';
+}
+function accRowHtml(d,u,side){
+  var lbl=side==='dt'?'Дт':'Кт',val=d[side],ed=d[side+'Edit'],e=u.accEdit&&u.accEdit.side===side;
+  var h='<span class="lbl">'+lbl+'</span><span class="accrow'+(ed?' edited':'')+'"><span class="val">'+
+    '<span class="mono v cut"'+(ed?' data-tip="Было '+accFmt(ed.was)+' · '+esc(ed.who)+', '+ed.when+'"':'')+'>'+val+'</span>'+
+    (ed?'<span class="mk2"></span><span class="rv" data-accrevert="'+side+'" data-tip="Вернуть исходное">↺</span>':'')+
+    '<span class="pen" data-accedit="'+side+'" data-tip="Изменить счёт '+lbl+'" role="button" tabindex="0">'+ic('edit')+'</span></span></span>';
+  if(e){var q=u.accEdit.q,raw=accRaw(q),bad=raw.length&&!/^\d{20}$/.test(raw),src=accSource(d,side);
+    h+='<div class="acced" data-accbox="'+side+'"><div class="inwrap"><input id="acc-'+side+'" class="'+(bad&&raw.length===20?'bad':'')+'" value="'+esc(q)+'" placeholder="20 цифр" autocomplete="off" aria-label="Счёт '+lbl+'">'+
+      sugHtml(d,side,q,u.accEdit.sel)+'</div>'+
+      '<div class="hint"><span'+(bad?' class="bad"':'')+'>'+(bad?'Счёт — 20 цифр, введено '+raw.length:(side==='kt'?'Карточка клиента · '+d.ccy+' · '+src.length+' сч.':'Счета банка · '+d.ccy+' · '+src.length+' сч.'))+'</span><span>↑↓ Enter · Esc</span></div></div>';
+  }
+  return h;
+}
+function accCommit(di,side,raw){
+  var d=DOCS[di],u=ui[di];raw=accRaw(raw);
+  if(!/^\d{20}$/.test(raw)){u.accEdit.q=raw;render(di);var i=document.getElementById('acc-'+side);if(i){i.focus();i.classList.add('bad')}return}
+  var was=d[side+'Edit']?d[side+'Edit'].was:d[side];
+  if(accRaw(was)===raw)delete d[side+'Edit'];else d[side+'Edit']={was:was,who:'Вы',when:new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).replace(',','')};
+  d[side]=accFmt(raw);u.accEdit=null;render(di);
+}
 function render(di){
   var d=DOCS[di],u=ui[di],p=PROFILES[TYPE],el=document.querySelector('.dw[data-d="'+di+'"]');if(!el)return;
   var B={
    msgs:function(){return '<div class="msgs">'+
      '<div><h6>Входящее SWIFT</h6><span class="lbl">S</span><span class="mono v cut">'+d.inS+'</span><span class="lbl">R</span><span class="mono v cut">'+d.inR+'</span></div>'+
      '<div><h6>Исходящее SWIFT</h6><span class="lbl">S → R</span><span class="mono v cut">'+d.outS+'<span class="ar">→</span>'+d.outR+'</span><span class="lbl">20 исх</span><span class="mono v cut">'+d.r20out+'</span></div>'+
-     '<div><h6>Счета</h6><span class="lbl">Дт</span><span class="mono v cut">'+d.dt+'</span><span class="lbl">Кт</span><span class="mono v cut">'+d.kt+'</span></div></div>'},
+     '<div style="position:relative"><h6>Счета</h6>'+accRowHtml(d,u,'dt')+accRowHtml(d,u,'kt')+'</div></div>'},
    route:function(){return '<div class="blk'+(u.shut.route?' shut':'')+'"><div class="bh"><h5>Маршрут</h5><span class="tag">'+d.route.type+'</span>'+
      '<span class="ln" style="gap:0 6px"><span class="lbl">Счёт</span><span class="mono v" title="'+esc(d.route.desc)+'">'+d.route.acc+'</span><span class="ar">→</span><span class="lbl">Receiver</span><span class="mono v">'+d.route.recv+'</span></span>'+
      '<button class="tg" data-tg="route" aria-label="Свернуть маршрут">▲</button></div>'+
@@ -896,6 +971,11 @@ pair.addEventListener('click',function(e){
     var list=JSON.parse(mr.dataset.menu),m=document.createElement('div');m.className='tabmenu';
     m.innerHTML=list.map(function(x){return '<span class="'+(x.off?'off':'')+'"'+(x.k?' data-tab="'+x.k+'"':'')+'>'+esc(x.n)+(x.off?' <span class="lbl">— нет данных</span>':'')+'</span>'}).join('');
     var bar=mr.parentNode;m.style.top=(bar.offsetTop+bar.offsetHeight-1)+'px';dw.appendChild(m);return}
+  var ae=e.target.closest('[data-accedit]');if(ae){var side=ae.dataset.accedit;u.accEdit={side:side,q:'',sel:-1};render(di);var inp=document.getElementById('acc-'+side);if(inp)inp.focus();return}
+  var ar=e.target.closest('[data-accrevert]');if(ar){var sd=ar.dataset.accrevert;if(d[sd+'Edit']){d[sd]=accFmt(d[sd+'Edit'].was);delete d[sd+'Edit']}render(di);return}
+  var si=e.target.closest('.si[data-acc]');if(si&&u.accEdit){accCommit(di,u.accEdit.side,si.dataset.acc);return}
+  if(e.target.closest('.acced'))return;
+  if(u.accEdit&&!e.target.closest('.acced')){u.accEdit=null;render(di);}
   var ld=e.target.closest('[data-linked]');if(ld){var li=+ld.dataset.linked;u.linked.has(li)?u.linked.delete(li):u.linked.add(li);render(di);return}
   var sr=e.target.closest('[data-src]');if(sr){var sk=sr.dataset.src;u.src.has(sk)?u.src.delete(sk):u.src.add(sk);render(di);return}
   var mp=e.target.closest('[data-mpu]');if(mp){var mi=+mp.dataset.mpu;u.mpu.has(mi)?u.mpu.delete(mi):u.mpu.add(mi);render(di);return}
@@ -939,7 +1019,18 @@ function validate(fe){
   var cnt=fe.querySelector('[data-cnt]');cnt.textContent=total+'/'+(N*W);cnt.classList.toggle('bad',total>N*W);if(total>N*W)errs.push('Всего '+total+' символов, максимум '+(N*W));
   fe.querySelector('[data-err]').textContent=errs[0]||'';var sv=fe.querySelector('[data-act="save"]');if(sv)sv.disabled=!!errs.length;return !errs.length;
 }
-pair.addEventListener('input',function(e){var fe=e.target.closest('.fe');if(fe)validate(fe)});
+pair.addEventListener('input',function(e){var fe=e.target.closest('.fe');if(fe)validate(fe);
+  var box=e.target.closest('.acced');if(box){var dw=box.closest('.dw'),di=+dw.dataset.d,u=ui[di],d=DOCS[di];u.accEdit.q=e.target.value.replace(/[^\d\s]/g,'');u.accEdit.sel=-1;
+    var old=box.querySelector('.sug');if(old)old.remove();box.querySelector('input').insertAdjacentHTML('afterend',sugHtml(d,u.accEdit.side,u.accEdit.q,-1));
+    var raw=accRaw(u.accEdit.q),bad=raw.length&&!/^\d{20}$/.test(raw),hint=box.querySelector('.hint span');e.target.classList.toggle('bad',!!bad&&raw.length>=20);
+    if(hint){hint.textContent=bad?'Счёт — 20 цифр, введено '+raw.length:(u.accEdit.side==='kt'?'Карточка клиента · '+d.ccy+' · '+accSource(d,'kt').length+' сч.':'Счета банка · '+d.ccy+' · '+accSource(d,'dt').length+' сч.');hint.className=bad?'bad':''}}
+});
+pair.addEventListener('keydown',function(e){var box=e.target.closest&&e.target.closest('.acced');if(!box)return;var dw=box.closest('.dw'),di=+dw.dataset.d,u=ui[di],d=DOCS[di];
+  var items=box.querySelectorAll('.si[data-acc]');
+  if(e.key==='Escape'){u.accEdit=null;render(di);return}
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();if(!items.length)return;u.accEdit.sel=(u.accEdit.sel+(e.key==='ArrowDown'?1:-1)+items.length)%items.length;items.forEach(function(x,i){x.classList.toggle('on',i===u.accEdit.sel)});return}
+  if(e.key==='Enter'){e.preventDefault();var pick=u.accEdit.sel>=0&&items[u.accEdit.sel]?items[u.accEdit.sel].dataset.acc:(items.length===1?items[0].dataset.acc:e.target.value);accCommit(di,u.accEdit.side,pick);}
+});
 
 function meter(){[0,1].forEach(function(k){var el=document.getElementById('dw'+k),b=document.getElementById('h'+k);if(!el||!b)return;var h=el.offsetHeight;b.textContent=h?h.toLocaleString('ru-RU'):'—';b.classList.toggle('over',h>860);if(k===0&&h&&TYPE==='MT103')document.getElementById('st-h').textContent='~'+Math.round(h/10)*10;});}
 document.getElementById('m-tx').onclick=function(){setMode('tx')};
