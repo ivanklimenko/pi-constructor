@@ -443,14 +443,17 @@ body{margin:0;overflow:hidden}
 .grid .lk.off:hover{background:none}
 .grid .lk.flash{background:var(--ok-soft);color:var(--ok)}
 .grid .lks{display:flex;gap:3px;margin-top:2px}
-.grid tr.purow td{max-width:0;overflow:hidden;text-overflow:ellipsis}
+/* обёртка width:0/min-width:100%: содержимое второй строки не влияет на ширину колонок, но занимает всю ширину */
+.grid tr.purow td .inner{display:flex;align-items:center;gap:6px;width:0;min-width:100%}
+.grid tr.purow td .inner .cv{flex:1;min-width:0;max-width:none;display:block}
+.grid tr.purow td .inner .fno,.grid tr.purow td .inner .sd{flex:none}
 .grid tr.purow td.reason{padding:2px 8px 6px;border-bottom:1px solid var(--line2);background:var(--sunk);font:11px var(--sans);color:var(--ink2);white-space:nowrap;overflow:hidden}
 .grid tbody.row:hover tr.purow td.reason{background:var(--chip)}
-.grid tr.purow td.reason.empty,.grid tbody.row:hover tr.purow td.reason.empty{background:transparent}
+.grid tr.purow td.reason.empty{background:transparent}
 .grid td.icons{white-space:nowrap}
 .grid td.icons .stdot{margin-left:4px}
-.grid tr.purow td.reason .sd{display:inline-block;width:7px;height:7px;border-radius:50%;margin:0 6px 1px 2px;vertical-align:middle}
-.grid tr.purow td.reason .cv{max-width:100%}
+.grid tr.purow td.reason .sd{display:inline-block;width:7px;height:7px;border-radius:50%;margin-left:2px}
+
 .filters{display:flex;align-items:center;gap:8px;padding:8px 20px;border-bottom:1px solid var(--line);background:var(--sunk);font-size:12.5px}
 .search{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:6px;background:var(--paper);padding:0 8px;height:28px;width:280px;color:var(--muted)}
 .search input{border:0;outline:0;background:none;font:12.5px var(--sans);color:var(--ink);flex:1}
@@ -484,7 +487,8 @@ body{margin:0;overflow:hidden}
 body.resizing{cursor:col-resize;user-select:none}
 .grid .sr .tag{max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .grid th{position:sticky;top:0;z-index:2;background:var(--paper);text-align:left;font:600 12.5px var(--sans);color:var(--ink);padding:9px 8px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
-.grid th .sub{display:block;font:11px var(--sans);color:var(--muted);font-weight:400;min-height:14px}
+.grid th .sub{display:block;font:11px var(--sans);color:var(--muted);font-weight:400;min-height:14px;overflow:hidden;text-overflow:ellipsis}
+.grid th{overflow:hidden}
 .grid th.sortable{cursor:pointer;user-select:none}
 .grid th.sortable:hover{background:var(--hover)}
 .grid th .sarrow{margin-left:4px;font-size:11px;color:var(--faint)}
@@ -506,8 +510,7 @@ body.resizing{cursor:col-resize;user-select:none}
 .grid tbody.row.selB td:first-child{box-shadow:inset 3px 0 0 var(--warn)}
 .grid tr.purow td.purp{padding:2px 8px 6px;border-bottom:1px solid var(--line2);background:var(--sunk);font:11px var(--sans);color:var(--ink2);text-transform:none;letter-spacing:0;max-width:none;margin:0;display:table-cell}
 .grid tbody.row:hover tr.purow td.purp{background:var(--chip)}
-.grid tr.purow .fno{font:600 10.5px var(--mono);color:var(--muted);margin-right:8px;cursor:help}
-.grid tr.purow .cv{max-width:100%}
+.grid tr.purow .fno{font:600 10.5px var(--mono);color:var(--muted);cursor:help}
 .grid tbody.row tr:first-child td:not([rowspan]){border-bottom:0;padding-bottom:2px}
 .grid [data-tip]::after{display:none}
 #gtip{position:fixed;z-index:80;background:var(--ink);color:var(--paper);font:500 11px/1.3 var(--sans);padding:3px 7px;border-radius:4px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .1s;max-width:70vw;overflow:hidden;text-overflow:ellipsis}
@@ -1346,15 +1349,15 @@ function rowHtml(d,i,ord){
    '<td class="sr" rowspan="2">'+cv(d.inS,'tag snd')+cv(d.inR,'tag rcv')+'</td>'+
    '<td class="sr" rowspan="2">'+cv(d.outS,'tag snd')+cv(d.outR,'tag rcv')+'</td>'+
    '<td class="sr" rowspan="2">'+cv(d.provS,'tag snd')+cv(d.provR,'tag rcv')+'</td></tr>'+
-   '<tr class="purow"><td colspan="2" class="reason'+(d.reason?'':' empty')+'">'+(d.reason?'<span class="sd sc-'+SM[d.status].cls+'"></span>'+cv(d.reason,'',9999):'')+'</td>'+
-   '<td colspan="5" class="purp"><span class="fno" data-tip="70 · Детали платежа">70</span>'+cv(purp,'',9999)+'</td></tr></tbody>';
+   '<tr class="purow"><td colspan="2" class="reason'+(d.reason?'':' empty')+'">'+(d.reason?'<div class="inner"><span class="sd sc-'+SM[d.status].cls+'"></span>'+cv(d.reason)+'</div>':'')+'</td>'+
+   '<td colspan="5" class="purp"><div class="inner"><span class="fno" data-tip="70 · Детали платежа">70</span>'+cv(purp)+'</div></td></tr></tbody>';
 }
 var grid=document.getElementById('grid');
 /* ---- сортировка: у составной колонки несколько реквизитов — клик по заголовку открывает меню, у простой — сразу переключает ---- */
 var SORT={by:null,dir:1};
 var COLS=[
   {t:'',sub:''},
-  {t:'',sub:'',keys:[{id:'status',l:'Статус'}]},
+  {t:'',m:'Статус',sub:'',keys:[{id:'status',l:'Статус'},{id:'reason',l:'Причина статуса'}]},
   {t:'ID',sub:'№ · 20 вх / исх',keys:[{id:'docNumber',l:'Номер документа',type:'number'},{id:'refIn',l:'20 вх'},{id:'refOut',l:'20 исх'}]},
   {t:'Дата / Время',sub:'валютирование Дт / Кт',keys:[{id:'created',l:'Дата документа',type:'date'},{id:'vdDt',l:'Валютирование Дт',type:'date'},{id:'vdKt',l:'Валютирование Кт',type:'date'}]},
   {t:'Тип',sub:'',keys:[{id:'type',l:'Тип сообщения'}]},
@@ -1394,7 +1397,7 @@ grid.addEventListener('click',function(e){
   if(c.keys.length===1){setSort(c.keys[0].id);return}
   closeSortMenu();var r=th.getBoundingClientRect(),z=parseFloat(document.documentElement.style.zoom)||1;
   var m=document.createElement('div');m.id='sortmenu';m.className='sortmenu';m.style.left=(r.left/z)+'px';m.style.top=(r.bottom/z+2)+'px';
-  m.innerHTML='<div class="smt">Сортировать «'+esc(c.t)+'» по</div>'+c.keys.map(function(k){var on=SORT.by===k.id;return '<button type="button" data-sort="'+k.id+'" class="'+(on?'on':'')+'">'+esc(k.l)+'<span class="sarrow">'+(on?(SORT.dir>0?'↑':'↓'):'')+'</span></button>'}).join('')+(SORT.by&&c.keys.some(function(k){return k.id===SORT.by})?'<button type="button" data-sort="" class="reset">Сбросить сортировку</button>':'');
+  m.innerHTML='<div class="smt">Сортировать «'+esc(c.m||c.t)+'» по</div>'+c.keys.map(function(k){var on=SORT.by===k.id;return '<button type="button" data-sort="'+k.id+'" class="'+(on?'on':'')+'">'+esc(k.l)+'<span class="sarrow">'+(on?(SORT.dir>0?'↑':'↓'):'')+'</span></button>'}).join('')+(SORT.by&&c.keys.some(function(k){return k.id===SORT.by})?'<button type="button" data-sort="" class="reset">Сбросить сортировку</button>':'');
   document.body.appendChild(m);
 });
 document.addEventListener('click',function(e){var b=e.target.closest('#sortmenu [data-sort]');if(b){if(b.dataset.sort)setSort(b.dataset.sort);else{SORT.by=null;closeSortMenu();refresh()}return}if(!e.target.closest('#sortmenu, th.sortable'))closeSortMenu()});
