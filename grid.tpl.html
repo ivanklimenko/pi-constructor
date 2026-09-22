@@ -43,7 +43,15 @@ body{margin:0;overflow:hidden}
 #cf-host.on{display:block}
 .cf .cf-grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
 .gridwrap{overflow:auto;position:relative}
-.grid{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;font-size:12.5px;line-height:1.35}
+.grid{border-collapse:separate;border-spacing:0;width:max-content;font-size:12.5px;line-height:1.35;table-layout:auto}
+.grid.fixed{table-layout:fixed}
+.grid.fixed td{overflow:hidden}
+.grid th{position:relative}
+.rz{position:absolute;top:0;right:-3px;width:7px;height:100%;cursor:col-resize;z-index:3}
+.rz::after{content:'';position:absolute;left:3px;top:8px;bottom:8px;width:1px;background:var(--line)}
+.rz:hover::after,.rz.on::after{background:var(--val);width:2px}
+body.resizing{cursor:col-resize;user-select:none}
+.grid .sr .tag{max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .grid th{position:sticky;top:0;z-index:2;background:var(--paper);text-align:left;font:600 12.5px var(--sans);color:var(--ink);padding:9px 8px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
 .grid th .sub{display:block;font:11px var(--sans);color:var(--muted);font-weight:400}
 .grid td{padding:7px 8px 6px;border-bottom:1px solid var(--line2);vertical-align:top;white-space:nowrap}
@@ -145,6 +153,7 @@ for(var i=0;i<12;i++){
   base.f['58']=base.type.indexOf('MT202')===0?{opt:'A',lines:[b2[0],b2[1]]}:{lines:[]};
   base.f['70']={lines:PURP[i%6].match(/.{1,35}(?=\s|$)|.{1,35}/g)};
   base.inS=b1[1];base.inR=b2[1];base.outS=b2[1];base.outR=b1[1];
+  var PROV=['ЕРС','LORO','NOSTRO','SUBOUL','VTO'];base.provS=DIRS[i][0]==='IN'?PROV[i%2?3:0]:PROV[4];base.provR=DIRS[i][0]==='IN'?PROV[4]:PROV[1+(i%3===0?1:0)];
   base.tabsOff=i%2?['Нотификации','Стриминг','MPU']:['MPU'];
   ROWS.push(base);
 }
@@ -152,7 +161,7 @@ for(var i=0;i<12;i++){
 function fld(f,showName){if(!f||(!f.lines.length&&!f.acc))return '<span class="nl">—</span>';var c=f.edit||f,acc=c.acc||f.acc,l0=c.lines[0]||'',last=c.lines[c.lines.length-1]||'';
   var main=acc?acc:(/^[A-Z0-9]{8}([A-Z0-9]{3})?$/.test(last)&&c.lines.length>1?last:l0);
   var cap=acc?l0:(main===last&&c.lines.length>1?l0:'');
-  return '<div class="fld"><span class="op">'+(c.opt||'')+'</span>'+cv(main,'mono',160)+'</div>'+(cap?'<span class="cap">'+cv(cap,'',150)+'</span>':'')}
+  return '<div class="fld"><span class="op">'+(c.opt||'')+'</span>'+cv(main,'mono',130)+'</div>'+(cap?'<span class="cap">'+cv(cap,'',125)+'</span>':'')}
 function cv(v,cls,mw){v=String(v==null?'':v);return '<span class="cv'+(cls?' '+cls:'')+'"'+(mw?' style="max-width:'+mw+'px"':'')+' data-v="'+esc(v)+'">'+esc(v)+'</span>'}
 function rowHtml(d,i){
   var vd=d.vd,same=vd.every(function(x){return x===vd[0]});
@@ -161,20 +170,39 @@ function rowHtml(d,i){
    '<td class="id"><b>'+cv(d.num)+'</b><span class="l2 mono">'+cv(d.f['20'].lines[0])+'<br>'+cv(d.r20out)+'</span></td>'+
    '<td>'+cv(d.created.slice(0,10))+' <span class="lbl">'+cv(d.created.slice(11,16))+'</span><span class="l2">Дт '+cv(vd[2])+'<br>Кт '+(same?cv(vd[3]):'<span style="color:var(--warn)">'+cv(vd[3])+'</span>')+'</span></td>'+
    '<td>'+cv(d.type,'tag mt')+'</td>'+
-   '<td><span class="dir">'+ic(d.dir==='IN'?'down':'kt')+cv(d.dir)+'</span><span class="l2">'+cv(d.dirTxt,'',120)+'</span></td>'+
+   '<td><span class="dir">'+ic(d.dir==='IN'?'down':'kt')+cv(d.dir)+'</span><span class="l2">'+cv(d.dirTxt,'',105)+'</span></td>'+
    '<td><span class="amt">'+cv(d.amount)+'</span><span class="l2">'+cv(d.ccy)+'</span></td>'+
-   '<td>'+fld(d.f['50'])+'<div class="purp">'+cv((d.f['70']||{lines:[]}).lines.join(' '),'',330)+'</div></td>'+
+   '<td>'+fld(d.f['50'])+'<div class="purp">'+cv((d.f['70']||{lines:[]}).lines.join(' '),'',250)+'</div></td>'+
    '<td>'+fld(d.f['52'])+'</td><td>'+fld(d.f['57'])+'</td><td>'+fld(d.f['58'])+'</td><td>'+fld(d.f['59'])+'</td>'+
    '<td>'+cv(d.route.acc,'mono',110)+'<span class="l2">'+cv(d.route.type)+' → '+cv(d.route.recv)+'</span></td>'+
-   '<td class="sr">'+cv(d.inS,'tag snd')+cv(d.inR,'tag rcv')+'</td></tr>';
+   '<td class="sr">'+cv(d.inS,'tag snd')+cv(d.inR,'tag rcv')+'</td>'+
+   '<td class="sr">'+cv(d.outS,'tag snd')+cv(d.outR,'tag rcv')+'</td>'+
+   '<td class="sr">'+cv(d.provS,'tag snd')+cv(d.provR,'tag rcv')+'</td></tr>';
 }
 var grid=document.getElementById('grid');
-var HEAD='<thead><tr><th><input type="checkbox" aria-label="Выбрать все"></th><th></th><th>ID<span class="sub">№ · 20 вх / исх</span></th><th>Дата / Время<span class="sub">валютирование Дт / Кт</span></th><th>Тип</th><th>Направление</th><th>32<span class="sub">сумма</span></th><th>50<span class="sub">приказодатель · 70</span></th><th>52</th><th>57</th><th>58</th><th>59</th><th>Маршрут</th><th>S / R</th></tr></thead>';
-function drawGrid(idx){
-  grid.innerHTML=HEAD+'<tbody>'+idx.map(function(i){return rowHtml(ROWS[i],i)}).join('')+(idx.length?'':'<tr><td colspan="14" style="text-align:center;color:var(--muted);padding:28px">По заданным условиям документов нет</td></tr>')+'</tbody>';
+var HEAD='<thead><tr><th><input type="checkbox" aria-label="Выбрать все"></th><th></th><th>ID<span class="sub">№ · 20 вх / исх</span></th><th>Дата / Время<span class="sub">валютирование Дт / Кт</span></th><th>Тип</th><th>Направление</th><th>32<span class="sub">сумма</span></th><th>50<span class="sub">приказодатель · 70</span></th><th>52</th><th>57</th><th>58</th><th>59</th><th>Маршрут</th><th>S / R in</th><th>S / R out</th><th>Провайдеры</th></tr></thead>';
+/* ---- изменяемая ширина колонок: после первого рендера фиксируем ширины, дальше тянем за границу в шапке ---- */
+var COLW=null;
+function initResize(){
+  var ths=[].slice.call(grid.querySelectorAll('thead th'));
+  if(!COLW){COLW=ths.map(function(th){return th.offsetWidth});grid.classList.add('fixed')}
+  ths.forEach(function(th,i){th.style.width=COLW[i]+'px';var h=document.createElement('span');h.className='rz';h.dataset.col=i;th.appendChild(h)});
+  grid.style.width=COLW.reduce(function(a,b){return a+b},0)+'px';
+}
+grid.addEventListener('mousedown',function(e){var h=e.target.closest('.rz');if(!h)return;e.preventDefault();
+  var i=+h.dataset.col,x0=e.clientX,w0=COLW[i],th=h.parentNode;h.classList.add('on');document.body.classList.add('resizing');
+  function mv(ev){COLW[i]=Math.max(36,w0+ev.clientX-x0);th.style.width=COLW[i]+'px';grid.style.width=COLW.reduce(function(a,b){return a+b},0)+'px'}
+  function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);h.classList.remove('on');document.body.classList.remove('resizing')}
+  document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+});
+grid.addEventListener('dblclick',function(e){var h=e.target.closest('.rz');if(!h)return;var i=+h.dataset.col;COLW=null;grid.classList.remove('fixed');[].forEach.call(grid.querySelectorAll('thead th'),function(th){th.style.width=''});grid.style.width='';drawGrid(lastIdx)});
+var lastIdx=[];
+function drawGrid(idx){lastIdx=idx;
+  grid.innerHTML=HEAD+'<tbody>'+idx.map(function(i){return rowHtml(ROWS[i],i)}).join('')+(idx.length?'':'<tr><td colspan="16" style="text-align:center;color:var(--muted);padding:28px">По заданным условиям документов нет</td></tr>')+'</tbody>';
   document.getElementById('cnt').textContent=idx.length+(idx.length===ROWS.length?' из 1 284':' из '+ROWS.length+' на странице');
   document.getElementById('foot').textContent=(idx.length?'1–'+idx.length:'0')+' из '+(idx.length===ROWS.length?'1 284':idx.length)+' · выбрано 0';
   if(typeof mark==='function')mark();
+  initResize();
 }
 drawGrid(ROWS.map(function(_,i){return i}));
 
@@ -189,7 +217,8 @@ var ACC={
   amount:function(d){return d.amount.replace(/\s/g,'')},currency:function(d){return d.ccy},dtAcc:function(d){return d.dt.replace(/\s/g,'')},ktAcc:function(d){return d.kt.replace(/\s/g,'')},
   f50name:function(d){return lines(d,'50')[0]||''},f50acc:function(d){return (d.f['50']||{}).acc||''},f59name:function(d){return lines(d,'59')[0]||''},f59acc:function(d){return (d.f['59']||{}).acc||''},
   f52:function(d){return bic(d,'52')},f57:function(d){return bic(d,'57')},f58:function(d){return bic(d,'58')},
-  routeType:function(d){return d.route.type},routeRecv:function(d){return d.route.recv},sender:function(d){return d.inS},receiver:function(d){return d.inR}
+  routeType:function(d){return d.route.type},routeRecv:function(d){return d.route.recv},sender:function(d){return d.inS},receiver:function(d){return d.inR},
+  outSender:function(d){return d.outS},outReceiver:function(d){return d.outR},provS:function(d){return d.provS},provR:function(d){return d.provR}
 };
 function F(id,label,type){return {id:id,label:label,type:type||'text',dict:uniq(ACC[id]).slice(0,12)}}
 var CATALOG=[
@@ -198,7 +227,7 @@ var CATALOG=[
   {group:'Финансы',fields:[F('amount','Сумма','number'),F('currency','Валюта','select'),F('dtAcc','Счёт Дт'),F('ktAcc','Счёт Кт')]},
   {group:'Контрагенты',fields:[F('f50name','Поле 50 (наименование)'),F('f50acc','Поле 50 (счёт)'),F('f59name','Поле 59 (наименование)'),F('f59acc','Поле 59 (счёт)')]},
   {group:'Банки (SWIFT-коды)',fields:[F('f52','Поле 52'),F('f57','Поле 57'),F('f58','Поле 58')]},
-  {group:'Маршрут',fields:[F('routeType','Тип маршрута','select'),F('routeRecv','Receiver'),F('sender','S — отправитель'),F('receiver','R — получатель')]}
+  {group:'Маршрут',fields:[F('routeType','Тип маршрута','select'),F('routeRecv','Receiver'),F('sender','S in'),F('receiver','R in'),F('outSender','S out'),F('outReceiver','R out'),F('provS','Провайдер отправителя','select'),F('provR','Провайдер получателя','select')]}
 ];
 var DEMO_SETS=[
   {id:'demo-1',name:'Входящие USD исполненные',data:{visible:['direction','currency','status'],ops:{direction:'eq',currency:'eq',status:'eq'},values:{direction:{list:[],draft:'IN'},currency:{list:[],draft:'USD'},status:{list:[],draft:'DONE'}}}},
