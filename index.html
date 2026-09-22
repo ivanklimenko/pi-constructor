@@ -168,7 +168,7 @@ a.lnk:hover{text-decoration:underline}
 .fh h5{margin:0;font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink2)}
 .fh .lnk{margin-left:auto;font-size:12px}
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px}
-.cell{border:1px solid var(--line);border-radius:4px;padding:3px 8px;min-width:0;display:grid;grid-template-columns:26px 14px minmax(0,1fr) auto 16px;gap:0 6px;align-items:center;min-height:27px;cursor:pointer;position:relative}
+.cell{border:1px solid var(--line);border-radius:4px;padding:3px 8px;min-width:0;display:grid;grid-template-columns:26px 14px minmax(0,1fr) auto 16px 16px;gap:0 6px;align-items:center;min-height:27px;cursor:pointer;position:relative}
 .cell:hover{border-color:var(--val)}
 .fno{font:600 12px var(--mono);color:var(--ink)}
 .op{font:700 12px var(--mono);color:var(--opt);text-align:center}
@@ -177,19 +177,30 @@ a.lnk:hover{text-decoration:underline}
 .eye{color:var(--faint);display:grid;place-items:center}
 .eye svg{width:15px;height:15px}
 .cell:hover .eye{color:var(--val)}
+.pen{color:var(--faint);display:grid;place-items:center;cursor:pointer;border-radius:3px}
+.pen svg{width:13px;height:13px}
+.cell:hover .pen{color:var(--muted)}
+.pen:hover{color:var(--val)!important;background:var(--val-soft)}
+.cell.txt .pen{position:absolute;top:4px;right:6px}
+.cell.editing{border-color:var(--val);box-shadow:inset 0 0 0 1px var(--val)}
+.fe input.bad{border-bottom-color:var(--bad);background:var(--bad-soft)}
+.fe .cnt.bad{color:var(--bad);font-weight:600}
+.fe .err{font:11px/1.3 var(--sans);color:var(--bad);margin-top:4px;min-height:14px}
+.fe .btn[disabled]{opacity:.45;cursor:not-allowed}
 .cell.null{cursor:default;border-style:dashed}
 .cell.null:hover{border-color:var(--line)}
 .cell.null .mn{color:var(--faint);font-weight:400}
 .cell.null .eye{visibility:hidden}
 .full{display:none;grid-column:3/-1;font:12px/1.45 var(--mono);color:var(--val);white-space:pre-wrap;margin:2px 0 3px;padding-top:3px;border-top:1px dashed var(--line)}
 .cell.open .full{display:block}
+.cell .full{grid-column:3/-1}
 .cell.open .sc{visibility:hidden}
 .cell .ed{display:none;grid-column:3/-1;justify-self:start;font:500 11px var(--sans);color:var(--val);background:none;border:0;padding:0;cursor:pointer;margin-bottom:2px}
 .cell.open .ed{display:block}
 .cell.edited{background:var(--warn-row);border-color:var(--warn)}
 .cell.edited .mn{color:var(--warn)}
 .cell.edited::after{content:"";position:absolute;top:-3px;right:-3px;width:8px;height:8px;border-radius:50%;background:var(--warn);box-shadow:0 0 0 2px var(--paper)}
-.cell.txt{align-items:start;cursor:default;grid-template-columns:26px minmax(0,1fr)}
+.cell.txt{align-items:start;cursor:default;grid-template-columns:26px minmax(0,1fr);padding-right:24px}
 .cell.txt:hover{border-color:var(--line)}
 .cell.txt pre{margin:0;font:11.5px/1.42 var(--mono);color:var(--val);white-space:pre;min-height:65px;overflow:hidden}
 .cell.txt.null pre{color:var(--faint)}
@@ -344,22 +355,22 @@ var FIELDS={
   '32A':{name:'Дата валютирования, валюта, сумма',kind:'amount'},
   '33B':{name:'Валюта и сумма инструкции',kind:'short'},
   '36': {name:'Курс',kind:'short'},
-  '50': {name:'Приказодатель',kind:'party',opts:['A','F','K']},
-  '52': {name:'Банк приказодателя',kind:'bank',opts:['A','D']},
+  '50': {name:'Приказодатель',kind:'party',opts:['A','F','K'],editable:true},
+  '52': {name:'Банк приказодателя',kind:'bank',opts:['A','D'],editable:true},
   '53': {name:'Корреспондент отправителя',kind:'bank',opts:['A','B','D']},
   '54': {name:'Корреспондент получателя',kind:'bank',opts:['A','B','D']},
   '55': {name:'Третье возмещающее учреждение',kind:'bank',opts:['A','B','D']},
-  '56': {name:'Банк-посредник',kind:'bank',opts:['A','C','D']},
-  '57': {name:'Банк получателя',kind:'bank',opts:['A','B','C','D']},
+  '56': {name:'Банк-посредник',kind:'bank',opts:['A','C','D'],editable:true},
+  '57': {name:'Банк получателя',kind:'bank',opts:['A','B','C','D'],editable:true},
   '58': {name:'Учреждение-бенефициар',kind:'bank',opts:['A','D']},
-  '59': {name:'Бенефициар',kind:'party',opts:['','A','F']},
-  '70': {name:'Детали платежа',kind:'text',lines:4,width:35},
+  '59': {name:'Бенефициар',kind:'party',opts:['','A','F'],editable:true},
+  '70': {name:'Детали платежа',kind:'text',lines:4,width:35,editable:true},
   '71A':{name:'Детали расходов',kind:'short'},
   '71B':{name:'Расходы, взимаемые получателем',kind:'short'},
   '71F':{name:'Расходы отправителя',kind:'short'},
   '71G':{name:'Расходы получателя',kind:'short'},
   '121':{name:'UETR — уникальный сквозной референс',kind:'ref'},
-  '72': {name:'Информация отправителя получателю',kind:'text',lines:6,width:35,show:4},
+  '72': {name:'Информация отправителя получателю',kind:'text',lines:6,width:35,show:4,editable:true},
   '77B':{name:'Регуляторная отчётность',kind:'short'},
   '79': {name:'Текст сообщения',kind:'text',lines:35,width:50,show:6}
 };
@@ -490,27 +501,28 @@ function cell(di,tag){
   var c=cur(f),acc=c.acc||f.acc,main=c.lines[0]||'',sec='';
   if(acc)sec=acc; else if(c.lines.length>1&&isBic(c.lines[c.lines.length-1]))sec=c.lines[c.lines.length-1];
   if(c.lines.length===1&&isBic(c.lines[0])){sec=c.lines[0];main='';}
-  var cls='cell'+(f.edit?' edited':'')+(u.open.has(tag)?' open':'');
+  var cls='cell'+(f.edit?' edited':'')+(u.open.has(tag)?' open':'')+(u.editing===tag?' editing':'');
   var tip=f.edit?' title="Изменено: '+esc(f.edit.who)+', '+f.edit.when+'"':'';
   var fullTxt=f.edit?('Было:\n'+full(f.lines,f.acc)+'\nСтало:\n'+full(f.edit.lines,f.edit.acc||f.acc)):full(c.lines,acc);
   return '<div class="'+cls+'" tabindex="0" data-no="'+tag+'"'+tip+'>'+
     fnoHtml(tag)+opHtml(c.opt)+
     '<span class="mn cut" title="'+esc(main)+'">'+esc(main)+'</span>'+
-    '<span class="sc">'+esc(sec)+'</span><span class="eye">'+ic('eye')+'</span>'+
-    '<div class="full">'+esc(fullTxt)+'</div><button class="ed" data-act="edit" data-no="'+tag+'">✎ Изменить'+(f.edit?' · '+esc(f.edit.who)+', '+f.edit.when:'')+'</button>'+
+    '<span class="sc">'+esc(sec)+'</span><span class="eye">'+ic('eye')+'</span>'+penHtml(tag)+
+    '<div class="full">'+esc(fullTxt)+'</div>'+(f.edit?'<button class="ed" data-act="edit" data-no="'+tag+'">✎ Изменить · '+esc(f.edit.who)+', '+f.edit.when+'</button>':'')+
   '</div>';
 }
+function penHtml(tag){return meta(tag).editable?'<span class="pen" data-act="edit" data-no="'+tag+'" data-tip="Редактировать" role="button" tabindex="0">'+ic('edit')+'</span>':'<span></span>'}
 function editor(di,tag){
-  var f=DOCS[di].f[tag],c=cur(f),m=meta(tag),L=c.lines.concat(['','','','']).slice(0,4),acc=c.acc||f.acc||'';
-  var letters=m.opts||[''];
+  var f=DOCS[di].f[tag],c=cur(f),m=meta(tag),N=m.lines||4,W=m.width||35,L=c.lines.concat(new Array(N).fill('')).slice(0,N),acc=c.acc||f.acc||'';
+  var letters=m.opts||[''],hasAcc=m.kind==='party';
   function lab(l){return l||'—'}
   return '<div class="fe"><h6>Поле '+base(tag)+' · '+esc(m.name)+' — правка</h6><div class="two">'+
-    '<div class="box ro"><div class="cap"><span>Исходное</span><span>'+f.lines.join('').length+'/140</span></div><div class="opts">'+letters.map(function(l){return '<span class="'+(l===(f.opt||'')?'on':'')+'" title="'+(l?'Опция '+l:'Без буквы')+'">'+lab(l)+'</span>'}).join('')+'</div>'+
-      (acc?'<pre>/'+esc(f.acc||'')+'</pre>':'')+'<pre>'+[0,1,2,3].map(function(k){return esc(f.lines[k]||' ')}).join('\n')+'</pre></div>'+
-    '<div class="box"><div class="cap"><span>Новое значение</span><span data-cnt>'+L.join('').length+'/140</span></div><div class="opts" data-opts>'+letters.map(function(l){return '<button type="button" data-o="'+l+'" title="'+(l?'Опция '+l:'Без буквы')+'" aria-pressed="'+(l===(c.opt||''))+'">'+lab(l)+'</button>'}).join('')+'</div>'+
-      (acc?'<input class="acc" id="e'+di+'-'+tag+'-acc" maxlength="34" value="'+esc(acc)+'" aria-label="Счёт">':'')+
-      L.map(function(l,k){return '<input id="e'+di+'-'+tag+'-'+k+'" maxlength="35" value="'+esc(l)+'" aria-label="Строка '+(k+1)+'" data-ln>'}).join('')+'</div>'+
-    '</div><div class="row"><span class="lbl">Опции поля '+base(tag)+' из реестра: '+letters.map(lab).join(' / ')+' · 4 строки по 35</span><button class="btn" data-act="cancel">Отмена</button><button class="btn pri" data-act="save" data-no="'+tag+'">Сохранить</button></div></div>';
+    '<div class="box ro"><div class="cap"><span>Как есть</span><span>'+f.lines.join('').length+'/'+(N*W)+'</span></div>'+(m.opts?'<div class="opts">'+letters.map(function(l){return '<span class="'+(l===(f.opt||'')?'on':'')+'" title="'+(l?'Опция '+l:'Без буквы')+'">'+lab(l)+'</span>'}).join('')+'</div>':'')+
+      (hasAcc?'<div class="lbl">Счёт / IBAN</div><pre>'+esc(f.acc||'—')+'</pre><div class="lbl">Наименование / адрес</div>':'')+'<pre>'+L.map(function(l,k){return esc(f.lines[k]||' ')}).join('\n')+'</pre></div>'+
+    '<div class="box" data-w="'+W+'" data-n="'+N+'"><div class="cap"><span>Редактирование</span><span data-cnt>'+L.join('').length+'/'+(N*W)+'</span></div>'+(m.opts?'<div class="opts" data-opts>'+letters.map(function(l){return '<button type="button" data-o="'+l+'" title="'+(l?'Опция '+l:'Без буквы')+'" aria-pressed="'+(l===(c.opt||''))+'">'+lab(l)+'</button>'}).join('')+'</div>':'')+
+      (hasAcc?'<div class="lbl">Счёт / IBAN</div><input class="acc" id="e'+di+'-'+tag+'-acc" value="'+esc(acc)+'" aria-label="Счёт" data-acc><div class="lbl">Наименование / адрес</div>':'')+
+      L.map(function(l,k){return '<input id="e'+di+'-'+tag+'-'+k+'" value="'+esc(l)+'" placeholder="Строка '+(k+1)+' до '+W+' символов" aria-label="Строка '+(k+1)+'" data-ln>'}).join('')+'<div class="err" data-err></div></div>'+
+    '</div><div class="row"><span class="lbl">'+N+' строк по '+W+' символов, набор SWIFT X'+(hasAcc?', счёт до 34':'')+'</span><button class="btn" data-act="cancel">Отмена</button><button class="btn pri" data-act="save" data-no="'+tag+'">Сохранить</button></div></div>';
 }
 function gridHtml(di,grid){
   var d=DOCS[di],u=ui[di],out='';
@@ -528,8 +540,9 @@ function textHtml(di,list){
   return list.map(function(tag){
     var f=d.f[tag],L=f?cur(f).lines:[],m=meta(tag),show=Math.min(m.show||m.lines||4,m.lines||4);
     var extra=L.length>show?'<span class="more lbl">ещё '+(L.length-show)+' стр. — клик</span>':'';
-    return '<div class="cell txt'+(L.length?'':' null')+(list.length===1?' wide':'')+(ui[di].open.has(tag)?' open':'')+'"'+(L.length>show?' data-no="'+tag+'" tabindex="0" style="cursor:pointer"':'')+'>'+fnoHtml(tag)+
-      '<pre style="min-height:'+(show*16.3+1)+'px">'+(L.length?esc((ui[di].open.has(tag)?L:L.slice(0,show)).join('\n')):'—')+'</pre>'+extra+'</div>'}).join('');
+    var ed=ui[di].editing===tag;
+    return '<div class="cell txt'+(L.length?'':' null')+(list.length===1?' wide':'')+(ui[di].open.has(tag)?' open':'')+(f&&f.edit?' edited':'')+(ed?' editing':'')+'"'+(L.length>show?' data-no="'+tag+'" tabindex="0" style="cursor:pointer"':'')+(f&&f.edit?' title="Изменено: '+esc(f.edit.who)+', '+f.edit.when+'"':'')+'>'+fnoHtml(tag)+
+      '<pre style="min-height:'+(show*16.3+1)+'px">'+(L.length?esc((ui[di].open.has(tag)?L:L.slice(0,show)).join('\n')):'—')+'</pre>'+extra+penHtml(tag)+'</div>'+(ed?editor(di,tag):'')}).join('');
 }
 function extraHtml(di,list){
   if(!list||!list.length)return '';
@@ -653,7 +666,7 @@ pair.addEventListener('click',function(e){
     if(a==='edit'){u.editing=no;render(di);var i=dw.querySelector('.fe input');if(i)i.focus();}
     else if(a==='cancel'){u.editing=null;render(di);}
     else if(a==='save'){
-      var f=d.f[no],fe=dw.querySelector('.fe');
+      var f=d.f[no],fe=dw.querySelector('.fe');if(!validate(fe))return;
       var lines=[].map.call(fe.querySelectorAll('[data-ln]'),function(x){return x.value.trim().toUpperCase()});
       while(lines.length&&!lines[lines.length-1])lines.pop();
       var accEl=fe.querySelector('.acc'),acc=accEl?accEl.value.trim():f.acc;
@@ -669,8 +682,18 @@ pair.addEventListener('click',function(e){
   if(c){var no=c.dataset.no;u.open.has(no)?u.open.delete(no):u.open.add(no);render(di);var n=dw.querySelector('[data-no="'+no+'"]');if(n)n.focus();}
 });
 document.addEventListener('click',function(e){if(!e.target.closest('.more,.tabmenu'))[].forEach.call(document.querySelectorAll('.tabmenu'),function(m){m.remove()})});
-pair.addEventListener('keydown',function(e){var c=e.target.closest&&e.target.closest('[data-no][tabindex]');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();c.click();}});
-pair.addEventListener('input',function(e){if(!e.target.matches('[data-ln]'))return;var fe=e.target.closest('.fe'),n=0;fe.querySelectorAll('[data-ln]').forEach(function(x){n+=x.value.length});fe.querySelector('[data-cnt]').textContent=n+'/140';});
+pair.addEventListener('keydown',function(e){var c=e.target.closest&&e.target.closest('.pen,[data-no][tabindex]');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();c.click();}});
+function validate(fe){
+  var box=fe.querySelector('.box[data-w]'),W=+box.dataset.w,N=+box.dataset.n,errs=[],total=0,X=/^[A-Z0-9\/\-\?:\(\)\.,'\+ ]*$/i;
+  fe.querySelectorAll('[data-ln]').forEach(function(inp,k){var v=inp.value;total+=v.length;var bad=false;
+    if(v.length>W){errs.push('Строка '+(k+1)+': '+v.length+' символов, максимум '+W);bad=true}
+    if(!X.test(v)){errs.push('Строка '+(k+1)+': недопустимые символы (только латиница, цифры и / - ? : ( ) . , \' +)');bad=true}
+    inp.classList.toggle('bad',bad)});
+  var acc=fe.querySelector('[data-acc]');if(acc){var ab=acc.value.length>34||!/^[A-Z0-9]*$/i.test(acc.value);acc.classList.toggle('bad',ab);if(ab)errs.push('Счёт: до 34 символов, только латиница и цифры')}
+  var cnt=fe.querySelector('[data-cnt]');cnt.textContent=total+'/'+(N*W);cnt.classList.toggle('bad',total>N*W);if(total>N*W)errs.push('Всего '+total+' символов, максимум '+(N*W));
+  fe.querySelector('[data-err]').textContent=errs[0]||'';var sv=fe.querySelector('[data-act="save"]');if(sv)sv.disabled=!!errs.length;return !errs.length;
+}
+pair.addEventListener('input',function(e){var fe=e.target.closest('.fe');if(fe)validate(fe)});
 
 function meter(){[0,1].forEach(function(k){var el=document.getElementById('dw'+k),b=document.getElementById('h'+k);if(!el||!b)return;var h=el.offsetHeight;b.textContent=h?h.toLocaleString('ru-RU'):'—';b.classList.toggle('over',h>860);if(k===0&&h&&TYPE==='MT103')document.getElementById('st-h').textContent='~'+Math.round(h/10)*10;});}
 document.getElementById('m-tx').onclick=function(){setMode('tx')};
