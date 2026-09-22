@@ -1,10 +1,9 @@
 /* ============================================================
    График динамики — компонент дизайн-кита.
-   Девять маленьких графиков вместо одного совмещённого: статусы
-   различаются на порядки, на общей шкале мелкие лягут в ноль.
-   У каждой панели своя шкала, заголовок и цвет своего статуса.
+   Единый график: все статусы в одних осях, шкала считается по
+   видимым рядам. Скрыл лишние — оставшиеся растянулись на всю
+   высоту, и конкретный статус читается крупно.
    ============================================================ */
-
 
 /* Цвета линий — собственные шаги под каждую тему, а не инверсия светлых.
    Проверено к поверхности: светлые >= 3:1 к белому, тёмные >= 3:1 к #161B26.
@@ -33,38 +32,41 @@
 .ch-x{border:0;background:none;color:var(--muted);cursor:pointer;font:16px/1 var(--sans);padding:0 4px}
 .ch-x:hover{color:var(--val)}
 
-/* сетка панелей */
-.ch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(186px,1fr));gap:8px;padding:8px 20px 10px}
-.ch-p{border:1px solid var(--line);border-radius:6px;padding:6px 8px 4px;background:var(--paper);cursor:pointer;
-      display:flex;flex-direction:column;gap:2px}
-.ch-p:hover{border-color:var(--val)}
-.ch-p:focus-visible{outline:2px solid var(--val);outline-offset:1px}
-.ch-p .t{display:flex;align-items:baseline;gap:6px}
-/* цвет статуса несёт только метка-точка; текст остаётся текстовым токеном */
-.ch-p .dot{width:8px;height:8px;border-radius:50%;flex:none}
-.ch-p .nm{font:500 11px var(--sans);color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ch-p .v{margin-left:auto;font:600 12.5px var(--sans);color:var(--ink);font-variant-numeric:tabular-nums}
-.ch-p .mx{font:10.5px var(--sans);color:var(--faint);font-variant-numeric:tabular-nums}
-.ch-p svg{display:block;width:100%;height:46px;overflow:visible}
-/* правило общее для панели и развёрнутого вида: иначе у большого
-   графика линия заливается по умолчанию чёрным */
+/* поле графика */
+.ch-plot{padding:4px 20px 0}
+/* высота подобрана так, чтобы блок графика занимал столько же,
+   сколько занимала сетка из девяти панелей (~212 px) */
+.ch-svg{display:block;width:100%;height:116px;overflow:visible}
 .ch .ln{fill:none;stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
-.ch-p .base{stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}
-.ch-p .cross{stroke:var(--faint);stroke-width:1;vector-effect:non-scaling-stroke;display:none}
-.ch-p .knob{display:none}
-.ch.hover .ch-p .cross,.ch.hover .ch-p .knob{display:block}
+.ch .gl{stroke:var(--line2);stroke-width:1;vector-effect:non-scaling-stroke}
+.ch .ax{font:10.5px var(--sans);fill:var(--muted)}
+/* подпись конца линии — при <= 4 рядах идентичность не держится на цвете */
+.ch .endlab{font:600 10.5px var(--sans)}
+.ch .cross{stroke:var(--faint);stroke-width:1;vector-effect:non-scaling-stroke;display:none}
+.ch .knob{display:none}
+.ch.hover .cross,.ch.hover .knob{display:block}
+.ch-none{height:116px;display:grid;place-items:center;font:12.5px var(--sans);color:var(--muted)}
 
-/* развёрнутая панель */
-.ch-big{padding:4px 20px 12px}
-.ch-big svg{display:block;width:100%;height:210px;overflow:visible}
-.ch-big .ax{font:10.5px var(--sans);fill:var(--muted)}
-.ch-big .gl{stroke:var(--line2);stroke-width:1;vector-effect:non-scaling-stroke}
-.ch-back{border:0;background:none;font:500 11.5px var(--sans);color:var(--val);cursor:pointer;padding:0}
+/* легенда: она же переключатель рядов */
+.ch-leg{display:flex;flex-wrap:wrap;gap:4px;padding:6px 20px 8px}
+.ch-leg .lg{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;border:1px solid var(--line);
+            border-radius:11px;background:var(--paper);font:11.5px var(--sans);color:var(--ink2);cursor:pointer}
+.ch-leg .lg b{font:600 11.5px var(--sans);color:var(--ink);font-variant-numeric:tabular-nums}
+.ch-leg .lg .dot{width:8px;height:8px;border-radius:50%}
+.ch-leg .lg:hover{border-color:var(--val)}
+.ch-leg .lg:focus-visible{outline:2px solid var(--val);outline-offset:1px}
+.ch-leg .lg[aria-pressed="false"]{color:var(--faint)}
+.ch-leg .lg[aria-pressed="false"] b{color:var(--faint);font-weight:400}
+.ch-leg .all{color:var(--val);border-style:dashed}
 
-/* подсказка времени — одна на всю сетку */
-.ch-tip{position:fixed;z-index:80;background:var(--ink);color:var(--paper);font:500 11px/1.3 var(--sans);
-        padding:3px 7px;border-radius:4px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .1s}
+/* подсказка под перекрестием: время и значения видимых рядов */
+.ch-tip{position:fixed;z-index:80;background:var(--ink);color:var(--paper);font:11px/1.45 var(--sans);
+        padding:5px 8px;border-radius:5px;pointer-events:none;opacity:0;transition:opacity .1s;min-width:150px}
 .ch-tip.on{opacity:1}
+.ch-tip i{display:block;font-style:normal;color:var(--faint);font-size:10.5px;margin-bottom:2px;font-variant-numeric:tabular-nums}
+.ch-tip span{display:flex;align-items:center;gap:6px;white-space:nowrap}
+.ch-tip em{width:7px;height:7px;border-radius:50%;flex:none}
+.ch-tip b{margin-left:auto;font-weight:600;font-variant-numeric:tabular-nums}
 
 /* таблица значений — тот же ряд словами */
 .ch-tbl{padding:0 20px 10px}

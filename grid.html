@@ -1668,7 +1668,9 @@ function refresh(){
 /* цвет берём токеном: тёмная тема имеет свои шаги, проверенные к своей поверхности */
 var SC_COLOR={};['flow','flowl','flowd','bad','badd','warn','ok','okl','grey']
   .forEach(function(k){SC_COLOR[k]='var(--st-'+k+')'});
-var CH_RANGES=[{label:'1 ч',minutes:60},{label:'12 ч',minutes:720},{label:'Сутки',minutes:1440}];
+/* диапазоны панели; шаг ряда всегда минутный, как отдаёт бекенд */
+function minutesToday(){var d=new Date();return Math.max(60,d.getHours()*60+d.getMinutes()+1)}
+var CH_RANGES=[{label:'Сегодня',minutes:0},{label:'3 дня',minutes:4320},{label:'7 дней',minutes:10080}];
 var chCtl=null,chTimer=null;
 
 function genPoints(end,n,seed){
@@ -1704,12 +1706,13 @@ function chOpen(){
   document.getElementById('chartbtn').setAttribute('aria-pressed','true');
   /* первая загрузка — скелетоны панелей той же геометрии */
   host.className='ch';
-  host.innerHTML='<div class="ch-head"><h3>Динамика по статусам</h3></div><div class="ch-grid">'+
-    STATUS_META.map(function(){return '<div class="ch-p">'+SK.ln('62%',11)+SK.sk('100%','46px')+'<span class="mx">'+SK.sk('44px','9px')+'</span></div>'}).join('')+'</div>';
+  host.innerHTML='<div class="ch-head"><h3>Динамика по статусам</h3></div>'+
+    '<div class="ch-plot">'+SK.sk('100%','116px','sq')+'</div>'+
+    '<div class="ch-leg">'+STATUS_META.map(function(){return SK.sk('84px','22px','sq')}).join('')+'</div>';
   setTimeout(function(){
-    chCtl=CH.mount(host,{series:chSeries(720),endAt:new Date(),stepMin:1,minutes:720,
+    chCtl=CH.mount(host,{series:chSeries(minutesToday()),endAt:new Date(),stepMin:1,minutes:0,
       ranges:CH_RANGES,
-      onRange:function(m){chCtl.cfg.series=chSeries(m);chCtl.cfg.endAt=new Date()},
+      onRange:function(m){chCtl.cfg.series=chSeries(m||minutesToday());chCtl.cfg.endAt=new Date()},
       onClose:chClose});
     /* бекенд складывает срез раз в минуту — обновляемся в том же такте */
     chTimer=setInterval(chRefresh,60000);
@@ -1719,7 +1722,7 @@ function chRefresh(){
   if(!chCtl)return;
   chCtl.cfg.busy=true;chCtl.render();
   setTimeout(function(){
-    chCtl.cfg.series=chSeries(chCtl.cfg.minutes);chCtl.cfg.endAt=new Date();
+    chCtl.cfg.series=chSeries(chCtl.cfg.minutes||minutesToday());chCtl.cfg.endAt=new Date();
     chCtl.cfg.busy=false;chCtl.render();
   },500);
 }
