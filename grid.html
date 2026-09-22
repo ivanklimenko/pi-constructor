@@ -494,7 +494,6 @@ body{margin:0;overflow:hidden}
 .rz::after{content:'';position:absolute;left:3px;top:8px;bottom:8px;width:1px;background:var(--line)}
 .rz:hover::after,.rz.on::after{background:var(--val);width:2px}
 body.resizing{cursor:col-resize;user-select:none}
-.grid .sr .tag{max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .grid th{position:sticky;top:0;z-index:2;background:var(--paper);text-align:left;font:600 12.5px var(--sans);color:var(--ink);padding:9px 8px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
 .grid th .sub{display:block;font:11px var(--sans);color:var(--muted);font-weight:400;min-height:14px;overflow:hidden;text-overflow:ellipsis}
 .grid th{overflow:hidden}
@@ -557,8 +556,10 @@ body.resizing{cursor:col-resize;user-select:none}
 .grid .dir{display:flex;gap:5px;align-items:center;color:var(--ink)}
 .grid .dir svg{width:13px;height:13px;color:var(--muted)}
 .grid .dir .dg{width:13px;text-align:center;color:var(--muted);font-size:12.5px}
-.grid .sr .tag{display:block;width:max-content;margin-bottom:3px}
-.grid .tag.snd{color:var(--warn);border-color:var(--warn)} .grid .tag.rcv{color:var(--ok);border-color:var(--ok)}
+/* S/R и провайдеры: без рамок. Роль подписывает служебный токен, значение остаётся значением */
+.grid .srl{display:block;white-space:nowrap;line-height:17px}
+.grid .srl .k{display:inline-block;width:14px;font:11px var(--sans);color:var(--faint)}
+.grid .srl .cv{font:12.5px var(--mono);color:var(--ink);max-width:none}
 .grid .nl{color:var(--faint)}
 .appf{display:flex;align-items:center;gap:14px;padding:7px 20px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);background:var(--sunk)}
 .appf .pg{display:inline-flex;gap:2px}
@@ -1358,6 +1359,11 @@ function fld(f,showName){if(!f||(!f.lines.length&&!f.acc))return '<span class="n
 function lk(name,v){return v?'<span class="lk" data-v="'+esc(v)+'" data-tip="'+esc(v)+' — копировать">'+name+'</span>':'<span class="lk off" data-tip="'+name+': нет значения">'+name+'</span>'}
 function cv(v,cls,mw){v=String(v==null?'':v);return '<span class="cv'+(cls?' '+cls:'')+'"'+(mw?' style="max-width:'+mw+'px"':'')+' data-v="'+esc(v)+'">'+esc(v)+'</span>'}
 function dirIco(g){return g==='IN'?ic('down'):g==='OUT'?ic('kt'):g==='TRANSIT'?'<span class="dg">⇄</span>':'<span class="dg">◦</span>'}
+/* отправитель/получатель: «S:» и «R:» — служебная подпись роли, не данные */
+function srPair(s,r){
+  return '<span class="srl"><span class="k">S:</span>'+cv(s)+'</span>'+
+         '<span class="srl"><span class="k">R:</span>'+cv(r)+'</span>';
+}
 function rowHtml(d,i,ord){
   var vd=d.vd,same=vd.every(function(x){return x===vd[0]}),purp=(d.f['70']||{lines:[]}).lines.join(' ');
   return '<tbody class="row" data-i="'+i+'"><tr><td rowspan="2"><input type="checkbox" aria-label="Выбрать"><span class="num">'+ord+'</span></td>'+
@@ -1370,9 +1376,9 @@ function rowHtml(d,i,ord){
    '<td class="f5">'+fld(d.f['50'])+'</td>'+
    '<td class="f5">'+fld(d.f['52'])+'</td><td class="f5">'+fld(d.f['57'])+'</td><td class="f5">'+fld(d.f['58'])+'</td><td class="f5">'+fld(d.f['59'])+'</td>'+
    '<td rowspan="2">'+cv(d.route.acc,'mono',110)+'<span class="l2">'+cv(d.route.type)+' → '+cv(d.route.recv)+'</span></td>'+
-   '<td class="sr" rowspan="2">'+cv(d.inS,'tag snd')+cv(d.inR,'tag rcv')+'</td>'+
-   '<td class="sr" rowspan="2">'+cv(d.outS,'tag snd')+cv(d.outR,'tag rcv')+'</td>'+
-   '<td class="sr" rowspan="2">'+cv(d.provS,'tag snd')+cv(d.provR,'tag rcv')+'</td></tr>'+
+   '<td class="sr" rowspan="2">'+srPair(d.inS,d.inR)+'</td>'+
+   '<td class="sr" rowspan="2">'+srPair(d.outS,d.outR)+'</td>'+
+   '<td class="sr" rowspan="2">'+srPair(d.provS,d.provR)+'</td></tr>'+
    '<tr class="purow"><td colspan="2" class="reason'+(d.reason?'':' empty')+'">'+(d.reason?'<div class="inner"><span class="sd sc-'+SM[d.status].cls+'"></span>'+cv(d.reason)+'</div>':'')+'</td>'+
    '<td colspan="5" class="purp"><div class="inner"><span class="fno" data-tip="70 · Детали платежа">70</span>'+cv(purp)+'</div></td></tr></tbody>';
 }
