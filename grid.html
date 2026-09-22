@@ -437,7 +437,11 @@ ol.q b,ul.l b{color:var(--ink)}
 /* ===== реестр ===== */
 html,body{height:100%}
 body{margin:0;overflow:hidden}
-.app{display:grid;grid-template-rows:auto auto auto auto auto auto minmax(0,1fr) auto;height:100%;background:var(--paper)}
+/* Flex, а не grid с позиционными рядами: скрытый через display:none
+   элемент (полоса прогресса) выпадал из сетки, и гибкий ряд доставался
+   подвалу — пагинация раздувалась на всю свободную высоту. */
+.app{display:flex;flex-direction:column;height:100%;background:var(--paper)}
+.app>*{flex:none}
 .apph{display:flex;align-items:center;gap:14px;padding:12px 20px 8px;border-bottom:1px solid var(--line)}
 .apph h1{margin:0;font-size:20px;font-weight:700;letter-spacing:-.01em}
 .apph .cnt{font-size:12.5px;color:var(--muted)}
@@ -508,7 +512,7 @@ body{margin:0;overflow:hidden}
 #cf-host{display:none}
 #cf-host.on{display:block}
 .cf .cf-grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
-.gridwrap{overflow:auto;position:relative}
+.gridwrap{overflow:auto;position:relative;flex:1 1 auto;min-height:0}
 .grid{border-collapse:separate;border-spacing:0;width:max-content;font-size:12.5px;line-height:1.35;table-layout:auto}
 .grid.fixed{table-layout:fixed}
 .grid.fixed td{overflow:hidden}
@@ -1691,7 +1695,10 @@ function genPoints(end,n,seed){
   return out;
 }
 function chSeries(minutes){
-  var cnt={};lastIdx.forEach(function(i){var st=ROWS[i].status;cnt[st]=(cnt[st]||0)+1});
+  /* По всем документам, а не по текущей выборке: график показывает
+     обстановку в системе. От lastIdx у скрытых статусов обнулялись
+     ряды, и переключение линий переставало что-либо показывать. */
+  var cnt={};ROWS.forEach(function(r){cnt[r.status]=(cnt[r.status]||0)+1});
   return STATUS_META.map(function(x,k){
     return {key:x[0],label:x[1],color:SC_COLOR[x[2]]||'#3A6EA5',points:genPoints(cnt[x[0]]||0,minutes,7919*(k+1)+13)};
   });
