@@ -474,6 +474,20 @@ body{margin:0;overflow:hidden}
 .sc-ok{background:var(--st-ok)} .sc-okl{background:var(--st-okl)} .sc-grey{background:var(--st-grey)}
 .sc-info{background:var(--val)} .sc-wait{background:var(--warn)}
 .grid .stdot{margin-left:0}
+/* ---- состояния записи: заблокирована другим пользователем / неактивна (для кита: .is-locked / .is-inactive на записи) ---- */
+.grid tbody.row.is-locked td,.grid tbody.row.is-inactive td{color:var(--muted)}
+.grid tbody.row.is-locked .cv,.grid tbody.row.is-inactive .cv,.grid tbody.row.is-locked .amt,.grid tbody.row.is-inactive .amt,.grid tbody.row.is-locked .id b,.grid tbody.row.is-inactive .id b,.grid tbody.row.is-locked .fld .mono,.grid tbody.row.is-inactive .fld .mono{color:var(--muted)}
+.grid tbody.row.is-locked .lk,.grid tbody.row.is-inactive .lk{color:var(--faint)}
+.grid tbody.row.is-locked .lk:not(.off):hover,.grid tbody.row.is-inactive .lk:not(.off):hover{color:var(--val)}
+.grid tbody.row.is-locked .tag,.grid tbody.row.is-inactive .tag{color:var(--muted);border-color:var(--line2);background:transparent}
+.grid tbody.row.is-locked .fld .op,.grid tbody.row.is-inactive .fld .op{color:var(--faint)}
+.grid tbody.row.is-locked .stdot,.grid tbody.row.is-inactive .stdot,.grid tbody.row.is-inactive .sd{filter:grayscale(1);opacity:.55}
+.grid tbody.row.is-locked .dir svg,.grid tbody.row.is-inactive .dir svg,.grid tbody.row.is-locked .dir .dg,.grid tbody.row.is-inactive .dir .dg{color:var(--faint)}
+.grid tbody.row.is-locked tr.purow td,.grid tbody.row.is-inactive tr.purow td{color:var(--faint)}
+.grid tbody.row.is-inactive td{background:repeating-linear-gradient(135deg,transparent 0 9px,var(--sunk) 9px 10px)}
+.grid tbody.row.is-inactive:hover td{background:var(--hover)}
+.grid tbody.row.is-locked td:first-child{box-shadow:inset 3px 0 0 var(--warn-soft)}
+.grid .ico.lock,.grid .ico.lock:hover{color:var(--warn)}
 .grid .lk{display:inline-block;font:500 11px/14px var(--sans);color:var(--val);cursor:copy;padding:0 2px;border-radius:3px;margin-left:-2px;letter-spacing:-.01em}
 .grid .lk:hover{background:var(--val-soft)}
 .grid .lk.off{color:var(--faint);cursor:default;text-decoration:line-through;text-decoration-color:var(--line)}
@@ -632,12 +646,13 @@ body.resizing{cursor:col-resize;user-select:none}
     <symbol id="i-back" viewBox="0 0 24 24"><path d="M20 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
     <symbol id="i-dt" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="15" r="1.4" fill="currentColor"/></symbol>
     <symbol id="i-kt" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   </defs>
 </svg>
 <div class="app">
   <div class="apph"><h1>Валютные документы</h1><span class="cnt" id="cnt"></span>
-    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, двойной клик по ней — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · фильтры — из vtb-filters</span><a href="index.html">конструктор деталки →</a><button type="button" class="skbtn" id="skdemo" aria-pressed="false" style="margin-left:10px" data-tip="Первое нажатие — скелетон первой загрузки, второе — обновление уже показанных данных">Скелетоны</button><span id="zoomctl" style="display:inline-flex;align-items:center;margin-left:10px"></span></div></div>
+    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, двойной клик по ней — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · 🔒 — заблокирована другим пользователем, штриховка — неактивная запись</span><a href="index.html">конструктор деталки →</a><button type="button" class="skbtn" id="skdemo" aria-pressed="false" style="margin-left:10px" data-tip="Первое нажатие — скелетон первой загрузки, второе — обновление уже показанных данных">Скелетоны</button><span id="zoomctl" style="display:inline-flex;align-items:center;margin-left:10px"></span></div></div>
   <div class="slane"><div class="slist" id="slane"></div><button type="button" class="chbtn" id="chartbtn" aria-pressed="false" data-tip="Динамика по статусам во времени" aria-label="Динамика по статусам во времени"></button></div>
   <div id="chhost"></div>
   <div class="filters">
@@ -1438,6 +1453,9 @@ for(var i=0;i<N_ROWS;i++){
   base.route={type:rt[0],recv:rt[1],desc:base.route.desc,text:base.route.text,
     acc:ACC_PFX[i%5]+(CCYN[base.ccy]||'810')+String((i*3)%10)+String(1000+(i*37+261)%9000)+String(1000000+(i*7919+430157)%9000000)};
   base.tabsOff=i%2?['Нотификации','Стриминг','MPU']:['MPU'];
+  /* состояния записи для дизайн-системы: заблокирована другим пользователем / неактивна (архив, отозвана) */
+  if(i%11===2)base.lock={who:['Петрова А. С.','Сидоров К. В.','Лебедева О. Н.'][i%3],since:'23.09.2026 '+String(9+i%8).padStart(2,'0')+':'+String((i*13)%60).padStart(2,'0')};
+  if(i%13===7)base.inactive={why:['Документ в архиве','Запись отозвана инициатором','Снят с обработки администратором'][i%3]};
   ROWS.push(base);
 }
 /* ---- рендер грида ---- */
@@ -1464,8 +1482,10 @@ function srPair(s,r){
 }
 function rowHtml(d,i,ord){
   var vd=d.vd,same=vd.every(function(x){return x===vd[0]}),purp=(d.f['70']||{lines:[]}).lines.join(' ');
-  return '<tbody class="row" data-i="'+i+'"><tr><td rowspan="2"><input type="checkbox" aria-label="Выбрать"><span class="num">'+ord+'</span></td>'+
-   '<td class="icons"><button type="button" class="ico open" data-open="'+i+'" aria-label="Открыть деталку документа № '+d.num+'" data-tip="Открыть деталку · двойной клик (или Shift) — рядом для сравнения">'+ic('esid')+'</button><span class="stdot sc-'+SM[d.status].cls+'" data-tip="'+SM[d.status].label+' · '+d.status+'">'+(d.st==='ok'?'✓':d.st==='bad'?'✕':'·')+'</span></td>'+
+  var st=(d.lock?' is-locked':'')+(d.inactive?' is-inactive':'');
+  var openTip=d.lock?'Заблокирована: '+esc(d.lock.who)+', с '+d.lock.since+' · открыть только для просмотра':d.inactive?esc(d.inactive.why)+' · открыть':'Открыть деталку · двойной клик (или Shift) — рядом для сравнения';
+  return '<tbody class="row'+st+'" data-i="'+i+'"><tr><td rowspan="2"><input type="checkbox" aria-label="Выбрать"'+(d.inactive?' disabled':'')+'><span class="num">'+ord+'</span></td>'+
+   '<td class="icons"><button type="button" class="ico open'+(d.lock?' lock':'')+'" data-open="'+i+'" aria-label="'+(d.lock?'Заблокирована другим пользователем, открыть только для просмотра':'Открыть деталку документа № '+d.num)+'" data-tip="'+openTip+'">'+ic(d.lock?'lock':'esid')+'</button><span class="stdot sc-'+SM[d.status].cls+'" data-tip="'+SM[d.status].label+' · '+d.status+'">'+(d.st==='ok'?'✓':d.st==='bad'?'✕':'·')+'</span></td>'+
    '<td class="id"><b>'+cv(d.num)+'</b><span class="lks">'+lk('uuid',d.uuid)+lk('refIn',d.f['20'].lines[0])+lk('refOut',d.r20out)+'</span></td>'+
    '<td rowspan="2">'+cv(d.created.slice(0,10))+' <span class="lbl">'+cv(d.created.slice(11,16))+'</span><span class="l2">Дт '+cv(vd[2])+'<br>Кт '+(same?cv(vd[3]):'<span style="color:var(--warn)">'+cv(vd[3])+'</span>')+'</span></td>'+
    '<td rowspan="2">'+cv(d.type,'tag mt')+'</td>'+
