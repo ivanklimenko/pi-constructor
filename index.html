@@ -115,8 +115,10 @@ a.lnk:hover{text-decoration:underline}
 .show-slots .ib .slot{display:block}
 .show-slots .ib{box-shadow:inset 0 0 0 1px var(--line);background:var(--paper)}
 .sep{width:1px;height:18px;background:var(--line);margin:0 4px}
-.tip{position:absolute;top:100%;margin-top:4px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);font:500 11px var(--sans);padding:3px 7px;border-radius:4px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .1s;z-index:10}
-.ib:hover .tip,.ib:focus-visible .tip{opacity:1}
+/* подсказка не занимает место, пока не показана: иначе невидимая подсказка расширяет прокрутку drawer */
+.tip{display:none;position:absolute;top:100%;margin-top:4px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);font:500 11px var(--sans);padding:3px 7px;border-radius:4px;white-space:nowrap;pointer-events:none;z-index:10}
+.ib:hover .tip,.ib:focus-visible .tip{display:block}
+.acts .ib:nth-last-child(-n+3) .tip{left:auto;right:0;transform:none}
 .acts .ib:last-child .tip{left:auto;right:0;transform:none}
 
 .tabs{display:flex;padding:0 14px;border-bottom:1px solid var(--line)}
@@ -265,8 +267,10 @@ a.lnk:hover{text-decoration:underline}
 .xr .len{font-size:10.5px;color:var(--faint);margin-left:auto}
 .xr .diffd{color:var(--warn);font-weight:600}
 [data-tip]{position:relative;cursor:help}
-[data-tip]::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 5px);left:0;background:var(--ink);color:var(--paper);font:500 11px/1.3 var(--sans);letter-spacing:0;text-transform:none;padding:3px 7px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .1s .15s;z-index:30}
-[data-tip]:hover::after,[data-tip]:focus-visible::after{opacity:1}
+/* display:none, а не opacity:0 — невидимый тултип у правого края расширял прокрутку drawer */
+[data-tip]::after{content:attr(data-tip);display:none;position:absolute;bottom:calc(100% + 5px);left:0;background:var(--ink);color:var(--paper);font:500 11px/1.3 var(--sans);letter-spacing:0;text-transform:none;padding:3px 7px;border-radius:4px;white-space:nowrap;pointer-events:none;z-index:30}
+[data-tip]:hover::after,[data-tip]:focus-visible::after{display:block;animation:tipin .12s ease-out .15s both}
+@keyframes tipin{from{opacity:0}to{opacity:1}}
 .cell .op[data-tip]::after,.xr .kv .lbl[data-tip]::after{left:50%;transform:translateX(-50%)}
 /* прочие вкладки */
 .tt{border:1px solid var(--line);border-radius:5px;overflow:hidden}

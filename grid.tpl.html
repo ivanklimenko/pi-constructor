@@ -208,7 +208,7 @@ body.resizing{cursor:col-resize;user-select:none}
 .appf .sp{margin-left:auto}
 /* ===== drawer host ===== */
 #pair{position:fixed;top:0;right:0;bottom:0;display:flex;justify-content:flex-end;align-items:stretch;gap:0;z-index:50;pointer-events:none}
-#pair .dw{pointer-events:auto;height:100%;overflow-y:auto;border-radius:0;box-shadow:-8px 0 28px rgba(20,26,41,.14);border-left:1px solid var(--line);transform:translateX(30px);opacity:0;animation:slidein .18s ease-out forwards}
+#pair .dw{pointer-events:auto;height:100%;overflow-y:auto;overflow-x:hidden;border-radius:0;box-shadow:-8px 0 28px rgba(20,26,41,.14);border-left:1px solid var(--line);transform:translateX(30px);opacity:0;animation:slidein .18s ease-out forwards}
 @keyframes slidein{to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){#pair .dw{animation:none;transform:none;opacity:1}}
 #pair .dw .fold{display:none}
