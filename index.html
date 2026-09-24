@@ -173,7 +173,7 @@ a.lnk:hover{text-decoration:underline}
 .cnt{font:600 11px var(--mono);background:var(--chip);color:var(--ink2);border-radius:9px;padding:0 6px}
 .txs{display:flex;gap:3px}
 .txs .st{padding:1px 6px 1px 5px;font-size:10px}
-.tx{display:grid;grid-template-columns:62px 84px 156px minmax(0,1fr) 104px 150px;gap:0 10px;align-items:center;border-top:1px solid var(--line2);padding:3px 10px;min-height:25px;white-space:nowrap}
+.tx{display:grid;grid-template-columns:62px 156px 150px 84px minmax(0,1fr) 104px;gap:0 10px;align-items:center;border-top:1px solid var(--line2);padding:3px 10px;min-height:25px;white-space:nowrap}
 .tx>*{min-width:0}
 .tx .tm{font:11.5px var(--mono);color:var(--ink2);font-variant-numeric:tabular-nums}
 .dir{font:600 10.5px var(--mono);color:var(--ink2);display:inline-flex;gap:4px;align-items:center}
@@ -947,9 +947,9 @@ function txBlockHtml(d,u,extra){return '<div class="blk'+(u.shut.tx?' shut':'')+
      '<span style="margin-left:auto">'+lk('txId',d.txId)+'</span><span class="lbl">'+d.txDate+'</span>'+
      '<button class="tg" data-tg="tx" aria-label="Свернуть или развернуть транзакции" style="margin-left:0">▲</button></div>'+
      '<div class="bb" style="padding:0">'+d.txs.map(function(t){
-       return '<div class="tx"><span class="dir">'+ic(t.dir==='DEBIT'?'dt':'kt')+t.dir+'</span><span><span class="st '+stCls(t.st)+'">'+t.st+'</span></span>'+
-         '<span class="mono v">'+t.acc+'</span><span class="cut lbl" style="font-size:11.5px" title="Тип регистра: '+esc(t.reg)+'">'+esc(t.reg)+'</span><span class="tm cut"'+(t.time&&t.time!=='—'?' data-tip="'+esc(t.time)+'"':'')+'>'+shortTime(t.time)+'</span>'+
-         '<span class="sum">'+t.amount+'<small>'+t.ccy+'</small></span></div>'}).join('')+'</div></div>'}
+       return '<div class="tx"><span class="dir">'+ic(t.dir==='DEBIT'?'dt':'kt')+t.dir+'</span>'+
+         '<span class="mono v">'+t.acc+'</span><span class="sum">'+t.amount+'<small>'+t.ccy+'</small></span>'+
+         '<span><span class="st '+stCls(t.st)+'">'+t.st+'</span></span><span class="cut lbl" style="font-size:11.5px" title="Тип регистра: '+esc(t.reg)+'">'+esc(t.reg)+'</span><span class="tm cut"'+(t.time&&t.time!=='—'?' data-tip="'+esc(t.time)+'"':'')+'>'+shortTime(t.time)+'</span></div>'}).join('')+'</div></div>'}
 function foldHtml(){return '<div class="fold"><span>видимая область 1080p ≈ 860 px</span></div>'}
 function dhHtml(d,title){return '<div class="dh"><button class="back" aria-label="Назад">'+ic('back')+'</button><b>'+title+'</b>'+
     '<span class="mono">'+d.uuid+'</span><button class="cp" data-copy="'+d.uuid+'" title="Скопировать ID">⧉</button><span class="lbl">'+d.created+'</span>'+
@@ -1236,7 +1236,7 @@ function render(di){
   if(p.family==='rub'){el.innerHTML=rubHtml(di);fitTabs(el);meter();return}
   var B={
    msgs:function(){return '<div class="msgs">'+
-     '<div><h6>Входящее SWIFT</h6><span class="lbl">S</span><span class="mono v cut">'+d.inS+'</span><span class="lbl">R</span><span class="mono v cut">'+d.inR+'</span></div>'+
+     '<div><h6>Входящее SWIFT</h6><span class="lbl">S → R</span><span class="mono v cut">'+(d.inS&&d.inS!=='—'?d.inS+'<span class="ar">→</span>'+d.inR:'<span class="nl">—</span>')+'</span><span class="lbl">20 вх</span><span class="mono v cut">'+(esc((d.f['20']||{lines:[]}).lines[0])||'<span class="nl">—</span>')+'</span></div>'+
      '<div><h6>Исходящее SWIFT</h6><span class="lbl">S → R</span><span class="mono v cut">'+d.outS+'<span class="ar">→</span>'+d.outR+'</span>'+txtRowHtml(d,u,'r20out','20 исх')+'</div>'+
      '<div style="position:relative"><h6>Счета</h6>'+accRowHtml(d,u,'dt')+accRowHtml(d,u,'kt')+'</div></div>'},
    route:function(){var re=d.routeEdit;return '<div class="blk'+(u.shut.route?' shut':'')+(re?' edited':'')+'"'+(re?' data-tip="Маршрут пересчитан после смены счёта Кт · было: '+esc(re.was.type+' '+re.was.acc+' → '+re.was.recv)+' · '+esc(re.who)+', '+re.when+'"':'')+'><div class="bh"><h5>Маршрут</h5><span class="tag">'+d.route.type+'</span>'+
