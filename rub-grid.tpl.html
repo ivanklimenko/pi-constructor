@@ -3,7 +3,7 @@
 <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48 64x64">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<title>Валютные документы</title>
+<title>Рублёвые документы</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
@@ -181,8 +181,6 @@ body.resizing{cursor:col-resize;user-select:none}
 .grid .l2.mono{font-family:var(--mono)}
 /* сумма — спокойная: обычный вес и размер текста записи, выравнивание по разрядам; валюта под ней приглушённая (перенято из katran) */
 .grid .amt{font-weight:400;font-size:12.5px;font-variant-numeric:tabular-nums;letter-spacing:0;color:var(--ink);text-align:right;display:block}
-.grid td.ccy{text-align:left}
-.grid td.ccy .tag{font-family:var(--mono);font-weight:600;font-size:11px}
 .grid .amt+.l2{text-align:right;color:var(--muted);font-weight:400;font-size:11px;margin-top:1px}
 .grid .fld{display:flex;gap:6px;align-items:baseline}
 .grid .fld .op{font:700 12.5px var(--mono);color:var(--opt);min-width:9px}
@@ -204,6 +202,8 @@ body.resizing{cursor:col-resize;user-select:none}
 .grid .acct b{font-weight:600;color:var(--ink)}
 .grid .acct .e{color:var(--faint);padding:0 1px}
 .grid .nl{color:var(--faint)}
+.grid .q{font:600 12.5px var(--sans);color:var(--ink)}
+.grid .sr .srl .k{width:16px}
 .appf{display:flex;align-items:center;gap:14px;padding:7px 20px;border-top:1px solid var(--line);font-size:11px;color:var(--muted);background:var(--sunk)}
 .appf .pg{display:inline-flex;gap:2px}
 .appf .pg span{min-width:24px;height:22px;display:grid;place-items:center;border-radius:4px;cursor:pointer;color:var(--ink2)}
@@ -223,14 +223,14 @@ body.resizing{cursor:col-resize;user-select:none}
 </head><body>
 {{SVG}}
 <div class="app">
-  <div class="apph"><h1>Валютные документы</h1><span class="cnt" id="cnt"></span>
-    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, двойной клик по ней — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · 🔒 — заблокирована другим пользователем, штриховка — неактивная запись</span><a href="rub-grid.html">реестр «Рублёвые документы» →</a><a href="index.html" style="margin-left:8px">конструктор деталки →</a><button type="button" class="skbtn" id="skdemo" aria-pressed="false" style="margin-left:10px" data-tip="Первое нажатие — скелетон первой загрузки, второе — обновление уже показанных данных">Скелетоны</button><span id="zoomctl" style="display:inline-flex;align-items:center;margin-left:10px"></span></div></div>
+  <div class="apph"><h1>Рублёвые документы</h1><span class="cnt" id="cnt"></span>
+    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, двойной клик по ней — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · 🔒 — заблокирована другим пользователем, штриховка — неактивная запись</span><a href="grid.html">реестр «Валютные документы» →</a><a href="index.html" style="margin-left:8px">конструктор деталки →</a><button type="button" class="skbtn" id="skdemo" aria-pressed="false" style="margin-left:10px" data-tip="Первое нажатие — скелетон первой загрузки, второе — обновление уже показанных данных">Скелетоны</button><span id="zoomctl" style="display:inline-flex;align-items:center;margin-left:10px"></span></div></div>
   <div class="slane"><div class="slist" id="slane"></div><button type="button" class="chbtn" id="chartbtn" aria-pressed="false" data-tip="Динамика по статусам во времени" aria-label="Динамика по статусам во времени"></button></div>
   <div id="chhost"></div>
   <div class="filters">
     <button class="fbtn" id="ftoggle" aria-expanded="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4.2 5.4A1 1 0 015.1 4h13.8a1 1 0 01.8 1.6L14 12.2V18a1 1 0 01-1.5.86l-3-1.8A1 1 0 019 16.2v-4L4.3 5.6a1 1 0 01-.1-.2z"/></svg>Фильтры<span class="badge" id="fcount" hidden>0</span></button>
     <div class="applied" id="applied"><span class="lbl">условия не заданы</span></div>
-    <div class="sp"><label class="chk" style="font-size:12px;margin-right:6px"><input type="checkbox" id="c-ccycol"> Валюта отдельной колонкой</label><span class="fchip">Колонки<span class="chev">▼</span></span><span class="fchip">Экспорт</span></div>
+    <div class="sp"><span class="fchip">Колонки<span class="chev">▼</span></span><span class="fchip">Экспорт</span></div>
   </div>
   <div id="cf-host" class="on"></div>
   <div id="skprog"></div>
@@ -243,12 +243,27 @@ body.resizing{cursor:col-resize;user-select:none}
 <script>
 (function(){
 var P=window.PI,esc=P.esc,ic=P.ic;
-/* ---- набор строк реестра: клоны двух базовых документов с вариациями (всё вымышленное) ---- */
-var NAMES=[['LAVRENTIEV DMITRY OLEGOVICH','40817840500010042371'],['SEMENOVA IRINA VLADIMIROVNA','40817840100050017762'],['OOO SEVERNAYA ZVEZDA','40702840300010009911'],['AO TEKHNOPARK VOSTOK','40702840600010004420'],['GRIGORYAN ARAM SAMVELOVICH','40817840900010031177'],['IP KUZNETSOVA E.A.','40802840200010007765']];
-var BANKS=[['NORDINVEST BANK MOSCOW','NRDIRUMMXXX'],['BALTIC CLEARING BANK RIGA','BCLHLV22XXX'],['HANSEATIC TRADE BANK HAMBURG','HSTBDEHHXXX'],['MERIDIAN INTERMEDIARY BANK LONDON','MRDNGB2LXXX'],['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8KXXX'],['CENTRAL EURO SETTLEMENT AG FRANKFURT','CESEDEFFXXX']];
-var PURP=['/INV/ 2026-0417 DD 15.09.2026 PAYMENT FOR CONSULTING SERVICES UNDER CONTRACT 12-45','/RETN/ RETURN OF FX2609220000417 DD 22.09.2026 /RC/ AC01 BENEFICIARY ACCOUNT CLOSED','PREPAYMENT UNDER CONTRACT 77-21 DD 03.02.2026 FOR EQUIPMENT DELIVERY, VAT 0','SALARY TRANSFER SEPTEMBER 2026 EMPLOYMENT CONTRACT 15 DD 01.04.2024','COVER FOR MT103 REF FX2609220000441 VALUE 23.09.2026','DIVIDENDS FOR 1H2026 ACCORDING TO SHAREHOLDERS RESOLUTION DD 30.06.2026'];
-var AMT=[['1 250 000.00','USD'],['1 249 965.00','USD'],['84 300.00','EUR'],['12 700 000.00','RUB'],['500.10','AMD'],['2 200 000.00','USD'],['318 450.75','EUR'],['99 000.00','CNY'],['1 148 300.00','EUR'],['64 000.00','USD'],['7 500.00','USD'],['410 000.00','USD']];
-var TYPES=['MT103','MT103','MT202','MT103','MT199','MT202COV','MT103','MT103','MT202','MT103','MT199','MT103'];
+/* ---- набор строк реестра: клоны двух рублёвых документов конструктора с вариациями (всё вымышленное) ---- */
+var R=P.RUB;
+var RNAMES=[['ООО «СЕВЕРНЫЙ ВЕТЕР»','40702810400000012345','7729563210','772901001'],['ИП КРЫЛОВА МАРИНА ПЕТРОВНА','40802810300050017801','540812345678',''],
+  ['АО «ТЕХНОПАРК ВОСТОК»','40702810600010004420','5406098765','540601001'],['СМИРНОВА ЕКАТЕРИНА ПАВЛОВНА','40817810600050017913','540912345601','0'],
+  ['ООО «ЛОГИСТИКА СИБИРИ»','40702810900010009911','5404123456','540401001'],['ГРИГОРЬЕВ АРТЁМ СЕРГЕЕВИЧ','40817810900010031177','540798765432','0'],
+  ['УФК по Новосибирской области (ОСП по Центральному району г. Новосибирска, л/с 05511851990)','03212643000000019876','5406012345','540601001'],
+  ['ООО «ЗЕЛЁНЫЙ ДОМ»','40702810200010007765','5402567890','540201001']];
+var RBANKS=[['ФИЛИАЛ № 7701 БАНКА ВОСТОЧНЫЙ КРЕДИТ (ПАО)','045004745','30101810100000000745'],['НОРДИНВЕСТ БАНК (АО)','044525207','30101810200000000207'],
+  ['СИБИРСКОЕ ГУ БАНКА РОССИИ // УФК по Новосибирской области','015004950','40102810845370000019'],['АО «БАНК ЮЖНЫЙ УРАЛ»','047501811','30101810900000000811'],
+  ['ПАО «ОКЕАН БАНК»','040507860','30101810300000000860'],['ФИЛИАЛ «ЦЕНТРАЛЬНЫЙ» БАНКА ВОСТОЧНЫЙ КРЕДИТ (ПАО)','044525411','30101810145250000411']];
+var RPURP=['Оплата по счёту № 2026-0417 от 15.09.2026 за консультационные услуги по договору 12-45 от 01.03.2026. В том числе НДС 20% — 14 302.39 руб.',
+  'Взыскание по исп. пост. 213253960/6639 от 23.09.2026. СПИ Иванова М. С. по и/п № 170152/26/66039-ИП от 07.09.2026',
+  'Предоплата по договору поставки № 77-21 от 03.02.2026 за оборудование. НДС не облагается',
+  'Заработная плата за сентябрь 2026 по реестру № 14 от 24.09.2026. НДС не облагается',
+  'Налог на прибыль организаций за 9 месяцев 2026 г. Уведомление № 3 от 22.09.2026',
+  'Возврат ошибочно перечисленных средств по п/п № 2931 от 24.09.2026. Без НДС'];
+var RAMT=['85 814.36','7.00','2 178.00','200 535.00','490 800.00','130 500.00','40 000.00','150 075.00','87 631.00','118 059.00','1 305 599.36','12 700 000.00'];
+var RTYPES=['PAYDOCRU','PAYDOCRU','REQDOCRU','PAYDOCRU','PAYORDRU','PAYDOCRU','PAYDOCRU','REQDOCRU','PAYDOCRU','PAYDOCRU','PAYORDRU','PAYDOCRU'];
+var ED_BY_TYPE={PAYDOCRU:'ED101',REQDOCRU:'ED104',PAYORDRU:'ED105'};
+var TYPE_NAME={PAYDOCRU:'Платёжное поручение',REQDOCRU:'Инкассовое поручение',PAYORDRU:'Платёжный ордер'};
+var OP_BY_TYPE={PAYDOCRU:['01','Платёжное поручение'],REQDOCRU:['06','Инкассовое поручение'],PAYORDRU:['16','Платёжный ордер']};
 /* Статусы системы — порядок как в лейне на проме */
 var STATUS_META=[
   ['IN_PROGRESS','В работе','flow'],['TO_EXPORT','К экспорту','flowl'],['PROCESSING','В обработке','flowd'],['ERROR','Ошибка','bad'],
@@ -256,40 +271,34 @@ var STATUS_META=[
 var SM={};STATUS_META.forEach(function(x){SM[x[0]]={label:x[1],cls:x[2]}});
 function drawerSt(code){return code==='DONE'||code==='EXPORTED'?'ok':(code==='ERROR'||code==='INVALID'||code==='REJECTED')?'bad':'wait'}
 var STS=['DONE','IN_PROGRESS','DONE','ERROR','DONE','TO_EXPORT','PROCESSING','DEFERRED','EXPORTED','REJECTED','DONE','IN_PROGRESS'];
-var REASONS=['Отправлен запрос в СУБО Контроль(2700)','Документ отправлен в ЕРС','Документ на контроле ДККФМ','Ожидание решения сотрудника','Документ с будущей датой исполнения','Ожидание обработки основного документа от Лоро','В очереди ожидания средств','Возврат на закрытый счёт. Поиск исходящего документа','Ожидание ответа от ВКО'];
+var REASONS=['Отправлен запрос в СУБО Контроль(2700)','Документ отправлен в ЦБ','Документ на контроле ДККФМ','Ожидание решения сотрудника','Документ с будущей датой исполнения','Ожидание обработки основного документа','В очереди ожидания средств (картотека 2)','Счёт плательщика закрыт. Поиск исходящего документа','Ожидание ответа от ПРИЗМ'];
 /* причина статуса бывает только у Отложенный / Ошибка / Отказ */
 var REASON_BY_ST={DEFERRED:[4,5,6,3,8,0,2,1],ERROR:[7],REJECTED:[7,3]};
 /* направление — два реквизита: группа (IN / OUT / TRANSIT / OTHER) и название направления */
-var DIRS=[['IN','входящий от ЕРС на клиента'],['OUT','исходящий возврат'],['OUT','исходящий межбанковский'],['IN','входящий от ЕРС на клиента'],['OTHER','уведомление, свободный формат'],['OUT','исходящий с покрытием'],['IN','входящий от корреспондента'],['OUT','исходящий клиентский'],['TRANSIT','транзит через корсчёт'],['OUT','исходящий клиентский'],['OTHER','запрос по документу'],['TRANSIT','транзит на другой банк']];
-/* пул маршрутов и составные части счёта — данные стенда, всё вымышленное */
-var ACC_PFX=['30114','30110','30109','47422','30111'],
-    CCYN={USD:'840',EUR:'978',CNY:'156',AMD:'051',RUB:'810'},
-    RT=[['NOSTRO','BCLHLV22XXX'],['NOSTRO','HSTBDEHHXXX'],['LORO','MRDNGB2LXXX'],['INTERNAL','VKRBRU8KXXX'],['NOSTRO','NRDIRUMMXXX']];
+var DIRS=[['IN','входящий от ЦБ на клиента'],['OUT','исходящий на ЦБ'],['OUT','исходящий на ЦБ · взыскание'],['IN','входящий от ЦБ на клиента'],['OTHER','внутрибанковский перевод'],['OUT','исходящий на ЦБ · бюджетный'],['IN','входящий от ЦБ на клиента'],['OUT','исходящий на ЦБ'],['TRANSIT','транзит через корсчёт филиала'],['OUT','исходящий на ЦБ'],['OTHER','внутрибанковский ордер'],['IN','входящий от ЦБ на клиента']];
+/* системы: инициатор / источник / назначение — короткие коды ИС */
+var SYS=[['CBR.CBR_IN','UFEBS','RETAIL'],['DBO.DBO_PPKOD','SUBOIL','UFEBS'],['CNTS.CNTS_DECR','CNTSEXEC','PRISM'],['CBR.CBR_IN','UFEBS','CORP'],['ERS.ERS_1','OPS','RETAIL'],['TAX.TAX_ENP','SUBOIL','UFEBS']];
+var SCEN={IN:'SC_CBR_IN_CREDIT',OUT:'SC_CBR_OUT_DEBIT',TRANSIT:'SC_BRANCH_TRANSIT',OTHER:'SC_INTERNAL'};
 var ROWS=[];
 var N_ROWS=87;
 for(var i=0;i<N_ROWS;i++){
-  var base=P.cl(P.DOCS[i%2===0?0:1]),n1=NAMES[i%6],n2=NAMES[(i+1)%6],b1=BANKS[i%6],b2=BANKS[(i+2)%6];
-  var k=i%12;base.type=TYPES[k];base.status=i%29===5?'INVALID':STS[k];base.st=drawerSt(base.status);base.dirTxt=DIRS[k][1];base.dir=DIRS[k][0];
+  var base=P.cl(P.DOCS[i%2===0?R.docs[0]:R.docs[1]]),n1=RNAMES[i%8],n2=RNAMES[(i+3)%8],b1=RBANKS[i%6],b2=RBANKS[(i+1)%6];
+  var k=i%12;base.type=RTYPES[k];base.status=i%29===5?'INVALID':STS[k];base.st=drawerSt(base.status);base.dirTxt=DIRS[k][1];base.dir=DIRS[k][0];
   var rs=REASON_BY_ST[base.status];base.reason=rs?REASONS[rs[i%rs.length]]:'';
-  base.amount=AMT[(i*7)%12][0];base.ccy=AMT[(i*7)%12][1];
+  base.amount=RAMT[(i*7)%12];base.ccy='RUB';
   var dd=(22+(i%12>7?1:0)),hh=String(7+(i*3)%11).padStart(2,'0'),mm=String((i*17)%60).padStart(2,'0');
-  base.created=dd+'.09.2026 '+hh+':'+mm+':'+String((i*7)%60).padStart(2,'0');base.num=String(400+i*3);base.numDate=dd+'.09.26';
-  base.vd=[dd+'.09.2026',dd+'.09.2026',dd+'.09.2026',(i%5===3?(dd+1):dd)+'.09.2026'];
+  base.created=dd+'.09.2026 '+hh+':'+mm+':'+String((i*7)%60).padStart(2,'0');base.num=String(2900+i*3);base.numDate=dd+'.09.2026';
+  base.changed=(dd+(i%9===4?1:0))+'.09.2026 '+String(Math.min(23,+hh+(i%3)))+':'+String((i*29)%60).padStart(2,'0');
   base.uuid=String(i).padStart(2,'0')+'e'+base.uuid.slice(3);
-  var ref=(DIRS[k][0]==='IN'?'FX':'VK')+'26092'+dd%10+'0000'+String(400+i*3).padStart(4,'0');
-  base.f['20']={lines:[ref]};base.r20out=(DIRS[k][0]==='IN'?'VK':'FX')+ref.slice(2);
-  if(DIRS[k][0]==='OUT'&&i%3!==0)base.f['20']={lines:[]};if(DIRS[k][0]==='IN'&&i%4===1)base.r20out='';
-  base.f['50']={opt:'F',acc:n1[1],lines:[n1[0],'ULITSA PROFSOYUZNAYA 83-1-214','RU/ MOSCOW, 117279']};
-  base.f['59']={opt:'F',acc:n2[1],lines:[n2[0],'PROSPEKT MIRA 101-2-45','RU/ MOSCOW, 129085']};
-  base.f['52']={opt:'A',lines:[b1[0],b1[1]]};base.f['57']={opt:'A',lines:[b2[0],b2[1]]};
-  base.f['58']=base.type.indexOf('MT202')===0?{opt:'A',lines:[b2[0],b2[1]]}:{lines:[]};
-  base.f['70']={lines:PURP[i%6].match(/.{1,35}(?=\s|$)|.{1,35}/g)};
-  base.inS=b1[1];base.inR=b2[1];base.outS=b2[1];base.outR=b1[1];
-  var PROV=['ЕРС','LORO','NOSTRO','SUBOUL','VTO'];base.provS=DIRS[k][0]==='IN'?PROV[i%2?3:0]:PROV[4];base.provR=DIRS[k][0]==='IN'?PROV[4]:PROV[1+(i%3===0?1:0)];
-  /* счёт маршрута: балансовый счёт + код валюты документа + филиал + номер */
-  var rt=RT[i%5];
-  base.route={type:rt[0],recv:rt[1],desc:base.route.desc,text:base.route.text,
-    acc:ACC_PFX[i%5]+(CCYN[base.ccy]||'810')+String((i*3)%10)+String(1000+(i*37+261)%9000)+String(1000000+(i*7919+430157)%9000000)};
+  base.txId=String((i*13)%100).padStart(2,'0')+'f'+base.txId.slice(3);
+  var r=base.r,op=OP_BY_TYPE[base.type],sy=SYS[i%6];
+  r.scen=SCEN[base.dir];r.from=base.dir==='IN'?'DB01':'DB02';r.to=base.dir==='IN'?'DB02':'DB01';
+  r.initiator=sy[0];r.source=sy[1];r.destination=sy[2];r.opCode=op[0];r.opName=op[1];r.queue=String(1+(i*5)%5);r.prio=i%7===3?1:0;
+  r.docRef=ED_BY_TYPE[base.type]+'-26092'+dd%10+'000'+String(1800+i*7).padStart(4,'0');
+  if(base.dir==='IN'&&i%4===1)r.docRef='';
+  r.party={s:{name:n1[0],opt:'',acc:n1[1],inn:n1[2],kpp:n1[3],info:'',addr:'',bank:b1[0],bic:b1[1],bankAcc:b1[2],bankInfo:''},
+           r:{name:n2[0],opt:'',acc:n2[1],inn:n2[2],kpp:n2[3],info:'',addr:'',bank:b2[0],bic:b2[1],bankAcc:b2[2],bankInfo:''}};
+  r.purpose=RPURP[i%6];
   base.tabsOff=i%2?['Нотификации','Стриминг','MPU']:['MPU'];
   /* состояния записи для дизайн-системы: заблокирована другим пользователем / неактивна (архив, отозвана) */
   if(i%11===2)base.lock={who:['Петрова А. С.','Сидоров К. В.','Лебедева О. Н.'][i%3],since:'23.09.2026 '+String(9+i%8).padStart(2,'0')+':'+String((i*13)%60).padStart(2,'0')};
@@ -297,73 +306,63 @@ for(var i=0;i<N_ROWS;i++){
   ROWS.push(base);
 }
 /* ---- рендер грида ---- */
-function fld(f,showName){if(!f||(!f.lines.length&&!f.acc))return '<span class="nl">—</span>';var c=f.edit||f,acc=c.acc||f.acc,l0=c.lines[0]||'',last=c.lines[c.lines.length-1]||'';
-  var main=acc?acc:(/^[A-Z0-9]{8}([A-Z0-9]{3})?$/.test(last)&&c.lines.length>1?last:l0);
-  var cap=acc?l0:(main===last&&c.lines.length>1?l0:'');
-  return '<div class="fld"><span class="op">'+(c.opt||'')+'</span>'+cv(main,'mono',130)+'</div>'+(cap?'<span class="cap">'+cv(cap,'',125)+'</span>':'')}
 /* линк-кнопка реквизита: имя фиксированной ширины вместо длинного значения; клик копирует, серая — значения нет */
 function lk(name,v){return v?'<span class="lk" data-v="'+esc(v)+'" data-tip="'+esc(v)+' — копировать">'+name+'</span>':'<span class="lk off" data-tip="'+name+': нет значения">'+name+'</span>'}
 function cv(v,cls,mw){v=String(v==null?'':v);return '<span class="cv'+(cls?' '+cls:'')+'"'+(mw?' style="max-width:'+mw+'px"':'')+' data-v="'+esc(v)+'">'+esc(v)+'</span>'}
 function dirIco(g){return g==='IN'?ic('down'):g==='OUT'?ic('kt'):g==='TRANSIT'?'<span class="dg">⇄</span>':'<span class="dg">◦</span>'}
-/* отправитель/получатель: «S:» и «R:» — служебная подпись роли, не данные */
-/* Счёт показываем сокращённо, копируется и всплывает полный.
-   Знаки 6–8 — код валюты, поэтому выделены. */
+/* Счёт показываем сокращённо, копируется и всплывает полный. Знаки 6–8 — код валюты (810), поэтому выделены. */
 function acct(v){
   v=String(v==null?'':v);
+  if(!v)return '<span class="nl">—</span>';
   if(v.length<12)return cv(v,'mono',110);
   return '<span class="cv mono acct" data-short data-v="'+esc(v)+'">'+
          esc(v.slice(0,5))+'<b>'+esc(v.slice(5,8))+'</b><span class="e">…</span>'+esc(v.slice(-3))+'</span>';
 }
-function srPair(s,r){
-  return '<span class="srl"><span class="k">S:</span>'+cv(s)+'</span>'+
-         '<span class="srl"><span class="k">R:</span>'+cv(r)+'</span>';
-}
+/* участник: счёт, под ним наименование; банк: БИК, под ним наименование */
+function party(p){return acct(p.acc)+'<span class="l2">'+cv(p.name,'',150)+'</span>'}
+function bank(p){return (p.bic?cv(p.bic,'mono'):'<span class="nl">—</span>')+'<span class="l2">'+cv(p.bank,'',150)+'</span>'}
+/* системы: «I:», «S:», «D:» — служебная подпись роли, не данные */
+function sysLines(r){return [['I',r.initiator],['S',r.source],['D',r.destination]].map(function(x){return '<span class="srl"><span class="k">'+x[0]+':</span>'+cv(x[1])+'</span>'}).join('')}
 function rowHtml(d,i,ord){
-  var vd=d.vd,same=vd.every(function(x){return x===vd[0]}),purp=(d.f['70']||{lines:[]}).lines.join(' ');
+  var r=d.r;
   var st=(d.lock?' is-locked':'')+(d.inactive?' is-inactive':'');
   var openTip=d.lock?'Заблокирована: '+esc(d.lock.who)+', с '+d.lock.since+' · открыть только для просмотра':d.inactive?esc(d.inactive.why)+' · открыть':'Открыть деталку · двойной клик (или Shift) — рядом для сравнения';
   return '<tbody class="row'+st+'" data-i="'+i+'"><tr><td rowspan="2"><input type="checkbox" aria-label="Выбрать"'+(d.inactive?' disabled':'')+'><span class="num">'+ord+'</span></td>'+
-   '<td class="icons"><button type="button" class="ico open'+(d.lock?' lock':'')+'" data-open="'+i+'" aria-label="'+(d.lock?'Заблокирована другим пользователем, открыть только для просмотра':'Открыть деталку документа № '+d.num)+'" data-tip="'+openTip+'">'+ic(d.lock?'lock':'esid')+'</button><span class="stdot sc-'+SM[d.status].cls+'" data-tip="'+SM[d.status].label+' · '+d.status+'">'+(d.st==='ok'?'✓':d.st==='bad'?'✕':'·')+'</span></td>'+
-   '<td class="id"><b>'+cv(d.num)+'</b><span class="lks">'+lk('uuid',d.uuid)+lk('refIn',d.f['20'].lines[0])+lk('refOut',d.r20out)+'</span></td>'+
-   '<td rowspan="2">'+cv(d.created.slice(0,10))+' <span class="lbl">'+cv(d.created.slice(11,16))+'</span><span class="l2">Дт '+cv(vd[2])+'<br>Кт '+(same?cv(vd[3]):'<span style="color:var(--warn)">'+cv(vd[3])+'</span>')+'</span></td>'+
-   '<td rowspan="2">'+cv(d.type,'tag mt')+'</td>'+
+   '<td class="icons"><button type="button" class="ico open'+(d.lock?' lock':'')+'" data-open="'+i+'" aria-label="'+(d.lock?'Заблокирована другим пользователем, открыть только для просмотра':'Открыть деталку документа № '+d.num)+'" data-tip="'+openTip+'">'+ic(d.lock?'lock':'esid')+'</button><span class="stdot sc-'+SM[d.status].cls+'" data-tip="'+esc(SM[d.status].label)+'"></span></td>'+
+   '<td class="id"><b>'+cv(d.num)+'</b><span class="lks">'+lk('uuid',d.uuid)+lk('txId',d.txId)+lk('docRef',r.docRef)+'</span></td>'+
+   '<td rowspan="2">'+cv(d.created.slice(0,10))+' <span class="lbl">'+cv(d.created.slice(11,16))+'</span><span class="l2">Изм. '+cv(d.changed.slice(0,5))+' '+cv(d.changed.slice(11,16))+'</span></td>'+
+   '<td rowspan="2">'+cv(d.type,'tag mt')+'<span class="l2">'+cv(ED_BY_TYPE[d.type])+'</span></td>'+
    '<td rowspan="2"><span class="dir">'+dirIco(d.dir)+cv(d.dir)+'</span><span class="l2">'+cv(d.dirTxt,'',105)+'</span></td>'+
-   (CCY_COL?'<td rowspan="2"><span class="amt">'+cv(d.amount)+'</span></td><td rowspan="2" class="ccy">'+cv(d.ccy,'tag mt')+'</td>':'<td rowspan="2"><span class="amt">'+cv(d.amount)+'</span><span class="l2">'+cv(d.ccy)+'</span></td>')+
-   '<td class="f5">'+fld(d.f['50'])+'</td>'+
-   '<td class="f5">'+fld(d.f['52'])+'</td><td class="f5">'+fld(d.f['57'])+'</td><td class="f5">'+fld(d.f['58'])+'</td><td class="f5">'+fld(d.f['59'])+'</td>'+
-   '<td rowspan="2">'+acct(d.route.acc)+'<span class="l2">'+cv(d.route.type)+' → '+cv(d.route.recv)+'</span></td>'+
-   '<td class="sr" rowspan="2">'+srPair(d.inS,d.inR)+'</td>'+
-   '<td class="sr" rowspan="2">'+srPair(d.outS,d.outR)+'</td>'+
-   '<td class="sr prov" rowspan="2">'+cv(d.provS,'tag snd')+cv(d.provR,'tag rcv')+'</td></tr>'+
+   '<td rowspan="2"><span class="amt">'+cv(d.amount)+'</span><span class="l2">'+cv(d.ccy)+'</span></td>'+
+   '<td class="f5">'+party(r.party.s)+'</td>'+
+   '<td class="f5">'+party(r.party.r)+'</td>'+
+   '<td class="f5">'+bank(r.party.s)+'</td>'+
+   '<td class="f5">'+bank(r.party.r)+'</td>'+
+   '<td class="sr" rowspan="2">'+sysLines(r)+'</td>'+
+   '<td rowspan="2"><span class="q">'+cv(r.queue)+'</span><span class="l2">'+(r.prio?'<span class="st wait" style="font-size:9.5px;padding:1px 5px">СРОЧНО</span>':cv('неприоритетный'))+'</span></td></tr>'+
    '<tr class="purow"><td colspan="2" class="reason'+(d.reason?'':' empty')+'">'+(d.reason?'<div class="inner"><span class="sd sc-'+SM[d.status].cls+'"></span>'+cv(d.reason)+'</div>':'')+'</td>'+
-   '<td colspan="5" class="purp"><div class="inner"><span class="fno" data-tip="70 · Детали платежа">70</span>'+cv(purp)+'</div></td></tr></tbody>';
+   '<td colspan="4" class="purp"><div class="inner"><span class="fno" data-tip="Назначение платежа">НАЗН.</span>'+cv(r.purpose)+'</div></td></tr></tbody>';
 }
 var grid=document.getElementById('grid');
 /* ---- сортировка: у составной колонки несколько реквизитов — клик по заголовку открывает меню, у простой — сразу переключает ---- */
 var SORT={by:null,dir:1};
-/* валюта — в колонке суммы (второй строкой) или отдельной колонкой; переключается галочкой, чтобы сравнить вживую */
-var CCY_COL=false;
-var COLS_BASE=[
+var COLS=[
   {t:'',sub:''},
   {t:'',m:'Статус',sub:'',keys:[{id:'status',l:'Статус'},{id:'reason',l:'Причина статуса'}]},
-  {t:'ID',sub:'№ · 20 вх / исх',keys:[{id:'docNumber',l:'Номер документа',type:'number'},{id:'refIn',l:'20 вх'},{id:'refOut',l:'20 исх'}]},
-  {t:'Дата / Время',sub:'',keys:[{id:'created',l:'Дата документа',type:'date'},{id:'vdDt',l:'Валютирование Дт',type:'date'},{id:'vdKt',l:'Валютирование Кт',type:'date'}]},
-  {t:'Тип',sub:'',keys:[{id:'type',l:'Тип сообщения'}]},
+  {t:'ID',sub:'№ · uuid / txId / docRef',keys:[{id:'docNumber',l:'Номер документа',type:'number'},{id:'docRef',l:'docReference'}]},
+  {t:'Дата / Время',sub:'создан · изменён',keys:[{id:'created',l:'Дата создания',type:'date'},{id:'changed',l:'Дата изменения',type:'date'}]},
+  {t:'Тип',sub:'',keys:[{id:'type',l:'Тип документа'}]},
   {t:'Направление',sub:'',keys:[{id:'direction',l:'Группа → название',then:'dirTxt'},{id:'dirTxt',l:'Название направления'}]},
-  {t:'32',sub:'сумма',keys:[{id:'amount',l:'Сумма',type:'number'},{id:'currency',l:'Валюта'}],ccyHost:true},
-  {t:'50',sub:'приказодатель · 70',keys:[{id:'f50name',l:'Наименование'},{id:'f50acc',l:'Счёт'},{id:'purpose',l:'Назначение (70)'}]},
-  {t:'52',sub:'',keys:[{id:'f52',l:'BIC 52'}]},
-  {t:'57',sub:'',keys:[{id:'f57',l:'BIC 57'}]},
-  {t:'58',sub:'',keys:[{id:'f58',l:'BIC 58'}]},
-  {t:'59',sub:'',keys:[{id:'f59name',l:'Наименование'},{id:'f59acc',l:'Счёт'}]},
-  {t:'Маршрут',sub:'',keys:[{id:'routeType',l:'Тип маршрута'},{id:'routeRecv',l:'Receiver'}]},
-  {t:'S / R in',sub:'',keys:[{id:'sender',l:'S in'},{id:'receiver',l:'R in'}]},
-  {t:'S / R out',sub:'',keys:[{id:'outSender',l:'S out'},{id:'outReceiver',l:'R out'}]},
-  {t:'Провайдеры',sub:'',keys:[{id:'provS',l:'Провайдер отправителя'},{id:'provR',l:'Провайдер получателя'}]}];
-function cols(){if(!CCY_COL)return COLS_BASE;var out=[];COLS_BASE.forEach(function(c){if(c.ccyHost){out.push({t:'32',sub:'сумма',keys:[{id:'amount',l:'Сумма',type:'number'}]});out.push({t:'Валюта',sub:'',keys:[{id:'currency',l:'Валюта'}]})}else out.push(c)});return out}
-function keyMeta(id){var C=cols();for(var c=0;c<C.length;c++){var k=(C[c].keys||[]).filter(function(x){return x.id===id})[0];if(k)return k}return null}
+  {t:'Сумма',sub:'RUB',keys:[{id:'amount',l:'Сумма',type:'number'}]},
+  {t:'Отправитель',sub:'счёт · наименование',keys:[{id:'fromName',l:'Наименование'},{id:'fromAcc',l:'Счёт'},{id:'fromInn',l:'ИНН'},{id:'purpose',l:'Назначение платежа'}]},
+  {t:'Получатель',sub:'счёт · наименование',keys:[{id:'toName',l:'Наименование'},{id:'toAcc',l:'Счёт'},{id:'toInn',l:'ИНН'}]},
+  {t:'Банк отправителя',sub:'БИК · наименование',keys:[{id:'fromBic',l:'БИК'},{id:'fromBank',l:'Наименование банка'}]},
+  {t:'Банк получателя',sub:'БИК · наименование',keys:[{id:'toBic',l:'БИК'},{id:'toBank',l:'Наименование банка'}]},
+  {t:'Системы',sub:'I · S · D',keys:[{id:'initiator',l:'Initiator'},{id:'source',l:'Source'},{id:'destination',l:'Destination'}]},
+  {t:'Очерёдн.',sub:'приоритет',keys:[{id:'queue',l:'Очерёдность',type:'number'},{id:'prio',l:'Приоритет',type:'number'}]}];
+function keyMeta(id){for(var c=0;c<COLS.length;c++){var k=(COLS[c].keys||[]).filter(function(x){return x.id===id})[0];if(k)return k}return null}
 function headHtml(){
-  return '<thead><tr>'+cols().map(function(c,i){
+  return '<thead><tr>'+COLS.map(function(c,i){
     if(i===0)return '<th><input type="checkbox" aria-label="Выбрать все"></th>';
     var active=c.keys&&c.keys.some(function(k){return k.id===SORT.by}),km=active?keyMeta(SORT.by):null;
     return '<th class="'+(c.keys?'sortable':'')+(active?' sorted':'')+'" data-col="'+i+'">'+(c.t||'')+(c.keys?'<span class="sarrow">'+(active?(SORT.dir>0?'↑':'↓'):'↕')+'</span>':'')+
@@ -384,7 +383,7 @@ function closeSortMenu(){var m=document.getElementById('sortmenu');if(m)m.remove
 grid.addEventListener('click',function(e){
   if(e.target.closest('.rz'))return;
   var th=e.target.closest('th.sortable');if(!th)return;
-  var c=cols()[+th.dataset.col];
+  var c=COLS[+th.dataset.col];
   if(c.keys.length===1){setSort(c.keys[0].id);return}
   closeSortMenu();var r=th.getBoundingClientRect(),z=parseFloat(document.documentElement.style.zoom)||1;
   var m=document.createElement('div');m.id='sortmenu';m.className='sortmenu';m.style.left=(r.left/z)+'px';m.style.top=(r.bottom/z+2)+'px';
@@ -412,7 +411,7 @@ var PAGE={size:20,n:1};
 function drawGrid(idx){lastIdx=idx;
   var pages=Math.max(1,Math.ceil(idx.length/PAGE.size));if(PAGE.n>pages)PAGE.n=pages;
   var from=(PAGE.n-1)*PAGE.size,slice=idx.slice(from,from+PAGE.size);
-  grid.innerHTML=headHtml()+slice.map(function(i,k){return rowHtml(ROWS[i],i,from+k+1)}).join('')+(idx.length?'':'<tbody><tr><td colspan="'+(CCY_COL?17:16)+'">'+SK.empty('По заданным условиям документов нет','Сбросить фильтр')+'</td></tr></tbody>');
+  grid.innerHTML=headHtml()+slice.map(function(i,k){return rowHtml(ROWS[i],i,from+k+1)}).join('')+(idx.length?'':'<tbody><tr><td colspan="13">'+SK.empty('По заданным условиям документов нет','Сбросить фильтр')+'</td></tr></tbody>');
   document.getElementById('cnt').textContent=idx.length===ROWS.length?ROWS.length+' документов':idx.length+' из '+ROWS.length;
   renderPager(idx.length,pages);
   if(typeof mark==='function')mark();
@@ -423,23 +422,21 @@ function drawGrid(idx){lastIdx=idx;
    при подмене ничего не должно сдвинуться. */
 function skRowHtml(ord){
   var S=SK,f5='';
-  /* высоты измерены на строке с данными: основная строка записи 34px
-     (две строки по 17), вторая строка 15px, ячейки rowspan — три строки */
-  for(var k=0;k<5;k++)f5+='<td class="f5">'+S.col(S.ln((58+k*7)+'%',11),S.ln((42+k*5)+'%',9,17))+'</td>';
-  var sr='';
-  for(var j=0;j<3;j++)sr+='<td class="sr" rowspan="2">'+S.col(S.ln('72px',13),S.ln('72px',13))+'</td>';
+  /* высоты измерены на строке с данными: основная строка записи 34px (две строки по 17), вторая строка 15px, ячейки rowspan — три строки */
+  for(var k=0;k<4;k++)f5+='<td class="f5">'+S.col(S.ln((58+k*7)+'%',11),S.ln((42+k*5)+'%',9,17))+'</td>';
   return '<tbody class="row skrow" aria-busy="true"><tr>'+
     '<td rowspan="2">'+S.sk('13px','13px','sq')+'<span class="num">'+ord+'</span></td>'+
     '<td class="icons">'+S.col(S.ln('16px',16,20),S.ln('16px',9,14))+'</td>'+
     '<td class="id">'+S.col(S.ln('34px',12),S.ln('96px',10,17))+'</td>'+
-    '<td rowspan="2">'+S.col(S.ln('88px',12),S.ln('62px',10),S.ln('62px',10))+'</td>'+
-    '<td rowspan="2">'+S.ln('46px',14)+'</td>'+
+    '<td rowspan="2">'+S.col(S.ln('88px',12),S.ln('62px',10))+'</td>'+
+    '<td rowspan="2">'+S.col(S.ln('60px',14),S.ln('36px',10))+'</td>'+
     '<td rowspan="2">'+S.col(S.ln('40px',12),S.ln('78px',10))+'</td>'+
     '<td rowspan="2"><span class="sk-col" style="align-items:flex-end">'+S.ln('94px',13)+S.ln('26px',10)+'</span></td>'+
     f5+
-    '<td rowspan="2">'+S.col(S.ln('86px',12),S.ln('66px',10))+'</td>'+sr+
+    '<td class="sr" rowspan="2">'+S.col(S.ln('72px',13),S.ln('72px',13),S.ln('72px',13))+'</td>'+
+    '<td rowspan="2">'+S.col(S.ln('12px',12),S.ln('70px',10))+'</td>'+
     '</tr><tr class="purow"><td colspan="2" class="reason empty"></td>'+
-    '<td colspan="5" class="purp">'+S.ln('58%',10,15)+'</td></tr></tbody>';
+    '<td colspan="4" class="purp">'+S.ln('58%',10,15)+'</td></tr></tbody>';
 }
 function skGridHtml(n){var out=headHtml();for(var i=1;i<=n;i++)out+=skRowHtml(i);return out}
 
@@ -479,30 +476,28 @@ document.getElementById('psize').addEventListener('change',function(e){PAGE.size
 
 /* ---- фильтры: каталог для реестра (конструктив из vtb-filters), значения справочников — из строк ---- */
 function uniq(fn){var s={};ROWS.forEach(function(d){var v=fn(d);if(v)s[v]=1});return Object.keys(s).sort()}
-function lines(d,t){var f=d.f[t];return f?(f.edit||f).lines:[]}
-function bic(d,t){var L=lines(d,t);return L[L.length-1]||''}
 var ACC={
-  docId:function(d){return d.uuid},docNumber:function(d){return d.num},refIn:function(d){return d.f['20'].lines[0]},refOut:function(d){return d.r20out},
-  status:function(d){return SM[d.status].label},reason:function(d){return d.reason},type:function(d){return d.type},direction:function(d){return d.dir},dirTxt:function(d){return d.dirTxt},purpose:function(d){return lines(d,'70').join(' ')},
-  created:function(d){return d.created.slice(0,10)},valueDate:function(d){return d.vd[0]},vdDt:function(d){return d.vd[2]},vdKt:function(d){return d.vd[3]},
-  amount:function(d){return d.amount.replace(/\s/g,'')},currency:function(d){return d.ccy},dtAcc:function(d){return d.dt.replace(/\s/g,'')},ktAcc:function(d){return d.kt.replace(/\s/g,'')},
-  f50name:function(d){return lines(d,'50')[0]||''},f50acc:function(d){return (d.f['50']||{}).acc||''},f59name:function(d){return lines(d,'59')[0]||''},f59acc:function(d){return (d.f['59']||{}).acc||''},
-  f52:function(d){return bic(d,'52')},f57:function(d){return bic(d,'57')},f58:function(d){return bic(d,'58')},
-  routeType:function(d){return d.route.type},routeRecv:function(d){return d.route.recv},sender:function(d){return d.inS},receiver:function(d){return d.inR},
-  outSender:function(d){return d.outS},outReceiver:function(d){return d.outR},provS:function(d){return d.provS},provR:function(d){return d.provR}
+  docId:function(d){return d.uuid},docNumber:function(d){return d.num},docRef:function(d){return d.r.docRef},txId:function(d){return d.txId},
+  status:function(d){return SM[d.status].label},reason:function(d){return d.reason},type:function(d){return d.type},direction:function(d){return d.dir},dirTxt:function(d){return d.dirTxt},purpose:function(d){return d.r.purpose},
+  scen:function(d){return d.r.scen},created:function(d){return d.created.slice(0,10)},changed:function(d){return d.changed.slice(0,10)},docDate:function(d){return d.numDate},
+  amount:function(d){return d.amount.replace(/\s/g,'')},queue:function(d){return d.r.queue},prio:function(d){return String(d.r.prio)},
+  fromName:function(d){return d.r.party.s.name},fromAcc:function(d){return d.r.party.s.acc},fromInn:function(d){return d.r.party.s.inn},fromKpp:function(d){return d.r.party.s.kpp},
+  toName:function(d){return d.r.party.r.name},toAcc:function(d){return d.r.party.r.acc},toInn:function(d){return d.r.party.r.inn},toKpp:function(d){return d.r.party.r.kpp},
+  fromBic:function(d){return d.r.party.s.bic},fromBank:function(d){return d.r.party.s.bank},toBic:function(d){return d.r.party.r.bic},toBank:function(d){return d.r.party.r.bank},
+  initiator:function(d){return d.r.initiator},source:function(d){return d.r.source},destination:function(d){return d.r.destination}
 };
 function F(id,label,type,dict){return {id:id,label:label,type:type||'text',dict:dict||uniq(ACC[id]).slice(0,12)}}
 var CATALOG=[
-  {group:'Основные',fields:[F('docId','ID документа'),F('docNumber','Номер документа'),F('refIn','Поле 20 (входящее)'),F('refOut','Поле 20 (исходящее)'),F('status','Статус','select',STATUS_META.map(function(x){return x[1]})),F('reason','Причина статуса','select',REASONS),F('type','Тип сообщения','select'),F('direction','Группа направления','select',['IN','OUT','TRANSIT','OTHER']),F('dirTxt','Название направления','select'),F('purpose','Назначение (70)')]},
-  {group:'Даты',fields:[F('created','Дата документа','date'),F('valueDate','Дата валютирования','date'),F('vdDt','Валютирование по Дт','date'),F('vdKt','Валютирование по Кт','date')]},
-  {group:'Финансы',fields:[F('amount','Сумма','number'),F('currency','Валюта','select'),F('dtAcc','Счёт Дт'),F('ktAcc','Счёт Кт')]},
-  {group:'Контрагенты',fields:[F('f50name','Поле 50 (наименование)'),F('f50acc','Поле 50 (счёт)'),F('f59name','Поле 59 (наименование)'),F('f59acc','Поле 59 (счёт)')]},
-  {group:'Банки (SWIFT-коды)',fields:[F('f52','Поле 52'),F('f57','Поле 57'),F('f58','Поле 58')]},
-  {group:'Маршрут',fields:[F('routeType','Тип маршрута','select'),F('routeRecv','Receiver'),F('sender','S in'),F('receiver','R in'),F('outSender','S out'),F('outReceiver','R out'),F('provS','Провайдер отправителя','select'),F('provR','Провайдер получателя','select')]}
+  {group:'Основные',fields:[F('docId','ID документа'),F('docNumber','Номер документа'),F('docRef','docReference'),F('txId','ID транзакции'),F('status','Статус','select',STATUS_META.map(function(x){return x[1]})),F('reason','Причина статуса','select',REASONS),F('type','Тип документа','select'),F('direction','Группа направления','select',['IN','OUT','TRANSIT','OTHER']),F('dirTxt','Название направления','select'),F('scen','Сценарий','select'),F('purpose','Назначение платежа')]},
+  {group:'Даты',fields:[F('created','Дата создания','date'),F('changed','Дата изменения','date'),F('docDate','Дата документа','date')]},
+  {group:'Финансы',fields:[F('amount','Сумма','number'),F('queue','Очерёдность','select',['1','2','3','4','5']),F('prio','Приоритет','select',['0','1'])]},
+  {group:'Отправитель',fields:[F('fromName','Наименование'),F('fromAcc','Счёт'),F('fromInn','ИНН'),F('fromKpp','КПП'),F('fromBic','БИК банка'),F('fromBank','Банк')]},
+  {group:'Получатель',fields:[F('toName','Наименование'),F('toAcc','Счёт'),F('toInn','ИНН'),F('toKpp','КПП'),F('toBic','БИК банка'),F('toBank','Банк')]},
+  {group:'Системы',fields:[F('initiator','Initiator','select'),F('source','Source','select'),F('destination','Destination','select')]}
 ];
 var DEMO_SETS=[
-  {id:'demo-1',name:'Входящие USD исполненные',data:{visible:['direction','currency','status'],ops:{direction:'eq',currency:'eq',status:'eq'},values:{direction:{list:[],draft:'IN'},currency:{list:[],draft:'USD'},status:{list:[],draft:'Обработан'}}}},
-  {id:'demo-2',name:'Проблемные MT103/MT202',data:{visible:['type','status','amount'],ops:{type:'in',status:'in',amount:'gt'},values:{type:{list:['MT103','MT202'],draft:''},status:{list:['Ошибка','Отказ','INVALID'],draft:''},amount:{list:[],draft:'100000'}}}}];
+  {id:'demo-1',name:'Входящие от ЦБ исполненные',data:{visible:['direction','status'],ops:{direction:'eq',status:'eq'},values:{direction:{list:[],draft:'IN'},status:{list:[],draft:'Обработан'}}}},
+  {id:'demo-2',name:'Взыскания приставов',data:{visible:['type','initiator','status'],ops:{type:'eq',initiator:'eq',status:'in'},values:{type:{list:[],draft:'REQDOCRU'},initiator:{list:[],draft:'CNTS.CNTS_DECR'},status:{list:['В работе','Отложенный','Ошибка'],draft:''}}}}];
 function toNum(v){var n=parseFloat(String(v).replace(/\s/g,'').replace(',','.'));return isNaN(n)?null:n}
 function toDate(v){var m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(String(v).trim());if(m)return m[3]+m[2]+m[1];m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v).trim());return m?m[1]+m[2]+m[3]:null}
 function cmp(field,a,b){if(field.type==='number'){var x=toNum(a),y=toNum(b);return x==null||y==null?null:x-y}if(field.type==='date'){var p=toDate(a),q=toDate(b);return p==null||q==null?null:(p<q?-1:p>q?1:0)}return String(a).localeCompare(String(b))}
@@ -520,7 +515,7 @@ function match(field,op,val,cond,list){
     case 'notIn':return !list.some(function(x){return field.type==='number'||field.type==='date'?cmp(field,v,x)===0:String(x).toLowerCase()===lv});
   }return true;
 }
-var cf=window.CF({root:document.getElementById('cf-host'),catalog:CATALOG,defaultIds:['refIn','status','type','currency'],demoSets:DEMO_SETS,storageKey:'pi-grid-filter-sets-v1',
+var cf=window.CF({root:document.getElementById('cf-host'),catalog:CATALOG,defaultIds:['docNumber','status','type','fromInn'],demoSets:DEMO_SETS,storageKey:'pi-rub-grid-filter-sets-v1',
   onApply:function(snap,desc){applyFilters(snap,desc)},onCancel:function(){togglePanel(false)}});
 var applied=[],quick=null;
 function byPanel(){return ROWS.map(function(_,i){return i}).filter(function(i){var d=ROWS[i];return applied.every(function(c){var field=cf.FIELD_BY_ID[c.id];return match(field,c.op,ACC[c.id](d),c.values[0],c.values)})})}
@@ -621,7 +616,6 @@ document.getElementById('applied').addEventListener('click',function(e){
 });
 function togglePanel(on){var h=document.getElementById('cf-host'),t=document.getElementById('ftoggle');if(on==null)on=!h.classList.contains('on');h.classList.toggle('on',on);t.setAttribute('aria-expanded',String(on))}
 document.getElementById('ftoggle').onclick=function(){togglePanel()};
-document.getElementById('c-ccycol').onchange=function(e){CCY_COL=e.target.checked;COLW=null;grid.classList.remove('fixed');grid.style.width='';refresh()};
 refresh();
 /* ---- открытие drawer ---- */
 var pair=document.getElementById('pair'),slots={A:null,B:null};

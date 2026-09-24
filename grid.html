@@ -441,6 +441,29 @@ ol.q b,ul.l b{color:var(--ink)}
 .topline b{font-size:17px}
 .only .stage{margin-inline:0;padding-inline:0}
 .only .pair{min-height:0}
+/* ===== рубль ===== */
+.rp{border:1px solid var(--line);border-radius:5px;overflow:hidden}
+.rph,.rpr{display:grid;grid-template-columns:128px minmax(0,1fr) minmax(0,1fr);gap:0 10px;padding:2px 10px;align-items:baseline}
+.rph{background:var(--sunk);font:600 10.5px var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);min-height:22px;align-items:center;border-bottom:1px solid var(--line2)}
+.rpr{min-height:23px;border-bottom:1px solid var(--line2)}
+.rpr:last-child{border-bottom:0}
+.rpr .nm{color:var(--muted);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rpr.null .nm{color:var(--faint)}
+.rpr .v{overflow-wrap:anywhere}
+.rp .nl,.rsec .nl,.rtxt .nl,.rtab .nl{color:var(--faint)}
+.rtxt{border:1px solid var(--line);border-radius:4px;padding:4px 8px 5px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 10px;align-items:baseline}
+.rtxt .lbl{font:600 10.5px var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);white-space:nowrap}
+.rtxt.null{border-style:dashed}.rtxt.null .v{color:var(--faint)}
+.blk.empty{border-style:dashed}.blk.empty h5{color:var(--faint)}
+.rsec .xr{grid-template-columns:250px minmax(0,1fr);padding:1px 10px}
+.rsec .xr .nm .fno{margin-right:5px}
+.rsec .xr .nm.mono{font:11.5px var(--mono);color:var(--muted)}
+.rsec h6{margin:0;padding:3px 10px;font:600 10.5px var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--sunk);border-block:1px solid var(--line2)}
+.rsec h6:first-child{border-top:0}
+.rsec .kvs{padding:5px 10px 6px;border-bottom:1px solid var(--line2)}
+.tt.rtab{border:0;border-radius:0}
+.tt.rtab .tr:last-child{border-bottom:0}
+.lks{display:inline-flex;gap:2px;flex-wrap:wrap}
 </style>
 <style>
 .zoomctl{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--paper);height:24px}
@@ -608,6 +631,8 @@ body.resizing{cursor:col-resize;user-select:none}
 .grid .l2.mono{font-family:var(--mono)}
 /* сумма — спокойная: обычный вес и размер текста записи, выравнивание по разрядам; валюта под ней приглушённая (перенято из katran) */
 .grid .amt{font-weight:400;font-size:12.5px;font-variant-numeric:tabular-nums;letter-spacing:0;color:var(--ink);text-align:right;display:block}
+.grid td.ccy{text-align:left}
+.grid td.ccy .tag{font-family:var(--mono);font-weight:600;font-size:11px}
 .grid .amt+.l2{text-align:right;color:var(--muted);font-weight:400;font-size:11px;margin-top:1px}
 .grid .fld{display:flex;gap:6px;align-items:baseline}
 .grid .fld .op{font:700 12.5px var(--mono);color:var(--opt);min-width:9px}
@@ -666,13 +691,13 @@ body.resizing{cursor:col-resize;user-select:none}
 </svg>
 <div class="app">
   <div class="apph"><h1>Валютные документы</h1><span class="cnt" id="cnt"></span>
-    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, двойной клик по ней — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · 🔒 — заблокирована другим пользователем, штриховка — неактивная запись</span><a href="index.html">конструктор деталки →</a><button type="button" class="skbtn" id="skdemo" aria-pressed="false" style="margin-left:10px" data-tip="Первое нажатие — скелетон первой загрузки, второе — обновление уже показанных данных">Скелетоны</button><span id="zoomctl" style="display:inline-flex;align-items:center;margin-left:10px"></span></div></div>
+    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, двойной клик по ней — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · 🔒 — заблокирована другим пользователем, штриховка — неактивная запись</span><a href="rub-grid.html">реестр «Рублёвые документы» →</a><a href="index.html" style="margin-left:8px">конструктор деталки →</a><button type="button" class="skbtn" id="skdemo" aria-pressed="false" style="margin-left:10px" data-tip="Первое нажатие — скелетон первой загрузки, второе — обновление уже показанных данных">Скелетоны</button><span id="zoomctl" style="display:inline-flex;align-items:center;margin-left:10px"></span></div></div>
   <div class="slane"><div class="slist" id="slane"></div><button type="button" class="chbtn" id="chartbtn" aria-pressed="false" data-tip="Динамика по статусам во времени" aria-label="Динамика по статусам во времени"></button></div>
   <div id="chhost"></div>
   <div class="filters">
     <button class="fbtn" id="ftoggle" aria-expanded="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4.2 5.4A1 1 0 015.1 4h13.8a1 1 0 01.8 1.6L14 12.2V18a1 1 0 01-1.5.86l-3-1.8A1 1 0 019 16.2v-4L4.3 5.6a1 1 0 01-.1-.2z"/></svg>Фильтры<span class="badge" id="fcount" hidden>0</span></button>
     <div class="applied" id="applied"><span class="lbl">условия не заданы</span></div>
-    <div class="sp"><span class="fchip">Колонки<span class="chev">▼</span></span><span class="fchip">Экспорт</span></div>
+    <div class="sp"><label class="chk" style="font-size:12px;margin-right:6px"><input type="checkbox" id="c-ccycol"> Валюта отдельной колонкой</label><span class="fchip">Колонки<span class="chev">▼</span></span><span class="fchip">Экспорт</span></div>
   </div>
   <div id="cf-host" class="on"></div>
   <div id="skprog"></div>
@@ -789,12 +814,49 @@ var BANK_ACCOUNTS=[
   {acc:'70601840100000000519',ccy:'USD',kind:'Доходы · комиссии'},{acc:'30110978300000001845',ccy:'EUR',kind:'Ностро · CESEDEFFXXX'},
   {acc:'30110810600000001848',ccy:'RUB',kind:'Корсчёт ЦБ'}];
 
+/* ===================== РУБЛЬ: КОНФИГ ===================== */
+/* Рублёвая ПИ — другой реестр реквизитов и другая компоновка «Общих данных».
+   Профили лежат в том же PROFILES с признаком family:'rub'. Реквизит в реестре:
+   name — подпись, no — номер поля платёжного документа (показывается тегом), mono — моноширинное значение. */
+var RFIELDS={
+  name:{name:'Наименование'},opt:{name:'Опция'},acc:{name:'Номер счёта',mono:1},inn:{name:'ИНН',mono:1},kpp:{name:'КПП',mono:1},
+  info:{name:'Доп. информация'},addr:{name:'Адрес'},bank:{name:'Наименование банка'},bic:{name:'БИК',mono:1},bankAcc:{name:'Счёт банка',mono:1},bankInfo:{name:'Доп. информация банка'},
+  purpose:{name:'Назначение платежа'},
+  instr:{name:'Инструкция получателю'},uip:{name:'УИП',mono:1},reserve:{name:'Резервное поле'},f20:{name:'Назначение платежа. Поле 20'},
+  b101:{no:'101',name:'Код статуса плательщика',mono:1},b104:{no:'104',name:'Код бюджетной классификации',mono:1},b105:{no:'105',name:'ОКТМО',mono:1},b106:{no:'106',name:'Основание налогового платежа'},
+  b107:{no:'107',name:'Налоговый период'},b108:{no:'108',name:'Номер документа'},b109:{no:'109',name:'Дата налогового документа'},b110:{no:'110',name:'Код вида налогового платежа',mono:1},
+  c48:{no:'48',name:'Дата поступления документов'},cLimit:{name:'Идентификатор ограничения',mono:1},c70:{no:'70',name:'Содержание операции'},c38:{no:'38',name:'Номер частичного платежа'},
+  c39:{no:'39',name:'Шифр частичного платежа'},c40:{no:'40',name:'Исходное распоряжение. Номер документа'},c41:{no:'41',name:'Исходное распоряжение. Дата выписки'}
+};
+/* Свёрнутые блоки «Общих данных». kv — строки реквизитов, table — таблица строк, ed107 — шапка + подгруппы путей ED. */
+var RSECTIONS={
+  purposeExtra:{title:'Назначение платежа. Дополнительная информация',kind:'kv',rows:['instr','uip','reserve','f20']},
+  agents:{title:'Посредник',kind:'table',cols:[['Наименование','name','minmax(0,1.5fr)'],['БИК','bic','90px'],['Счёт банка','bankAcc','1fr'],['Счёт получателя','acc','1fr']]},
+  budget:{title:'Бюджетные реквизиты',kind:'kv',rows:['b101','b104','b105','b106','b107','b108','b109','b110']},
+  ed107:{title:'Параметры ED107',kind:'ed107'},
+  collect:{title:'Параметры инкассового поручения',kind:'kv',rows:['c48','cLimit','c70','c38','c39','c40','c41']}
+};
+var RUB_PARTY=['name','opt','acc','inn','kpp','info','addr','bank','bic','bankAcc','bankInfo'];
+/* Профиль вида документа: hero и блоки фиксированы, party — строки таблицы отправитель|получатель, sections — свёрнутые блоки по порядку. */
+PROFILES.PAYDOCRU={family:'rub',title:'Платёжное поручение',hero:[],blocks:['scen','tx'],grid:[],text:['purpose'],party:RUB_PARTY,sections:['purposeExtra','agents','budget','ed107']};
+PROFILES.REQDOCRU={family:'rub',title:'Инкассовое поручение',hero:[],blocks:['scen','tx'],grid:[],text:['purpose'],party:RUB_PARTY,sections:['purposeExtra','agents','budget','collect','ed107']};
+PROFILES.PAYORDRU={family:'rub',title:'Платёжный ордер',hero:[],blocks:['scen','tx'],grid:[],text:['purpose'],party:RUB_PARTY,sections:['purposeExtra','agents','ed107']};
+var TABS_RUB=['Общие данные','Статусы','Комплаенс','Связанные документы','Задачи','Нотификации','ED244','Стриминг','MPU','Аудит'];
+TAB_KEY['ED244']='ed244';
+function famOf(d){return PROFILES[typeOf(d)].family||'cur'}
+function tabsFor(d){return famOf(d)==='rub'?TABS_RUB:TABS}
+
 /* ===================== ДАННЫЕ ===================== */
 var ACTIONS=[
   {id:'refresh',t:'Обновить',k:'F5'},{id:'edit',t:'Редактировать',k:'E'},{id:'esid',t:'Создать ЭСИД по документу'},
   {id:'down',t:'Скачать SWIFT-сообщение'},{id:'print',t:'Печать',menu:['Платёжное поручение','Мемориальный ордер','Форма SWIFT']},{id:'link',t:'Скопировать ссылку на документ'},
   {id:'ban',t:'Аннулировать',danger:1}
 ];
+var ACTIONS_RUB=ACTIONS.map(function(a){var b=cl(a);
+  if(a.id==='down')b.t='Скачать сообщение ED (XML)';
+  if(a.id==='print')b.menu=['Платёжное поручение','Инкассовое поручение','Платёжный ордер','Мемориальный ордер'];
+  return b});
+function actionsFor(d){return famOf(d)==='rub'?ACTIONS_RUB:ACTIONS}
 function ic(id){return '<svg><use href="#i-'+id+'"/></svg>'}
 function lk(name,v){return v?'<span class="lk" data-v="'+esc(v)+'" data-tip="'+esc(v)+' — копировать">'+name+'</span>':'<span class="lk off" data-tip="'+name+': нет значения">'+name+'</span>'}
 /* пул маршрутов: после смены счёта Кт маршрут пересчитывается (в макете — случайно из пула) */
@@ -928,9 +990,61 @@ var DOCS=[
  }
 ];
 DOCS.push(cl(DOCS[0]));
+/* ---- РУБЛЬ: документы стенда. Все реквизиты вымышленные. ---- */
+/* Вкладки статусов / задач / аудита берём от валютного документа, коды маршрутов заменяем на рублёвые. */
+function rubDoc(o){
+  var b=DOCS[0];
+  var tabs=JSON.parse(JSON.stringify({statuses:b.statuses,tasks:b.tasks,stream:b.stream,notif:b.notif,audit:b.audit,compliance:b.compliance})
+    .replace(/pmts-curr-/g,'pmts-rub-').replace(/_curr_/g,'_rub_').replace(/SC_CURR_INCOMING/g,o.r.scen));
+  tabs.audit.documentSection={docNumber:o.num,docDate:o.numDate,amount:+o.amount.replace(/\s/g,''),currency:'RUB',scenario:o.r.scen,operation:o.r.opCode,queue:o.r.queue,docReference:o.r.docRef};
+  delete tabs.audit.originalDocumentSection;
+  var d={type:o.type,status:o.status,st:o.st,dirTxt:o.dirTxt,tabsOff:o.tabsOff||[],uuid:o.uuid,created:o.created,num:o.num,numDate:o.numDate,amount:o.amount,ccy:'RUB',
+    vd:[o.created.slice(0,10),o.created.slice(0,10),o.created.slice(0,10),o.created.slice(0,10)],txId:o.txId,txDate:o.txDate,txs:o.txs,r:o.r,source:o.source,linked:[],mpu:[],f:{}};
+  for(var k in tabs)d[k]=tabs[k];
+  return d;
+}
+DOCS.push(rubDoc({status:'DONE',st:'ok',dirTxt:'входящий от ЦБ на клиента',tabsOff:['Стриминг','MPU'],
+  uuid:'5d31a7c2-8e4b-4f0a-9c21-7b6e0d2f8a13',created:'24.09.2026 11:08:14',num:'2931',numDate:'24.09.2026',amount:'85 814.36',
+  txId:'9b7e2f41-6c0d-4a8e-b3f5-2d1c7e9a0b64',txDate:'24.09.2026 11:08:20',
+  txs:[{dir:'DEBIT',st:'EXECUTED',acc:'30102810900000000745',reg:'00000_CorrCBR',time:'2026-09-24 08:08:20.114Z',amount:'85 814.36',ccy:'RUB'},
+       {dir:'CREDIT',st:'EXECUTED',acc:'40802810300050017801',reg:'00010_ClientCurrent',time:'2026-09-24 08:08:20.118Z',amount:'85 814.36',ccy:'RUB'}],
+  r:{scen:'SC_CBR_IN_CREDIT',from:'DB01',to:'DB02',initiator:'CBR.CBR_IN',source:'UFEBS',destination:'RETAIL',opCode:'01',opName:'Платёжное поручение',queue:'5',prio:0,docRef:'ED101-2609240001842',
+   party:{s:{name:'ООО «СЕВЕРНЫЙ ВЕТЕР»',opt:'',acc:'40702810400000012345',inn:'7729563210',kpp:'772901001',info:'',addr:'119180, г. Москва, пр-т Мира, д. 70, пом. 854',bank:'НОРДИНВЕСТ БАНК (АО)',bic:'044525207',bankAcc:'30101810200000000207',bankInfo:''},
+          r:{name:'ИП КРЫЛОВА МАРИНА ПЕТРОВНА',opt:'',acc:'40802810300050017801',inn:'540812345678',kpp:'',info:'',addr:'630099, г. Новосибирск, ул. Ленина, д. 12, кв. 7',bank:'ФИЛИАЛ № 7701 БАНКА ВОСТОЧНЫЙ КРЕДИТ (ПАО)',bic:'045004745',bankAcc:'30101810100000000745',bankInfo:'Филиал в г. Новосибирске'}},
+   purpose:'Оплата по счёту № 2026-0417 от 15.09.2026 за консультационные услуги по договору 12-45 от 01.03.2026. В том числе НДС 20% — 14 302.39 руб.',
+   purposeExtra:{instr:'',uip:'',reserve:'',f20:'Оплата по счёту № 2026-0417'},
+   agents:[{name:'НОРДИНВЕСТ БАНК (АО) — Ф-Л В Г. САНКТ-ПЕТЕРБУРГЕ',bic:'044030773',bankAcc:'30101810600000000773',acc:'30110810700000000512'}],
+   budget:null,
+   ed107:{head:[['ID связанного документа','2144'],['ID инициирующего документа','24154'],['Дата связанного документа','24.09.2026'],['Запрошенная дата исполнения','24.09.2026']],
+     groups:[{title:'Информация о банке-плательщике',rows:[['ed:OrderingBank/BIC','044525207'],['ed:OrderingBank/ed:Name','НОРДИНВЕСТ БАНК (АО)'],['ed:OrderingBank/BankAccount','30101810200000000207'],['ed:OrderingBank/SWBIC','NRDIRUMM']]},
+             {title:'Информация о банке-получателе',rows:[['ed:Beneficiary/BIC','045004745'],['ed:Beneficiary/ed:Name','ВОСТОЧНЫЙ КРЕДИТ БАНК (ПАО)'],['ed:Beneficiary/BankAccount','30101810100000000745'],['ed:Beneficiary/SWBIC','VKRBRU8K']]},
+             {title:'Информация о банке-отправителе',rows:[['ed:InstructingAgent/BIC','044525207'],['ed:InstructingAgent/CorrespAcc','30101810200000000207'],['ed:InstructingAgent/SWBIC','NRDIRUMM']]},
+             {title:'Информация о банке-исполнителе',rows:[['ed:InstructedAgent/BIC','045004745'],['ed:InstructedAgent/CorrespAcc','30101810100000000745'],['ed:InstructedAgent/SWBIC','VKRBRU8K']]}]},
+   collect:null},
+  source:{ED244:'<?xml version="1.0" encoding="UTF-8"?>\n<ed:ED244 xmlns:ed="urn:cbr-ru:ed:v2.0" EDNo="1842" EDDate="2026-09-24" EDAuthor="4525207000" EDReceiver="4500474500" Sum="8581436" PaymentPrecedence="5">\n  <ed:AccDoc AccDocNo="2931" AccDocDate="2026-09-24"/>\n  <ed:Payer PersonalAcc="40702810400000012345" INN="7729563210" KPP="772901001">\n    <ed:Name>ООО «СЕВЕРНЫЙ ВЕТЕР»</ed:Name>\n    <ed:Bank BIC="044525207" CorrespAcc="30101810200000000207"/>\n  </ed:Payer>\n  <ed:Payee PersonalAcc="40802810300050017801" INN="540812345678">\n    <ed:Name>ИП КРЫЛОВА МАРИНА ПЕТРОВНА</ed:Name>\n    <ed:Bank BIC="045004745" CorrespAcc="30101810100000000745"/>\n  </ed:Payee>\n  <ed:Purpose>Оплата по счёту № 2026-0417 от 15.09.2026 за консультационные услуги по договору 12-45 от 01.03.2026. В том числе НДС 20% — 14 302.39 руб.</ed:Purpose>\n</ed:ED244>'}
+}));
+DOCS.push(rubDoc({type:'REQDOCRU',status:'IN_PROGRESS',st:'wait',dirTxt:'исходящий на ЦБ · взыскание',tabsOff:['MPU'],
+  uuid:'b8e2f4a1-3c6d-4e7f-8a90-1d2c3b4a5e6f',created:'24.09.2026 10:59:26',num:'879910',numDate:'23.09.2026',amount:'7.00',
+  txId:'2c4d6e8f-0a1b-4c3d-9e5f-7a8b9c0d1e2f',txDate:'24.09.2026 10:59:31',
+  txs:[{dir:'DEBIT',st:'EXECUTED',acc:'40817810600050017913',reg:'00010_ClientCurrent',time:'2026-09-24 07:59:31.402Z',amount:'7.00',ccy:'RUB'},
+       {dir:'CREDIT',st:'PENDING',acc:'30102810900000000745',reg:'00000_CorrCBR',time:'—',amount:'7.00',ccy:'RUB'}],
+  r:{scen:'SC_CBR_OUT_DEBIT',from:'DB02',to:'DB01',initiator:'CNTS.CNTS_DECR',source:'CNTSEXEC',destination:'PRISM',opCode:'06',opName:'Инкассовое поручение',queue:'4',prio:0,docRef:'ED104-2609240008819',
+   party:{s:{name:'СМИРНОВА ЕКАТЕРИНА ПАВЛОВНА',opt:'',acc:'40817810600050017913',inn:'540912345601',kpp:'0',info:'',addr:'',bank:'ФИЛИАЛ № 7701 БАНКА ВОСТОЧНЫЙ КРЕДИТ (ПАО)',bic:'045004745',bankAcc:'30101810100000000745',bankInfo:''},
+          r:{name:'УФК по Новосибирской области (Отделение судебных приставов по Центральному району г. Новосибирска, л/с 05511851990)',opt:'',acc:'03212643000000019876',inn:'5406012345',kpp:'540601001',info:'',addr:'',bank:'СИБИРСКОЕ ГУ БАНКА РОССИИ // УФК по Новосибирской области',bic:'015004950',bankAcc:'40102810845370000019',bankInfo:''}},
+   purpose:'Взыскание по исп. пост. 213253960/6639 от 23.09.2026. СПИ Иванова М. С. по и/п № 170152/26/66039-ИП от 07.09.2026',
+   purposeExtra:{instr:'',uip:'32112643000000019876',reserve:'',f20:''},
+   agents:[],
+   budget:{b101:'19',b104:'32211601201019000140',b105:'50701000',b106:'0',b107:'0',b108:'170152/26/66039-ИП',b109:'07.09.2026',b110:'0'},
+   collect:{c48:'23.09.2026',cLimit:'76349202',c70:'Взыскание по исполнительному производству',c38:'3',c39:'1',c40:'213253960/6639',c41:'23.09.2026'},
+   ed107:null},
+  source:{ED244:'<?xml version="1.0" encoding="UTF-8"?>\n<ed:ED244 xmlns:ed="urn:cbr-ru:ed:v2.0" EDNo="8819" EDDate="2026-09-24" EDAuthor="4500474500" EDReceiver="4500495000" Sum="700" PaymentPrecedence="4">\n  <ed:AccDoc AccDocNo="879910" AccDocDate="2026-09-23"/>\n  <ed:Payer PersonalAcc="40817810600050017913" INN="540912345601">\n    <ed:Name>СМИРНОВА ЕКАТЕРИНА ПАВЛОВНА</ed:Name>\n    <ed:Bank BIC="045004745" CorrespAcc="30101810100000000745"/>\n  </ed:Payer>\n  <ed:Payee PersonalAcc="03212643000000019876" INN="5406012345" KPP="540601001">\n    <ed:Name>УФК по Новосибирской области</ed:Name>\n    <ed:Bank BIC="015004950" CorrespAcc="40102810845370000019"/>\n  </ed:Payee>\n  <ed:Purpose>Взыскание по исп. пост. 213253960/6639 от 23.09.2026</ed:Purpose>\n</ed:ED244>'}
+}));
+/* индексы документов стенда по семействам: a — левый drawer, b — правый, ret — «платёжка и возврат рядом» */
+var FAM={cur:{a:0,b:2,ret:1,type:'MT103'},rub:{a:3,b:4,ret:4,type:'PAYDOCRU'}};
+var FAMILY='cur';
 var TYPE='MT103';
-function mkui(tx){return {open:new Set(),editing:null,vdEdit:false,vdDraft:null,all:false,shut:{tx:tx},tab:'main',audit:new Set(['commonSection']),tasks:new Set(),linked:new Set([0]),src:new Set(['swiftMessage']),mpu:new Set([0]),accEdit:null,txtEdit:null}}
-var ui=[mkui(true),mkui(true),mkui(false)];
+function mkui(tx){return {open:new Set(),editing:null,vdEdit:false,vdDraft:null,all:false,shut:{tx:tx,purposeExtra:true,agents:true,budget:true,ed107:true,collect:true},tab:'main',audit:new Set(['commonSection']),tasks:new Set(),linked:new Set([0]),src:new Set(['swiftMessage','ED244']),mpu:new Set([0]),accEdit:null,txtEdit:null}}
+var ui=DOCS.map(function(_,k){return mkui(k!==2)});
 
 /* ===================== ОТРИСОВКА ===================== */
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
@@ -1004,6 +1118,20 @@ function txSummary(t){var c={};t.forEach(function(x){c[x.st]=(c[x.st]||0)+1});re
 function shortTime(t){var m=/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2}:\d{2})/.exec(t||'');return m?m[3]+'.'+m[2]+' '+m[4]:(t||'—')}
 function stCls(s){return s==='EXECUTED'||s==='DONE'?'ok':s==='CANCELED'?'bad':'wait'}
 
+function txBlockHtml(d,u,extra){return '<div class="blk'+(u.shut.tx?' shut':'')+'"><div class="bh txh" data-tg="tx" title="'+(u.shut.tx?'Показать проводки':'Свернуть проводки')+'"><h5>Транзакции</h5><span class="cnt">'+d.txs.length+'</span>'+txSummary(d.txs)+extra+
+     '<span style="margin-left:auto">'+lk('txId',d.txId)+'</span><span class="lbl">'+d.txDate+'</span>'+
+     '<button class="tg" data-tg="tx" aria-label="Свернуть или развернуть транзакции" style="margin-left:0">▲</button></div>'+
+     '<div class="bb" style="padding:0">'+d.txs.map(function(t){
+       return '<div class="tx"><span class="dir">'+ic(t.dir==='DEBIT'?'dt':'kt')+t.dir+'</span><span><span class="st '+stCls(t.st)+'">'+t.st+'</span></span>'+
+         '<span class="mono v">'+t.acc+'</span><span class="cut lbl" style="font-size:11.5px" title="Тип регистра: '+esc(t.reg)+'">'+esc(t.reg)+'</span><span class="tm cut"'+(t.time&&t.time!=='—'?' data-tip="'+esc(t.time)+'"':'')+'>'+shortTime(t.time)+'</span>'+
+         '<span class="sum">'+t.amount+'<small>'+t.ccy+'</small></span></div>'}).join('')+'</div></div>'}
+function foldHtml(){return '<div class="fold"><span>видимая область 1080p ≈ 860 px</span></div>'}
+function dhHtml(d,title){return '<div class="dh"><button class="back" aria-label="Назад">'+ic('back')+'</button><b>'+title+'</b>'+
+    '<span class="mono">'+d.uuid+'</span><button class="cp" data-copy="'+d.uuid+'" title="Скопировать ID">⧉</button><span class="lbl">'+d.created+'</span>'+
+    '<button class="x" aria-label="Закрыть">'+ic('x')+'</button></div>'}
+function laneHtml(d,T,p){return '<div class="lane"><span class="tag mt">'+T+'</span><span class="st '+d.st+'">'+d.status+'</span><span class="kind">'+p.title+' · '+d.dirTxt+'</span>'+
+    '<div class="acts">'+actionsFor(d).map(function(a,k){
+      return (a.danger?'<span class="sep"></span>':'')+'<button class="ib'+(a.danger?' danger':'')+(a.menu?' hasmenu':'')+'" data-action="'+a.id+'" aria-label="'+a.t+'"'+(a.menu?' aria-haspopup="menu"':'')+'>'+ic(a.id)+'<span class="slot">'+(k+1)+'</span><span class="tip">'+a.t+(a.k?' · '+a.k:'')+'</span></button>'}).join('')+'</div></div>'}
 function heroHtml(d,p,di){
   function ruToIso(x){var m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(x||'');return m?m[3]+'-'+m[2]+'-'+m[1]:''}
   var names=['Вх','Исх','Дт','Кт'],vd=d.vd,same=vd.every(function(x){return x===vd[0]}),diffs=[];
@@ -1050,7 +1178,7 @@ function xtabHtml(d){
 }
 function tabsHtml(d,u){
   var off=d.tabsOff||[];
-  var act=TABS.filter(function(t){return off.indexOf(t)<0}),ina=TABS.filter(function(t){return off.indexOf(t)>=0});
+  var all=tabsFor(d),act=all.filter(function(t){return off.indexOf(t)<0}),ina=all.filter(function(t){return off.indexOf(t)>=0});
   function one(t,isOff){var k=TAB_KEY[t];return '<span class="'+(isOff?'off':'')+(k&&u.tab===k?' on':'')+'"'+(k&&!isOff?' data-tab="'+k+'"':'')+' data-name="'+esc(t)+'"'+(isOff?' data-tip="Нет данных"':'')+'>'+esc(t)+'</span>'}
   return '<div class="tabs">'+act.map(function(t){return one(t,false)}).join('')+(ina.length?'<span class="tdiv"></span>'+ina.map(function(t){return one(t,true)}).join(''):'')+'</div>';
 }
@@ -1069,13 +1197,54 @@ function fitTabs(el){
   more.dataset.menu=JSON.stringify(hidden.map(function(v){return {n:v.dataset.name,off:v.classList.contains('off'),k:v.dataset.tab||''}}));
 }
 /* сосед по строке сетки: раскрываем/сворачиваем парой, иначе соседняя карточка растягивается пустой */
-function typeOf(d){return d.type||TYPE}
+function typeOf(d){if(d.type)return d.type;var rub=!!PROFILES[TYPE].family;return d.r?(rub?TYPE:'PAYDOCRU'):(rub?'MT103':TYPE)}
 function rowMates(tag,d){
   var p=PROFILES[typeOf(d||{})],rows=p.grid.concat(p.seqB?p.seqB.grid:[]),out=[tag];
   rows.forEach(function(r){var tags=r.map(spec).filter(Boolean).map(function(x){return x.tag});if(tags.indexOf(tag)>=0)out=tags});
   [p.text,p.seqB?p.seqB.text:[]].forEach(function(t){if(t&&t.length>1&&t.indexOf(tag)>=0)out=t});
   return out;
 }
+/* ===================== РУБЛЬ: ОТРИСОВКА ===================== */
+function rlbl(key){var m=RFIELDS[key]||{name:key};return (m.no?'<span class="fno" data-tip="'+m.no+' · '+esc(m.name)+'">'+m.no+'</span>':'')+esc(m.name)}
+function rval(key,v){var m=RFIELDS[key]||{};if(v==null||v==='')return '<span class="nl">—</span>';return '<span class="v'+(m.mono?' mono':'')+'">'+esc(v)+'</span>'}
+/* hero: номер и дата документа, операция, очерёдность со срочностью, сумма */
+function rubHeroHtml(d){var r=d.r;
+  return '<div class="hero" style="grid-template-columns:auto auto auto 1fr">'+
+    '<div><span class="lbl">Номер документа · от</span><span class="hv">№ '+esc(d.num)+'</span> <span class="hv" style="font-weight:500">от '+esc(d.numDate)+'</span></div>'+
+    '<div><span class="lbl">Операция</span><span class="hv mono v">'+esc(r.opCode)+'</span> <span class="hv" style="font-weight:500">'+esc(r.opName)+'</span></div>'+
+    '<div><span class="lbl">Очерёдность · приоритет</span><span class="hv">'+esc(r.queue)+'</span>'+(r.prio?'<span class="st wait" style="margin-left:8px;vertical-align:2px">СРОЧНО</span>':'<span class="lbl" style="display:inline;margin-left:8px">неприоритетный</span>')+'</div>'+
+    '<div class="amtc"><span class="lbl">Сумма</span><span class="amt">'+d.amount+'<small>'+d.ccy+'</small></span></div></div>'}
+/* аналог блока «Маршрут» валюты: сценарий, системы, ссылки на идентификаторы */
+function rubScenHtml(d){var r=d.r;
+  return '<div class="msgs">'+
+    '<div><h6>Сценарий</h6><span class="lbl">Код</span><span class="mono v cut" title="'+esc(r.scen)+'">'+esc(r.scen)+'</span><span class="lbl">S → R</span><span class="mono v cut">'+esc(r.from)+'<span class="ar">→</span>'+esc(r.to)+'</span></div>'+
+    '<div><h6>Системы</h6><span class="lbl">Initiator</span><span class="mono v cut" title="'+esc(r.initiator)+'">'+esc(r.initiator)+'</span><span class="lbl">Source</span><span class="mono v cut">'+esc(r.source)+'</span><span class="lbl">Destination</span><span class="mono v cut">'+esc(r.destination)+'</span></div>'+
+    '<div><h6>Идентификаторы</h6><span class="lbl">Ссылки</span><span class="lks">'+lk('txId',d.txId)+lk('docRef',r.docRef)+lk('УИП',r.purposeExtra&&r.purposeExtra.uip)+'</span></div></div>'}
+/* таблица отправитель | получатель: строки фиксированы профилем, пустые остаются бледными — два документа рядом читаются построчно */
+function rubPartyHtml(d,p){var S=d.r.party.s||{},R=d.r.party.r||{};
+  return '<div class="fh"><h5>Отправитель / Получатель</h5><span class="lbl">отправитель слева · получатель справа</span></div>'+
+    '<div class="rp"><div class="rph"><span></span><span>Отправитель</span><span>Получатель</span></div>'+
+    p.party.map(function(k){var a=S[k],b=R[k],empty=(a==null||a==='')&&(b==null||b==='');
+      return '<div class="rpr'+(empty?' null':'')+'"><span class="nm">'+rlbl(k)+'</span>'+rval(k,a)+rval(k,b)+'</div>'}).join('')+'</div>'}
+function rubTextHtml(d,key){var v=d.r[key];return '<div class="rtxt'+(v?'':' null')+'"><span class="lbl">'+esc(RFIELDS[key].name)+'</span><span class="v">'+(v?esc(v):'—')+'</span></div>'}
+/* свёрнутый блок: без данных — бледный заголовок без раскрытия, чтобы состав блоков не прыгал между документами */
+function rubSectionHtml(d,u,key){var s=RSECTIONS[key],data=d.r[key],has=!!data&&(Array.isArray(data)?data.length:Object.keys(data).some(function(k){return data[k]!=null&&data[k]!==''})),shut=!!u.shut[key];
+  if(!has)return '<div class="blk empty"><div class="bh"><h5>'+esc(s.title)+'</h5><span class="lbl">нет данных</span></div></div>';
+  var body='';
+  if(s.kind==='kv')body='<div class="rsec">'+s.rows.map(function(k){return '<div class="xr"><span class="nm">'+rlbl(k)+'</span><span class="kv">'+rval(k,data[k])+'</span></div>'}).join('')+'</div>';
+  else if(s.kind==='table'){var cols=s.cols.map(function(c){return c[2]}).join(' ');
+    body='<div class="tt rtab"><div class="th" style="grid-template-columns:'+cols+'">'+s.cols.map(function(c){return '<span>'+esc(c[0])+'</span>'}).join('')+'</div>'+
+      data.map(function(row){return '<div class="tr" style="grid-template-columns:'+cols+'">'+s.cols.map(function(c){return '<span class="cut" title="'+esc(row[c[1]])+'">'+rval(c[1],row[c[1]])+'</span>'}).join('')+'</div>'}).join('')+'</div>'}
+  else if(s.kind==='ed107')
+    body='<div class="rsec"><div class="kvs">'+data.head.map(function(h){return '<span class="lbl">'+esc(h[0])+'</span>'+rval('',h[1])}).join('')+'</div>'+
+      data.groups.map(function(g){return '<h6>'+esc(g.title)+'</h6>'+g.rows.map(function(rw){return '<div class="xr"><span class="nm mono">'+esc(rw[0])+'</span><span class="kv">'+rval('',rw[1])+'</span></div>'}).join('')}).join('')+'</div>';
+  return '<div class="blk'+(shut?' shut':'')+'"><div class="bh txh" data-tg="'+key+'" title="'+(shut?'Показать':'Свернуть')+'"><h5>'+esc(s.title)+'</h5>'+(s.kind==='table'?'<span class="cnt">'+data.length+'</span>':'')+
+    '<button class="tg" data-tg="'+key+'" aria-label="Свернуть или развернуть" style="margin-left:auto">▲</button></div><div class="bb" style="padding:0">'+body+'</div></div>'}
+function rubHtml(di){var d=DOCS[di],u=ui[di],T=typeOf(d),p=PROFILES[T];
+  return foldHtml()+dhHtml(d,'Платёжная инструкция')+laneHtml(d,T,p)+tabsHtml(d,u)+
+    (u.tab!=='main'?'<div class="db">'+viewHtml(di)+'</div>':'<div class="db">'+rubHeroHtml(d)+rubScenHtml(d)+
+      txBlockHtml(d,u,'<a class="lnk" data-tip="Запросить остатки по счетам транзакции">Проверить баланс</a>')+
+      rubPartyHtml(d,p)+p.text.map(function(k){return rubTextHtml(d,k)}).join('')+p.sections.map(function(k){return rubSectionHtml(d,u,k)}).join('')+'</div>')}
 /* ---- остальные вкладки ---- */
 function tmHtml(t){var m=/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2}:\d{2})(\.\d+)?/.exec(t||'');return m?'<span class="tm" data-tip="'+esc(t)+'">'+m[3]+'.'+m[2]+' <b>'+m[4]+'</b>'+(m[5]?'<span style="color:var(--faint)">'+m[5].slice(0,4)+'</span>':'')+'</span>':'<span class="tm">'+esc(t||'—')+'</span>'}
 function ms(t){return new Date((t||'').replace(' ','T')+'Z').getTime()}
@@ -1128,10 +1297,11 @@ function linkedHtml(d,u){
       '</div>':'')}).join('')+'</div>';
 }
 function swiftHtml(t){return esc(t).replace(/\{(\d|S):/g,'<span class="blk">{$1:</span>').replace(/^(:\d{2}[A-Z]?:)/gm,'<span class="tag4">$1</span>').replace(/\{121:([0-9a-f-]{36})\}/g,'{121:<span class="uetr">$1</span>}')}
+function xmlHtml(t){return esc(t).replace(/(&lt;\/?)([\w:.-]+)/g,'$1<span class="tag4">$2</span>').replace(/\s([\w:.-]+)=(&quot;[^&]*&quot;)/g,' <span class="blk">$1</span>=<span class="uetr">$2</span>')}
 function sourceHtml(d,u){
   var src=d.source||{},keys=Object.keys(src);if(!keys.length)return '<div class="tt"><div class="empty">Исходного текста нет</div></div>';
   return '<div class="au">'+keys.map(function(k){var v=src[k],op=u.src.has(k)&&v;
-    return '<div class="ah'+(op?' open':'')+'" data-src="'+k+'"><span class="chev">▼</span>'+esc(k)+'<span class="lbl">'+(v?v.length+' симв.':'нет')+'</span></div>'+(op?'<pre class="sw">'+swiftHtml(v)+'</pre>':'')}).join('')+'</div>';
+    return '<div class="ah'+(op?' open':'')+'" data-src="'+k+'"><span class="chev">▼</span>'+esc(k)+'<span class="lbl">'+(v?v.length+' симв.':'нет')+'</span></div>'+(op?'<pre class="sw">'+(/^\s*<\?xml|^\s*</.test(v)?xmlHtml(v):swiftHtml(v))+'</pre>':'')}).join('')+'</div>';
 }
 function mpuHtml(d,u){
   var rows=d.mpu||[];if(!rows.length)return '<div class="tt"><div class="empty">Сообщений MPU нет</div></div>';
@@ -1178,7 +1348,8 @@ function viewHtml(di){
     case 'source':return sourceHtml(d,u);
     case 'mpu':return mpuHtml(d,u);
     case 'compliance':return complianceHtml(d);
-    default:return '<div class="stub">Вкладка «'+esc(TABS.filter(function(t){return TAB_KEY[t]===u.tab})[0]||u.tab)+'» — макет ещё не рисовали</div>';
+    case 'ed244':return sourceHtml(d,u);
+    default:return '<div class="stub">Вкладка «'+esc(tabsFor(d).filter(function(t){return TAB_KEY[t]===u.tab})[0]||u.tab)+'» — макет ещё не рисовали</div>';
   }
 }
 /* ---- счета Дт/Кт: правка с саджестом ---- */
@@ -1237,6 +1408,7 @@ function accCommit(di,side,raw){
 }
 function render(di){
   var d=DOCS[di],u=ui[di],T=typeOf(d),p=PROFILES[T],el=document.querySelector('.dw[data-d="'+di+'"]');if(!el)return;
+  if(p.family==='rub'){el.innerHTML=rubHtml(di);fitTabs(el);meter();return}
   var B={
    msgs:function(){return '<div class="msgs">'+
      '<div><h6>Входящее SWIFT</h6><span class="lbl">S</span><span class="mono v cut">'+d.inS+'</span><span class="lbl">R</span><span class="mono v cut">'+d.inR+'</span></div>'+
@@ -1246,22 +1418,10 @@ function render(di){
      '<span class="ln" style="gap:0 6px"><span class="lbl">Счёт</span><span class="mono v" title="'+esc(d.route.desc)+'">'+d.route.acc+'</span><span class="ar">→</span><span class="lbl">Receiver</span><span class="mono v">'+d.route.recv+'</span></span>'+
      (re?'<span class="rv" data-routerevert data-tip="Вернуть исходный маршрут">↺</span>':'')+'<button class="tg" data-tg="route" aria-label="Свернуть маршрут">▲</button></div>'+
      '<div class="bb"><span class="cut v" title="'+esc(d.route.text)+'">'+esc(d.route.text)+'</span></div></div>'},
-   tx:function(){return '<div class="blk'+(u.shut.tx?' shut':'')+'"><div class="bh txh" data-tg="tx" title="'+(u.shut.tx?'Показать проводки':'Свернуть проводки')+'"><h5>Транзакции</h5><span class="cnt">'+d.txs.length+'</span>'+txSummary(d.txs)+
-     '<span style="margin-left:auto">'+lk('txId',d.txId)+'</span><span class="lbl">'+d.txDate+'</span>'+
-     '<button class="tg" data-tg="tx" aria-label="Свернуть или развернуть транзакции" style="margin-left:0">▲</button></div>'+
-     '<div class="bb" style="padding:0">'+d.txs.map(function(t){
-       return '<div class="tx"><span class="dir">'+ic(t.dir==='DEBIT'?'dt':'kt')+t.dir+'</span><span><span class="st '+stCls(t.st)+'">'+t.st+'</span></span>'+
-         '<span class="mono v">'+t.acc+'</span><span class="cut lbl" style="font-size:11.5px" title="Тип регистра: '+esc(t.reg)+'">'+esc(t.reg)+'</span><span class="tm cut"'+(t.time&&t.time!=='—'?' data-tip="'+esc(t.time)+'"':'')+'>'+shortTime(t.time)+'</span>'+
-         '<span class="sum">'+t.amount+'<small>'+t.ccy+'</small></span></div>'}).join('')+'</div></div>'}
+   tx:function(){return txBlockHtml(d,u,'')}
   };
   var hasGrid=p.grid.length||p.seqB;
-  var h='<div class="fold"><span>видимая область 1080p ≈ 860 px</span></div>'+
-  '<div class="dh"><button class="back" aria-label="Назад">'+ic('back')+'</button><b>Платёжная инструкция ВАЛЮТА</b>'+
-    '<span class="mono">'+d.uuid+'</span><button class="cp" data-copy="'+d.uuid+'" title="Скопировать ID">⧉</button><span class="lbl">'+d.created+'</span>'+
-    '<button class="x" aria-label="Закрыть">'+ic('x')+'</button></div>'+
-  '<div class="lane"><span class="tag mt">'+T+'</span><span class="st '+d.st+'">'+d.status+'</span><span class="kind">'+p.title+' · '+d.dirTxt+'</span>'+
-    '<div class="acts">'+ACTIONS.map(function(a,k){
-      return (a.danger?'<span class="sep"></span>':'')+'<button class="ib'+(a.danger?' danger':'')+(a.menu?' hasmenu':'')+'" data-action="'+a.id+'" aria-label="'+a.t+'"'+(a.menu?' aria-haspopup="menu"':'')+'>'+ic(a.id)+'<span class="slot">'+(k+1)+'</span><span class="tip">'+a.t+(a.k?' · '+a.k:'')+'</span></button>'}).join('')+'</div></div>'+
+  var h=foldHtml()+dhHtml(d,'Платёжная инструкция ВАЛЮТА')+laneHtml(d,T,p)+
   tabsHtml(d,u)+
   (u.tab!=='main'?'<div class="db">'+viewHtml(di)+'</div>':'<div class="db">'+heroHtml(d,p,di)+p.blocks.map(function(b){return B[b]()}).join('')+
    '<div class="fh"><h5>Поля '+T+'</h5>'+(p.grid.length?'<span class="lbl">отправитель слева · получатель справа</span>':'')+(hasGrid?'<a class="lnk" data-all>'+(u.all?'Свернуть поля':'Развернуть поля')+'</a>':'')+'</div>'+
@@ -1296,7 +1456,7 @@ document.getElementById('pair').addEventListener('change',function(e){
 var pair=document.getElementById('pair');
 var STANDALONE=!pair.hasAttribute('data-host');
 if(STANDALONE)pair.innerHTML='<div class="dw" id="dw0" data-d="0"></div><div class="dw" id="dw1" data-d="2"></div>';
-function setMode(m){var b=document.getElementById('dw1');if(!b)return;pair.classList.toggle('single',m==='one');b.dataset.d=m==='ret'?'1':'2';render(+b.dataset.d);
+function setMode(m){var b=document.getElementById('dw1');if(!b)return;var F=FAM[FAMILY];pair.classList.toggle('single',m==='one');b.dataset.d=String(m==='ret'?F.ret:F.b);render(+b.dataset.d);
   ['m-tx','m-ret','m-one'].forEach(function(id){document.getElementById(id).setAttribute('aria-pressed',String(id==='m-'+m))});meter();}
 
 pair.addEventListener('click',function(e){
@@ -1307,7 +1467,7 @@ pair.addEventListener('click',function(e){
     var t=document.createElement('div');t.className='toast';t.textContent='Печать: '+am.dataset.print+' — формируется PDF';document.body.appendChild(t);requestAnimationFrame(function(){t.classList.add('on')});setTimeout(function(){t.classList.remove('on');setTimeout(function(){t.remove()},200)},1600);return}
   var ib=e.target.closest('.ib.hasmenu');
   if(ib){var old=dw.querySelector('.actmenu');var wasOpen=!!old;if(old)old.remove();dw.querySelectorAll('.ib.hasmenu').forEach(function(b){b.setAttribute('aria-expanded','false')});if(wasOpen&&old.dataset.for===ib.dataset.action)return;
-    var act=ACTIONS.filter(function(a){return a.id===ib.dataset.action})[0],m=document.createElement('div');m.className='actmenu';m.dataset.for=act.id;
+    var act=actionsFor(d).filter(function(a){return a.id===ib.dataset.action})[0],m=document.createElement('div');m.className='actmenu';m.dataset.for=act.id;
     m.innerHTML='<div class="amt-t">'+esc(act.t)+' — печатная форма</div>'+act.menu.map(function(n){return '<button type="button" role="menuitem" data-print="'+esc(n)+'">'+ic('print')+esc(n)+'</button>'}).join('');
     var r=ib.getBoundingClientRect(),dr=dw.getBoundingClientRect();m.style.top=(ib.offsetTop+ib.offsetHeight+4)+'px';dw.appendChild(m);
     var left=r.left-dr.left+dw.scrollLeft;m.style.left=Math.max(8,Math.min(left,dw.clientWidth-m.offsetWidth-8))+'px';ib.setAttribute('aria-expanded','true');return}
@@ -1393,6 +1553,18 @@ pair.addEventListener('keydown',function(e){var tb=e.target.closest&&e.target.cl
 function meter(){[0,1].forEach(function(k){var el=document.getElementById('dw'+k),b=document.getElementById('h'+k);if(!el||!b)return;var h=el.offsetHeight;b.textContent=h?h.toLocaleString('ru-RU'):'—';b.classList.toggle('over',h>860);if(k===0&&h&&TYPE==='MT103')document.getElementById('st-h').textContent='~'+Math.round(h/10)*10;});}
 function on(id,ev,fn){var el=document.getElementById(id);if(el)el[ev]=fn}
 on('m-tx','onclick',function(){setMode('tx')});on('m-ret','onclick',function(){setMode('ret')});on('m-one','onclick',function(){setMode('one')});
+/* семейство документа: валюта / рубль — свои документы, типы и вкладки */
+function setFamily(f){
+  FAMILY=f;TYPE=FAM[f].type;
+  var a=document.getElementById('dw0');if(a)a.dataset.d=String(FAM[f].a);
+  [].forEach.call(document.querySelectorAll('[data-family]'),function(x){x.setAttribute('aria-pressed',String(x.dataset.family===f))});
+  [].forEach.call(document.querySelectorAll('[data-fam-seg]'),function(x){x.hidden=x.dataset.famSeg!==f});
+  [].forEach.call(document.querySelectorAll('[data-type]'),function(x){x.setAttribute('aria-pressed',String(x.dataset.type===TYPE))});
+  var m=['tx','ret','one'].filter(function(k){var el=document.getElementById('m-'+k);return el&&el.getAttribute('aria-pressed')==='true'})[0]||'tx';
+  ui.forEach(function(u){u.editing=null;if(TAB_KEY[u.tab]===undefined){}});
+  setMode(m);renderAll();
+}
+[].forEach.call(document.querySelectorAll('[data-family]'),function(b){b.onclick=function(){setFamily(b.dataset.family)}});
 [].forEach.call(document.querySelectorAll('[data-type]'),function(b){b.onclick=function(){
   TYPE=b.dataset.type;ui.forEach(function(u){u.editing=null});
   [].forEach.call(document.querySelectorAll('[data-type]'),function(x){x.setAttribute('aria-pressed',String(x===b))});renderAll();}});
@@ -1406,6 +1578,7 @@ if(document.getElementById('slots'))document.getElementById('slots').innerHTML=A
 function renderConfig(){
   if(!document.getElementById('reg'))return;
   var p=PROFILES[TYPE],used={};
+  if(p.family==='rub'){document.getElementById('prof-name').textContent=TYPE;document.getElementById('prof').textContent=JSON.stringify(p,null,1);return}
   function mark(x){var sp=spec(x);if(sp)used[base(sp.tag)]=1}
   p.hero.forEach(mark);p.grid.forEach(function(r){r.forEach(mark)});p.text.forEach(mark);(p.extra||[]).forEach(mark);
   if(p.seqB){p.seqB.grid.forEach(function(r){r.forEach(mark)});p.seqB.text.forEach(mark);(p.seqB.extra||[]).forEach(mark);}
@@ -1420,7 +1593,8 @@ function renderConfig(){
 if(STANDALONE)renderAll();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(meter);
 /* API для других страниц стенда (реестр) */
-window.PI={DOCS:DOCS,ui:ui,mkui:mkui,render:render,cl:cl,PROFILES:PROFILES,FIELDS:FIELDS,esc:esc,ic:ic,accFmt:accFmt,tmHtml:tmHtml,stCls:stCls};
+window.PI={DOCS:DOCS,ui:ui,mkui:mkui,render:render,cl:cl,PROFILES:PROFILES,FIELDS:FIELDS,esc:esc,ic:ic,accFmt:accFmt,tmHtml:tmHtml,stCls:stCls,
+  RUB:{docs:[3,4],FIELDS:RFIELDS,SECTIONS:RSECTIONS,FAM:FAM}};
 })();
 </script>
 <script src="filters.js"></script>
@@ -1512,7 +1686,7 @@ function rowHtml(d,i,ord){
    '<td rowspan="2">'+cv(d.created.slice(0,10))+' <span class="lbl">'+cv(d.created.slice(11,16))+'</span><span class="l2">Дт '+cv(vd[2])+'<br>Кт '+(same?cv(vd[3]):'<span style="color:var(--warn)">'+cv(vd[3])+'</span>')+'</span></td>'+
    '<td rowspan="2">'+cv(d.type,'tag mt')+'</td>'+
    '<td rowspan="2"><span class="dir">'+dirIco(d.dir)+cv(d.dir)+'</span><span class="l2">'+cv(d.dirTxt,'',105)+'</span></td>'+
-   '<td rowspan="2"><span class="amt">'+cv(d.amount)+'</span><span class="l2">'+cv(d.ccy)+'</span></td>'+
+   (CCY_COL?'<td rowspan="2"><span class="amt">'+cv(d.amount)+'</span></td><td rowspan="2" class="ccy">'+cv(d.ccy,'tag mt')+'</td>':'<td rowspan="2"><span class="amt">'+cv(d.amount)+'</span><span class="l2">'+cv(d.ccy)+'</span></td>')+
    '<td class="f5">'+fld(d.f['50'])+'</td>'+
    '<td class="f5">'+fld(d.f['52'])+'</td><td class="f5">'+fld(d.f['57'])+'</td><td class="f5">'+fld(d.f['58'])+'</td><td class="f5">'+fld(d.f['59'])+'</td>'+
    '<td rowspan="2">'+acct(d.route.acc)+'<span class="l2">'+cv(d.route.type)+' → '+cv(d.route.recv)+'</span></td>'+
@@ -1525,14 +1699,16 @@ function rowHtml(d,i,ord){
 var grid=document.getElementById('grid');
 /* ---- сортировка: у составной колонки несколько реквизитов — клик по заголовку открывает меню, у простой — сразу переключает ---- */
 var SORT={by:null,dir:1};
-var COLS=[
+/* валюта — в колонке суммы (второй строкой) или отдельной колонкой; переключается галочкой, чтобы сравнить вживую */
+var CCY_COL=false;
+var COLS_BASE=[
   {t:'',sub:''},
   {t:'',m:'Статус',sub:'',keys:[{id:'status',l:'Статус'},{id:'reason',l:'Причина статуса'}]},
   {t:'ID',sub:'№ · 20 вх / исх',keys:[{id:'docNumber',l:'Номер документа',type:'number'},{id:'refIn',l:'20 вх'},{id:'refOut',l:'20 исх'}]},
   {t:'Дата / Время',sub:'',keys:[{id:'created',l:'Дата документа',type:'date'},{id:'vdDt',l:'Валютирование Дт',type:'date'},{id:'vdKt',l:'Валютирование Кт',type:'date'}]},
   {t:'Тип',sub:'',keys:[{id:'type',l:'Тип сообщения'}]},
   {t:'Направление',sub:'',keys:[{id:'direction',l:'Группа → название',then:'dirTxt'},{id:'dirTxt',l:'Название направления'}]},
-  {t:'32',sub:'сумма',keys:[{id:'amount',l:'Сумма',type:'number'},{id:'currency',l:'Валюта'}]},
+  {t:'32',sub:'сумма',keys:[{id:'amount',l:'Сумма',type:'number'},{id:'currency',l:'Валюта'}],ccyHost:true},
   {t:'50',sub:'приказодатель · 70',keys:[{id:'f50name',l:'Наименование'},{id:'f50acc',l:'Счёт'},{id:'purpose',l:'Назначение (70)'}]},
   {t:'52',sub:'',keys:[{id:'f52',l:'BIC 52'}]},
   {t:'57',sub:'',keys:[{id:'f57',l:'BIC 57'}]},
@@ -1542,9 +1718,10 @@ var COLS=[
   {t:'S / R in',sub:'',keys:[{id:'sender',l:'S in'},{id:'receiver',l:'R in'}]},
   {t:'S / R out',sub:'',keys:[{id:'outSender',l:'S out'},{id:'outReceiver',l:'R out'}]},
   {t:'Провайдеры',sub:'',keys:[{id:'provS',l:'Провайдер отправителя'},{id:'provR',l:'Провайдер получателя'}]}];
-function keyMeta(id){for(var c=0;c<COLS.length;c++){var k=(COLS[c].keys||[]).filter(function(x){return x.id===id})[0];if(k)return k}return null}
+function cols(){if(!CCY_COL)return COLS_BASE;var out=[];COLS_BASE.forEach(function(c){if(c.ccyHost){out.push({t:'32',sub:'сумма',keys:[{id:'amount',l:'Сумма',type:'number'}]});out.push({t:'Валюта',sub:'',keys:[{id:'currency',l:'Валюта'}]})}else out.push(c)});return out}
+function keyMeta(id){var C=cols();for(var c=0;c<C.length;c++){var k=(C[c].keys||[]).filter(function(x){return x.id===id})[0];if(k)return k}return null}
 function headHtml(){
-  return '<thead><tr>'+COLS.map(function(c,i){
+  return '<thead><tr>'+cols().map(function(c,i){
     if(i===0)return '<th><input type="checkbox" aria-label="Выбрать все"></th>';
     var active=c.keys&&c.keys.some(function(k){return k.id===SORT.by}),km=active?keyMeta(SORT.by):null;
     return '<th class="'+(c.keys?'sortable':'')+(active?' sorted':'')+'" data-col="'+i+'">'+(c.t||'')+(c.keys?'<span class="sarrow">'+(active?(SORT.dir>0?'↑':'↓'):'↕')+'</span>':'')+
@@ -1565,7 +1742,7 @@ function closeSortMenu(){var m=document.getElementById('sortmenu');if(m)m.remove
 grid.addEventListener('click',function(e){
   if(e.target.closest('.rz'))return;
   var th=e.target.closest('th.sortable');if(!th)return;
-  var c=COLS[+th.dataset.col];
+  var c=cols()[+th.dataset.col];
   if(c.keys.length===1){setSort(c.keys[0].id);return}
   closeSortMenu();var r=th.getBoundingClientRect(),z=parseFloat(document.documentElement.style.zoom)||1;
   var m=document.createElement('div');m.id='sortmenu';m.className='sortmenu';m.style.left=(r.left/z)+'px';m.style.top=(r.bottom/z+2)+'px';
@@ -1593,7 +1770,7 @@ var PAGE={size:20,n:1};
 function drawGrid(idx){lastIdx=idx;
   var pages=Math.max(1,Math.ceil(idx.length/PAGE.size));if(PAGE.n>pages)PAGE.n=pages;
   var from=(PAGE.n-1)*PAGE.size,slice=idx.slice(from,from+PAGE.size);
-  grid.innerHTML=headHtml()+slice.map(function(i,k){return rowHtml(ROWS[i],i,from+k+1)}).join('')+(idx.length?'':'<tbody><tr><td colspan="16">'+SK.empty('По заданным условиям документов нет','Сбросить фильтр')+'</td></tr></tbody>');
+  grid.innerHTML=headHtml()+slice.map(function(i,k){return rowHtml(ROWS[i],i,from+k+1)}).join('')+(idx.length?'':'<tbody><tr><td colspan="'+(CCY_COL?17:16)+'">'+SK.empty('По заданным условиям документов нет','Сбросить фильтр')+'</td></tr></tbody>');
   document.getElementById('cnt').textContent=idx.length===ROWS.length?ROWS.length+' документов':idx.length+' из '+ROWS.length;
   renderPager(idx.length,pages);
   if(typeof mark==='function')mark();
@@ -1802,6 +1979,7 @@ document.getElementById('applied').addEventListener('click',function(e){
 });
 function togglePanel(on){var h=document.getElementById('cf-host'),t=document.getElementById('ftoggle');if(on==null)on=!h.classList.contains('on');h.classList.toggle('on',on);t.setAttribute('aria-expanded',String(on))}
 document.getElementById('ftoggle').onclick=function(){togglePanel()};
+document.getElementById('c-ccycol').onchange=function(e){CCY_COL=e.target.checked;COLW=null;grid.classList.remove('fixed');grid.style.width='';refresh()};
 refresh();
 /* ---- открытие drawer ---- */
 var pair=document.getElementById('pair'),slots={A:null,B:null};
