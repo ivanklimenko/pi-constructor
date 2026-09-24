@@ -631,6 +631,8 @@ body.resizing{cursor:col-resize;user-select:none}
 .grid .l2.mono{font-family:var(--mono)}
 /* сумма — спокойная: обычный вес и размер текста записи, выравнивание по разрядам; валюта под ней приглушённая (перенято из katran) */
 .grid .amt{font-weight:400;font-size:12.5px;font-variant-numeric:tabular-nums;letter-spacing:0;color:var(--ink);text-align:right;display:block}
+.grid td.ccy{text-align:left}
+.grid td.ccy .tag{font-family:var(--mono);font-weight:600;font-size:11px}
 .grid .amt+.l2{text-align:right;color:var(--muted);font-weight:400;font-size:11px;margin-top:1px}
 .grid .fld{display:flex;gap:6px;align-items:baseline}
 .grid .fld .op{font:700 12.5px var(--mono);color:var(--opt);min-width:9px}
@@ -820,7 +822,7 @@ var BANK_ACCOUNTS=[
    name — подпись, no — номер поля платёжного документа (показывается тегом), mono — моноширинное значение. */
 var RFIELDS={
   name:{name:'Наименование'},opt:{name:'Опция'},acc:{name:'Номер счёта',mono:1},inn:{name:'ИНН',mono:1},kpp:{name:'КПП',mono:1},
-  info:{name:'Доп. информация'},addr:{name:'Адрес'},bank:{name:'Наименование банка'},bic:{name:'БИК',mono:1},bankAcc:{name:'Счёт банка',mono:1},bankInfo:{name:'Доп. информация банка'},
+  info:{name:'Доп. информация'},addr:{name:'Адрес'},bank:{name:'Наименование банка'},bic:{name:'БИК',mono:1},bankAcc:{name:'Счёт банка',mono:1},bankInfo:{name:'Доп. информация'},
   purpose:{name:'Назначение платежа'},
   instr:{name:'Инструкция получателю'},uip:{name:'УИП',mono:1},reserve:{name:'Резервное поле'},f20:{name:'Назначение платежа. Поле 20'},
   b101:{no:'101',name:'Код статуса плательщика',mono:1},b104:{no:'104',name:'Код бюджетной классификации',mono:1},b105:{no:'105',name:'ОКТМО',mono:1},b106:{no:'106',name:'Основание налогового платежа'},
@@ -1643,7 +1645,7 @@ for(var i=0;i<N_ROWS;i++){
   var base=P.cl(P.DOCS[i%2===0?R.docs[0]:R.docs[1]]),n1=RNAMES[i%8],n2=RNAMES[(i+3)%8],b1=RBANKS[i%6],b2=RBANKS[(i+1)%6];
   var k=i%12;base.type=RTYPES[k];base.status=i%29===5?'INVALID':STS[k];base.st=drawerSt(base.status);base.dirTxt=DIRS[k][1];base.dir=DIRS[k][0];
   var rs=REASON_BY_ST[base.status];base.reason=rs?REASONS[rs[i%rs.length]]:'';
-  base.amount=RAMT[(i*7)%12];base.ccy='RUB';
+  base.amount=RAMT[(i*7+(i/12|0)*5)%12];base.ccy='RUB';
   var dd=(22+(i%12>7?1:0)),hh=String(7+(i*3)%11).padStart(2,'0'),mm=String((i*17)%60).padStart(2,'0');
   base.created=dd+'.09.2026 '+hh+':'+mm+':'+String((i*7)%60).padStart(2,'0');base.num=String(2900+i*3);base.numDate=dd+'.09.2026';
   base.changed=(dd+(i%9===4?1:0))+'.09.2026 '+String(Math.min(23,+hh+(i%3)))+':'+String((i*29)%60).padStart(2,'0');
@@ -1718,9 +1720,10 @@ var COLS=[
   {t:'Банк получателя',sub:'БИК · наименование',keys:[{id:'toBic',l:'БИК'},{id:'toBank',l:'Наименование банка'}]},
   {t:'Системы',sub:'I · S · D',keys:[{id:'initiator',l:'Initiator'},{id:'source',l:'Source'},{id:'destination',l:'Destination'}]},
   {t:'Очерёдн.',sub:'приоритет',keys:[{id:'queue',l:'Очерёдность',type:'number'},{id:'prio',l:'Приоритет',type:'number'}]}];
-function keyMeta(id){for(var c=0;c<COLS.length;c++){var k=(COLS[c].keys||[]).filter(function(x){return x.id===id})[0];if(k)return k}return null}
+function cols(){return COLS}
+function keyMeta(id){var C=cols();for(var c=0;c<C.length;c++){var k=(C[c].keys||[]).filter(function(x){return x.id===id})[0];if(k)return k}return null}
 function headHtml(){
-  return '<thead><tr>'+COLS.map(function(c,i){
+  return '<thead><tr>'+cols().map(function(c,i){
     if(i===0)return '<th><input type="checkbox" aria-label="Выбрать все"></th>';
     var active=c.keys&&c.keys.some(function(k){return k.id===SORT.by}),km=active?keyMeta(SORT.by):null;
     return '<th class="'+(c.keys?'sortable':'')+(active?' sorted':'')+'" data-col="'+i+'">'+(c.t||'')+(c.keys?'<span class="sarrow">'+(active?(SORT.dir>0?'↑':'↓'):'↕')+'</span>':'')+
@@ -1741,7 +1744,7 @@ function closeSortMenu(){var m=document.getElementById('sortmenu');if(m)m.remove
 grid.addEventListener('click',function(e){
   if(e.target.closest('.rz'))return;
   var th=e.target.closest('th.sortable');if(!th)return;
-  var c=COLS[+th.dataset.col];
+  var c=cols()[+th.dataset.col];
   if(c.keys.length===1){setSort(c.keys[0].id);return}
   closeSortMenu();var r=th.getBoundingClientRect(),z=parseFloat(document.documentElement.style.zoom)||1;
   var m=document.createElement('div');m.id='sortmenu';m.className='sortmenu';m.style.left=(r.left/z)+'px';m.style.top=(r.bottom/z+2)+'px';
@@ -1974,6 +1977,7 @@ document.getElementById('applied').addEventListener('click',function(e){
 });
 function togglePanel(on){var h=document.getElementById('cf-host'),t=document.getElementById('ftoggle');if(on==null)on=!h.classList.contains('on');h.classList.toggle('on',on);t.setAttribute('aria-expanded',String(on))}
 document.getElementById('ftoggle').onclick=function(){togglePanel()};
+
 refresh();
 /* ---- открытие drawer ---- */
 var pair=document.getElementById('pair'),slots={A:null,B:null};
