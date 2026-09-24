@@ -348,6 +348,19 @@ a.lnk:hover{text-decoration:underline}
 .two-t{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .sw{margin:0;padding:6px 10px 8px 28px;font:11.5px/1.45 var(--mono);color:var(--ink2);background:var(--sunk);border-bottom:1px solid var(--line2);white-space:pre-wrap;word-break:break-all}
 .sw .blk{color:var(--muted)} .sw .tag4{color:var(--bad);font-weight:600} .sw .uetr{color:var(--val)}
+/* разобранный XML: строка — блок с отступом по глубине (--d) и выравниванием атрибута (--a), в ch моноширинного шрифта.
+   Перенос длинной строки уходит под начало её содержимого (висячий отступ), номер строки — в поле слева. */
+.sw.xml{padding:6px 10px 8px 0;white-space:normal;word-break:normal;counter-reset:xl}
+.sw.xml .xl{position:relative;padding-left:calc(46px + var(--d,0)*2ch + var(--a,0)*1ch + 2ch);text-indent:-2ch;white-space:pre-wrap;overflow-wrap:anywhere;counter-increment:xl}
+.sw.xml .xl::before{content:counter(xl);position:absolute;left:0;width:30px;text-align:right;text-indent:0;color:var(--faint);font-size:10.5px;user-select:none}
+.sw.xml .xl:hover{background:var(--hover)}
+.sw.xml .xp{color:var(--faint)}
+.sw.xml .xt{color:var(--ink);font-weight:600}
+.sw.xml .xns{color:var(--muted);font-weight:400}
+.sw.xml .xa{color:var(--muted)}
+.sw.xml .xa .xns{color:var(--faint)}
+.sw.xml .xv{color:var(--val)}
+.sw.xml .xx{color:var(--ink)}
 .xg.byname.cp-kv .xr{grid-template-columns:230px minmax(0,1fr)}
 .xr .kv .st{font-size:10px}
 .stub{border:1px dashed var(--line);border-radius:5px;padding:26px 10px;text-align:center;color:var(--muted);font-size:12.5px}
@@ -1048,7 +1061,7 @@ DOCS.push(rubDoc({status:'DONE',st:'ok',dirTxt:'входящий от ЦБ на 
              {title:'Информация о банке-отправителе',rows:[['ed:InstructingAgent/BIC','049597373'],['ed:InstructingAgent/CorrespAcc','30101810508469019375'],['ed:InstructingAgent/SWBIC','XБЯКRUKK']]},
              {title:'Информация о банке-исполнителе',rows:[['ed:InstructedAgent/BIC','042993195'],['ed:InstructedAgent/CorrespAcc','30101810664602335376'],['ed:InstructedAgent/SWBIC','XДЯХRUKM']]}]},
    collect:null},
-  source:{ED244:'<?xml version="1.0" encoding="UTF-8"?>\\n<ed:ED244 xmlns:ed="urn:cbr-ru:ed:v2.0" EDNo="9818" EDDate="2026-09-24" EDAuthor="2072537694" EDReceiver="4971095821" Sum="7639481" PaymentPrecedence="5">\\n  <ed:AccDoc AccDocNo="3741" AccDocDate="2026-09-24"/>\\n  <ed:Payer PersonalAcc="40702810064578557830" INN="4340195751" KPP="473897776">\\n    <ed:Name>ООО «ХУРЫГУПЯ»</ed:Name>\\n    <ed:Bank BIC="049597373" CorrespAcc="30101810508469019375"/>\\n  </ed:Payer>\\n  <ed:Payee PersonalAcc="40802810820980451081" INN="394831189084">\\n    <ed:Name>ИП ТЫСЫЛИОВ ГИБАС ЗУДЫОВИЧ</ed:Name>\\n    <ed:Bank BIC="042993195" CorrespAcc="30101810664602335376"/>\\n  </ed:Payee>\\n  <ed:Purpose>Оплата по счёту № 6945-2101 от 18.07.2026 за оборудование по договору 65-89 от 27.02.2026. В том числе НДС 20% — 18 658.24 руб.</ed:Purpose>\\n</ed:ED244>'}
+  source:{ED244:'<?xml version="1.0" encoding="UTF-8"?>\n<ed:ED244 xmlns:ed="urn:cbr-ru:ed:v2.0" EDNo="9818" EDDate="2026-09-24" EDAuthor="2072537694" EDReceiver="4971095821" Sum="7639481" PaymentPrecedence="5">\n  <ed:AccDoc AccDocNo="3741" AccDocDate="2026-09-24"/>\n  <ed:Payer PersonalAcc="40702810064578557830" INN="4340195751" KPP="473897776">\n    <ed:Name>ООО «ХУРЫГУПЯ»</ed:Name>\n    <ed:Bank BIC="049597373" CorrespAcc="30101810508469019375"/>\n  </ed:Payer>\n  <ed:Payee PersonalAcc="40802810820980451081" INN="394831189084">\n    <ed:Name>ИП ТЫСЫЛИОВ ГИБАС ЗУДЫОВИЧ</ed:Name>\n    <ed:Bank BIC="042993195" CorrespAcc="30101810664602335376"/>\n  </ed:Payee>\n  <ed:Purpose>Оплата по счёту № 6945-2101 от 18.07.2026 за оборудование по договору 65-89 от 27.02.2026. В том числе НДС 20% — 18 658.24 руб.</ed:Purpose>\n</ed:ED244>'}
 }));
 DOCS.push(rubDoc({type:'REQDOCRU',status:'IN_PROGRESS',st:'wait',dirTxt:'исходящий на ЦБ · взыскание',tabsOff:['MPU'],
   uuid:'6bb3cd76-2461-4984-a8db-68be95162e4a',created:'24.09.2026 10:59:26',num:'714297',numDate:'23.09.2026',amount:'23.84',
@@ -1064,7 +1077,7 @@ DOCS.push(rubDoc({type:'REQDOCRU',status:'IN_PROGRESS',st:'wait',dirTxt:'исх�
    budget:{b101:'98',b104:'24943713437772038687',b105:'78166455',b106:'0',b107:'0',b108:'290984/26/61340-ИП',b109:'06.01.2026',b110:'0'},
    collect:{c48:'23.09.2026',cLimit:'11497427',c70:'Взыскание по исполнительному производству',c38:'9',c39:'3',c40:'181110362/8804',c41:'23.09.2026'},
    ed107:null},
-  source:{ED244:'<?xml version="1.0" encoding="UTF-8"?>\\n<ed:ED244 xmlns:ed="urn:cbr-ru:ed:v2.0" EDNo="3668" EDDate="2026-09-24" EDAuthor="6918470000" EDReceiver="9869552771" Sum="2384" PaymentPrecedence="4">\\n  <ed:AccDoc AccDocNo="714297" AccDocDate="2026-09-23"/>\\n  <ed:Payer PersonalAcc="40817810122440937855" INN="724963654922">\\n    <ed:Name>ПЯРИФООВА ТЯХОР ВУПЯОВНА</ed:Name>\\n    <ed:Bank BIC="045927897" CorrespAcc="30101810434016985259"/>\\n  </ed:Payer>\\n  <ed:Payee PersonalAcc="03212015887737416204" INN="6906224315" KPP="102930012">\\n    <ed:Name>УФК ПО ДУВЫМЯСКОЙ ОБЛАСТИ</ed:Name>\\n    <ed:Bank BIC="014948298" CorrespAcc="40102810113853348959"/>\\n  </ed:Payee>\\n  <ed:Purpose>Взыскание по исп. пост. 228808703/5707 от 12.07.2026</ed:Purpose>\\n</ed:ED244>'}
+  source:{ED244:'<?xml version="1.0" encoding="UTF-8"?>\n<ed:ED244 xmlns:ed="urn:cbr-ru:ed:v2.0" EDNo="3668" EDDate="2026-09-24" EDAuthor="6918470000" EDReceiver="9869552771" Sum="2384" PaymentPrecedence="4">\n  <ed:AccDoc AccDocNo="714297" AccDocDate="2026-09-23"/>\n  <ed:Payer PersonalAcc="40817810122440937855" INN="724963654922">\n    <ed:Name>ПЯРИФООВА ТЯХОР ВУПЯОВНА</ed:Name>\n    <ed:Bank BIC="045927897" CorrespAcc="30101810434016985259"/>\n  </ed:Payer>\n  <ed:Payee PersonalAcc="03212015887737416204" INN="6906224315" KPP="102930012">\n    <ed:Name>УФК ПО ДУВЫМЯСКОЙ ОБЛАСТИ</ed:Name>\n    <ed:Bank BIC="014948298" CorrespAcc="40102810113853348959"/>\n  </ed:Payee>\n  <ed:Purpose>Взыскание по исп. пост. 228808703/5707 от 12.07.2026</ed:Purpose>\n</ed:ED244>'}
 }));
 /* индексы документов стенда по семействам: a — левый drawer, b — правый, ret — «платёжка и возврат рядом» */
 var FAM={cur:{a:0,b:2,ret:1,type:'MT103'},rub:{a:3,b:4,ret:4,type:'PAYDOCRU'}};
@@ -1348,11 +1361,48 @@ function linkedHtml(d,u){
       '</div>':'')}).join('')+'</div>';
 }
 function swiftHtml(t){return esc(t).replace(/\{(\d|S):/g,'<span class="blk">{$1:</span>').replace(/^(:\d{2}[A-Z]?:)/gm,'<span class="tag4">$1</span>').replace(/\{121:([0-9a-f-]{36})\}/g,'{121:<span class="uetr">$1</span>}')}
-function xmlHtml(t){return esc(t).replace(/(&lt;\/?)([\w:.-]+)/g,'$1<span class="tag4">$2</span>').replace(/\s([\w:.-]+)=(&quot;[^&]*&quot;)/g,' <span class="blk">$1</span>=<span class="uetr">$2</span>')}
+/* XML показываем разобранным, а не подсвеченным регуляркой: отступ по вложенности,
+   атрибуты — в строку, если тег помещается, иначе столбиком под первым атрибутом;
+   длинный текст — отдельной строкой с висячим отступом. Не разобралось — сырой текст. */
+var XML_LINE=92;
+function xmlHtml(t){
+  var doc=null;try{doc=new DOMParser().parseFromString(t,'application/xml')}catch(_){}
+  if(!doc||doc.getElementsByTagName('parsererror').length)return '<div class="xl">'+esc(t)+'</div>';
+  var out=[];
+  function P(x){return '<span class="xp">'+x+'</span>'}
+  function nm(n){var i=n.indexOf(':');return i>0?'<span class="xns">'+esc(n.slice(0,i+1))+'</span>'+esc(n.slice(i+1)):esc(n)}
+  function at(a){return '<span class="xa">'+nm(a.name)+'</span>'+P('="')+'<span class="xv">'+esc(a.value)+'</span>'+P('"')}
+  function line(d,h,a){out.push('<div class="xl" style="--d:'+d+(a?';--a:'+a:'')+'">'+h+'</div>')}
+  var decl=/^\s*<\?xml([^?]*)\?>/.exec(t);
+  if(decl)line(0,P('&lt;?xml')+decl[1].replace(/([\w:.-]+)="([^"]*)"/g,function(m,k,v){return '<span class="xa">'+esc(k)+'</span>'+P('="')+'<span class="xv">'+esc(v)+'</span>'+P('"')})+P('?&gt;'));
+  function walk(el,d){
+    var kids=[].filter.call(el.childNodes,function(n){return n.nodeType===1||((n.nodeType===3||n.nodeType===4)&&n.nodeValue.trim())});
+    var attrs=[].slice.call(el.attributes),name=el.nodeName;
+    var open=P('&lt;')+'<span class="xt">'+nm(name)+'</span>',end=kids.length?P('&gt;'):P('/&gt;');
+    var close=P('&lt;/')+'<span class="xt">'+nm(name)+'</span>'+P('&gt;');
+    var text=kids.length===1&&kids[0].nodeType!==1?kids[0].nodeValue.trim():null;
+    var headLen=d*2+name.length+2+attrs.reduce(function(s,a){return s+a.name.length+a.value.length+4},0);
+    if(headLen<=XML_LINE){
+      var head=open+attrs.map(function(a){return ' '+at(a)}).join('')+end;
+      if(text!=null&&headLen+text.length+name.length+3<=XML_LINE){line(d,head+'<span class="xx">'+esc(text)+'</span>'+close);return}
+      line(d,head);
+    }else{
+      /* атрибуты столбиком: выравнивание под первым атрибутом — моноширинный шрифт, считаем в ch */
+      attrs.forEach(function(a,k){var last=k===attrs.length-1;
+        if(k===0)line(d,open+' '+at(a)+(last?end:''));else line(d,at(a)+(last?end:''),name.length+2)});
+    }
+    if(!kids.length)return;
+    if(text!=null)line(d+1,'<span class="xx">'+esc(text)+'</span>');
+    else kids.forEach(function(n){if(n.nodeType===1)walk(n,d+1);else line(d+1,'<span class="xx">'+esc(n.nodeValue.trim())+'</span>')});
+    line(d,close);
+  }
+  walk(doc.documentElement,0);
+  return out.join('');
+}
 function sourceHtml(d,u){
   var src=d.source||{},keys=Object.keys(src);if(!keys.length)return '<div class="tt"><div class="empty">Исходного текста нет</div></div>';
   return '<div class="au">'+keys.map(function(k){var v=src[k],op=u.src.has(k)&&v;
-    return '<div class="ah'+(op?' open':'')+'" data-src="'+k+'"><span class="chev">▼</span>'+esc(k)+'<span class="lbl">'+(v?v.length+' симв.':'нет')+'</span></div>'+(op?'<pre class="sw">'+(/^\s*<\?xml|^\s*</.test(v)?xmlHtml(v):swiftHtml(v))+'</pre>':'')}).join('')+'</div>';
+    return '<div class="ah'+(op?' open':'')+'" data-src="'+k+'"><span class="chev">▼</span>'+esc(k)+'<span class="lbl">'+(v?v.length+' симв.':'нет')+'</span></div>'+(op?(/^\s*</.test(v)?'<div class="sw xml">'+xmlHtml(v)+'</div>':'<pre class="sw">'+swiftHtml(v)+'</pre>'):'')}).join('')+'</div>';
 }
 function mpuHtml(d,u){
   var rows=d.mpu||[];if(!rows.length)return '<div class="tt"><div class="empty">Сообщений MPU нет</div></div>';
