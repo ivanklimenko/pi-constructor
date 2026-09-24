@@ -139,6 +139,17 @@ body.resizing{cursor:col-resize;user-select:none}
 .sortmenu button{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;background:none;text-align:left;font:12.5px var(--sans);color:var(--ink2);padding:5px 12px;cursor:pointer}
 .sortmenu button:hover{background:var(--hover)}
 .sortmenu button.on{color:var(--val);font-weight:500}
+.sortmenu .smi{display:flex;align-items:stretch}
+.sortmenu .smi button{flex:1}
+.sortmenu .smi button.add{flex:0 0 28px;justify-content:center;color:var(--muted);border-left:1px solid var(--line2);font-weight:600}
+.sortmenu .smi button.add:hover{color:var(--val);background:var(--val-soft)}
+.sortmenu .smi.on button{color:var(--val);font-weight:500}
+.sortmenu .smh{font-size:10.5px;color:var(--faint);padding:4px 12px 2px;border-top:1px solid var(--line2);margin-top:3px}
+.grid th .sarrow sup,.sortmenu .sarrow sup{font-size:8px;margin-left:1px;vertical-align:top}
+.sortchip .o{min-width:14px;height:14px;border-radius:7px;background:var(--val);color:var(--paper);font:600 9px/14px var(--sans);text-align:center}
+.sortchip .v{cursor:pointer}
+.sortchip .v:hover{text-decoration:underline}
+#sortchips .sarr{color:var(--faint);font-size:12px;padding:0 1px}
 .sortmenu button.reset{border-top:1px solid var(--line2);margin-top:3px;color:var(--muted);font-size:12px}
 .grid td{padding:8px 8px 4px;border-bottom:1px solid var(--line);vertical-align:top;white-space:nowrap}
 .grid td[rowspan]{padding-bottom:8px}
@@ -230,6 +241,7 @@ body.resizing{cursor:col-resize;user-select:none}
   <div class="filters">
     <button class="fbtn" id="ftoggle" aria-expanded="true"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M4.2 5.4A1 1 0 015.1 4h13.8a1 1 0 01.8 1.6L14 12.2V18a1 1 0 01-1.5.86l-3-1.8A1 1 0 019 16.2v-4L4.3 5.6a1 1 0 01-.1-.2z"/></svg>Фильтры<span class="badge" id="fcount" hidden>0</span></button>
     <div class="applied" id="applied"><span class="lbl">условия не заданы</span></div>
+    <div class="applied" id="sortchips"></div>
     <div class="sp"><label class="chk" style="font-size:12px;margin-right:6px"><input type="checkbox" id="c-ccycol"> Валюта отдельной колонкой</label><span class="fchip">Колонки<span class="chev">▼</span></span><span class="fchip">Экспорт</span></div>
   </div>
   <div id="cf-host" class="on"></div>
@@ -340,7 +352,7 @@ function rowHtml(d,i,ord){
 }
 var grid=document.getElementById('grid');
 /* ---- сортировка: у составной колонки несколько реквизитов — клик по заголовку открывает меню, у простой — сразу переключает ---- */
-var SORT={by:null,dir:1};
+var SORT=[];
 /* валюта — в колонке суммы (второй строкой) или отдельной колонкой; переключается галочкой, чтобы сравнить вживую */
 var CCY_COL=false;
 var COLS_BASE=[
@@ -365,33 +377,58 @@ function keyMeta(id){var C=cols();for(var c=0;c<C.length;c++){var k=(C[c].keys||
 function headHtml(){
   return '<thead><tr>'+cols().map(function(c,i){
     if(i===0)return '<th><input type="checkbox" aria-label="Выбрать все"></th>';
-    var active=c.keys&&c.keys.some(function(k){return k.id===SORT.by}),km=active?keyMeta(SORT.by):null;
-    return '<th class="'+(c.keys?'sortable':'')+(active?' sorted':'')+'" data-col="'+i+'">'+(c.t||'')+(c.keys?'<span class="sarrow">'+(active?(SORT.dir>0?'↑':'↓'):'↕')+'</span>':'')+
+    var lv=c.keys?c.keys.map(function(k){return sortLevel(k.id)}).filter(function(x){return x>=0}).sort(function(a,b){return a-b}):[];
+    var active=lv.length>0,L=active?SORT[lv[0]]:null,km=active?keyMeta(L.by):null;
+    return '<th class="'+(c.keys?'sortable':'')+(active?' sorted':'')+'" data-col="'+i+'">'+(c.t||'')+
+      (c.keys?'<span class="sarrow">'+(active?(L.dir>0?'↑':'↓')+(SORT.length>1?'<sup>'+(lv[0]+1)+'</sup>':''):'↕')+'</span>':'')+
       '<span class="sub">'+(active&&c.keys.length>1?esc(km.l):esc(c.sub))+'</span></th>'}).join('')+'</tr></thead>';
 }
+/* многоуровневая сортировка: SORT — массив уровней; сравнение идёт по уровням, пока есть равенство */
+function sortLevel(id){for(var i=0;i<SORT.length;i++)if(SORT[i].by===id)return i;return -1}
+function cmpv(type,va,vb){if(type==='number')return (toNum(va)||0)-(toNum(vb)||0);if(type==='date')return String(toDate(va)||'').localeCompare(String(toDate(vb)||''));if(!va&&vb)return 1;if(va&&!vb)return -1;return String(va).localeCompare(String(vb),'ru')}
+var GROUP_ORDER={IN:1,OUT:2,TRANSIT:3,OTHER:4};
+function cmpLevel(L,a,b){var km=keyMeta(L.by),acc=ACC[L.by],va=acc(ROWS[a]),vb=acc(ROWS[b]),c;
+  c=L.by==='direction'?(GROUP_ORDER[va]||9)-(GROUP_ORDER[vb]||9):cmpv(km.type,va,vb);
+  if(!c&&km.then)c=cmpv(null,ACC[km.then](ROWS[a]),ACC[km.then](ROWS[b]));
+  return c*L.dir;}
 function sortIdx(idx){
-  if(!SORT.by)return idx;var km=keyMeta(SORT.by),acc=ACC[SORT.by],dir=SORT.dir;
-  function cmpv(type,va,vb){if(type==='number')return (toNum(va)||0)-(toNum(vb)||0);if(type==='date')return String(toDate(va)||'').localeCompare(String(toDate(vb)||''));if(!va&&vb)return 1;if(va&&!vb)return -1;return String(va).localeCompare(String(vb),'ru')}
-  var GROUP_ORDER={IN:1,OUT:2,TRANSIT:3,OTHER:4};
-  return idx.slice().sort(function(a,b){var va=acc(ROWS[a]),vb=acc(ROWS[b]),c;
-    c=SORT.by==='direction'?(GROUP_ORDER[va]||9)-(GROUP_ORDER[vb]||9):cmpv(km.type,va,vb);
-    /* второй ключ (например, у направления — название внутри группы) идёт в том же порядке */
-    if(!c&&km.then)c=cmpv(null,ACC[km.then](ROWS[a]),ACC[km.then](ROWS[b]));
-    return c*dir||a-b});
+  if(!SORT.length)return idx;
+  return idx.slice().sort(function(a,b){for(var i=0;i<SORT.length;i++){var c=cmpLevel(SORT[i],a,b);if(c)return c}return a-b});
 }
-function setSort(id){if(SORT.by===id)SORT.dir=-SORT.dir;else{SORT.by=id;SORT.dir=keyMeta(id).type==='date'||keyMeta(id).type==='number'?-1:1}PAGE.n=1;closeSortMenu();refresh()}
+function defDir(id){var t=keyMeta(id).type;return t==='date'||t==='number'?-1:1}
+/* setSort(id) — сделать единственным ключом (повтор — сменить направление); setSort(id,true) — добавить уровнем (повтор — сменить направление уровня) */
+function setSort(id,add){var i=sortLevel(id);
+  if(add){if(i>=0)SORT[i].dir=-SORT[i].dir;else SORT.push({by:id,dir:defDir(id)})}
+  else{if(SORT.length===1&&i===0)SORT[0].dir=-SORT[0].dir;else SORT=[{by:id,dir:defDir(id)}]}
+  PAGE.n=1;closeSortMenu();refresh()}
+function removeSort(id){var i=sortLevel(id);if(i>=0)SORT.splice(i,1);PAGE.n=1;refresh()}
+function renderSortChips(){
+  var el=document.getElementById('sortchips');if(!el)return;
+  if(!SORT.length){el.innerHTML='';return}
+  el.innerHTML='<span class="lbl">Сортировка:</span>'+SORT.map(function(L,i){var km=keyMeta(L.by);return '<span class="achip sortchip" data-tip="Клик — сменить направление · ✕ — убрать уровень"><span class="o">'+(i+1)+'</span><span class="v" data-sortflip="'+L.by+'">'+esc(km.l)+' '+(L.dir>0?'↑':'↓')+'</span><span class="x" data-sortrm="'+L.by+'" title="Убрать уровень">✕</span></span>'}).join('<span class="sarr">›</span>')+
+    (SORT.length>1?'<span class="lbl" style="margin-left:4px">Shift+клик по заголовку — ещё уровень</span>':'');
+}
 function closeSortMenu(){var m=document.getElementById('sortmenu');if(m)m.remove()}
 grid.addEventListener('click',function(e){
   if(e.target.closest('.rz'))return;
   var th=e.target.closest('th.sortable');if(!th)return;
   var c=cols()[+th.dataset.col];
-  if(c.keys.length===1){setSort(c.keys[0].id);return}
+  if(c.keys.length===1){setSort(c.keys[0].id,e.shiftKey);return}
   closeSortMenu();var r=th.getBoundingClientRect(),z=parseFloat(document.documentElement.style.zoom)||1;
   var m=document.createElement('div');m.id='sortmenu';m.className='sortmenu';m.style.left=(r.left/z)+'px';m.style.top=(r.bottom/z+2)+'px';
-  m.innerHTML='<div class="smt">Сортировать «'+esc(c.m||c.t)+'» по</div>'+c.keys.map(function(k){var on=SORT.by===k.id;return '<button type="button" data-sort="'+k.id+'" class="'+(on?'on':'')+'">'+esc(k.l)+'<span class="sarrow">'+(on?(SORT.dir>0?'↑':'↓'):'')+'</span></button>'}).join('')+(SORT.by&&c.keys.some(function(k){return k.id===SORT.by})?'<button type="button" data-sort="" class="reset">Сбросить сортировку</button>':'');
+  m.innerHTML='<div class="smt">Сортировать «'+esc(c.m||c.t)+'» по</div>'+c.keys.map(function(k){var lv=sortLevel(k.id),on=lv>=0;
+      return '<div class="smi'+(on?' on':'')+'"><button type="button" data-sort="'+k.id+'" title="Сделать единственным ключом">'+esc(k.l)+'<span class="sarrow">'+(on?(SORT[lv].dir>0?'↑':'↓')+(SORT.length>1?'<sup>'+(lv+1)+'</sup>':''):'')+'</span></button>'+
+        '<button type="button" class="add" data-sortadd="'+k.id+'" title="'+(on?'Сменить направление этого уровня':'Добавить уровнем сортировки')+'">'+(on?'↕':'+')+'</button></div>'}).join('')+
+    '<div class="smh">клик — единственный ключ · «+» или Shift+клик — добавить уровнем</div>'+
+    (SORT.length?'<button type="button" data-sort="" class="reset">Сбросить сортировку</button>':'');
   document.body.appendChild(m);
 });
-document.addEventListener('click',function(e){var b=e.target.closest('#sortmenu [data-sort]');if(b){if(b.dataset.sort)setSort(b.dataset.sort);else{SORT.by=null;closeSortMenu();refresh()}return}if(!e.target.closest('#sortmenu, th.sortable'))closeSortMenu()});
+document.addEventListener('click',function(e){
+  var ad=e.target.closest('#sortmenu [data-sortadd]');if(ad){setSort(ad.dataset.sortadd,true);return}
+  var b=e.target.closest('#sortmenu [data-sort]');if(b){if(b.dataset.sort)setSort(b.dataset.sort,e.shiftKey);else{SORT=[];closeSortMenu();refresh()}return}
+  var fl=e.target.closest('#sortchips [data-sortflip]');if(fl){var i=sortLevel(fl.dataset.sortflip);if(i>=0){SORT[i].dir=-SORT[i].dir;PAGE.n=1;refresh()}return}
+  var rm=e.target.closest('#sortchips [data-sortrm]');if(rm){removeSort(rm.dataset.sortrm);return}
+  if(!e.target.closest('#sortmenu, th.sortable'))closeSortMenu()});
 /* ---- изменяемая ширина колонок: после первого рендера фиксируем ширины, дальше тянем за границу в шапке ---- */
 var COLW=null;
 function initResize(){
@@ -528,7 +565,7 @@ function applyFilters(snap,desc){applied=desc;PAGE.n=1;refresh()}
 function refresh(){
   var base=byPanel();
   var idx=quick?base.filter(function(i){return ROWS[i].status===quick}):base;
-  drawGrid(sortIdx(idx));renderApplied();renderLane(base);
+  drawGrid(sortIdx(idx));renderApplied();renderSortChips();renderLane(base);
 }
 /* ============ график динамики по статусам ============
    Данные стенда: ряды заканчиваются ровно на счётчиках лейна, иначе
