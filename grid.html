@@ -478,6 +478,12 @@ ol.q b,ul.l b{color:var(--ink)}
 .only .stage{margin-inline:0;padding-inline:0}
 .only .pair{min-height:0}
 /* ===== рубль ===== */
+.rsec h6.sub{display:flex;align-items:center;gap:8px;cursor:pointer}
+.rsec h6.sub:hover{background:var(--hover)}
+.rsec h6.sub .n{margin-left:auto;font:500 10.5px var(--mono);letter-spacing:0;color:var(--faint);text-transform:none}
+.rsec h6.sub .chev{font-size:9px;color:var(--faint);width:10px;text-align:center}
+.rsec .xr.null .nm{color:var(--faint)}
+.rsep{height:5px;background:var(--sunk);border-bottom:1px solid var(--line2)}
 .rp{border:1px solid var(--line);border-radius:5px;overflow:hidden}
 .rph,.rpr{display:grid;grid-template-columns:128px minmax(0,1fr) minmax(0,1fr);gap:0 10px;padding:2px 10px;align-items:baseline}
 .rph{background:var(--sunk);font:600 10.5px var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);min-height:22px;align-items:center;border-bottom:1px solid var(--line2)}
@@ -493,6 +499,7 @@ ol.q b,ul.l b{color:var(--ink)}
 .blk.empty{border-style:dashed}.blk.empty h5{color:var(--faint)}
 .rsec .xr{grid-template-columns:250px minmax(0,1fr);padding:1px 10px}
 .rsec .xr .nm .fno{margin-right:5px}
+.rsec .xr .nm{white-space:normal;overflow:visible;line-height:1.3;padding:2px 0}
 .rsec .xr .nm.mono{font:11.5px var(--mono);color:var(--muted)}
 .rsec h6{margin:0;padding:3px 10px;font:600 10.5px var(--sans);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--sunk);border-block:1px solid var(--line2)}
 .rsec h6:first-child{border-top:0}
@@ -884,14 +891,25 @@ var RSECTIONS={
   purposeExtra:{title:'Назначение платежа. Дополнительная информация',kind:'kv',rows:['instr','uip','reserve','f20']},
   agents:{title:'Посредник',kind:'table',cols:[['Наименование','name','minmax(0,1.5fr)'],['БИК','bic','90px'],['Счёт банка','bankAcc','1fr'],['Счёт получателя','acc','1fr']]},
   budget:{title:'Бюджетные реквизиты',kind:'kv',rows:['b101','b104','b105','b106','b107','b108','b109','b110']},
-  ed107:{title:'Параметры ED107',kind:'ed107'},
-  collect:{title:'Параметры инкассового поручения',kind:'kv',rows:['c48','cLimit','c70','c38','c39','c40','c41']}
+  /* ED107: шапка из четырёх реквизитов + подгруппы узлов ED. Состав подгрупп фиксирован конфигом,
+     значения берутся по пути «узел/реквизит»; пустое значение — бледная строка, подгруппа сворачивается отдельно. */
+  ed107:{title:'Параметры ED107',kind:'ed107',
+    head:[['relId','ID связанного документа'],['initId','ID инициирующего документа'],['relDate','Дата связанного документа'],['execDate','Запрошенная дата исполнения']],
+    groups:[
+      {id:'payer',title:'Информация о банке-плательщике',node:'OrderingBank',rows:['BIC','ed:Name','BankAccount','SWBIC']},
+      {id:'acctWith',title:'Информация об агенте банка-получателя',node:'AcctWithInst',rows:['BIC','ed:Name','BankAccount','SWBIC']},
+      {id:'benef',title:'Информация о банке-получателе',node:'Beneficiary',rows:['BIC','ed:Name','BankAccount','SWBIC']},
+      {id:'prev',title:'Информация о предыдущем инструктирующем банке',node:'PrevInstrAgent',rows:['BIC','ed:Name','BankAccount','SWBIC']},
+      {id:'instg',title:'Информация о банке-отправителе',node:'InstructingAgent',rows:['BIC','CorrespAcc','SWBIC']},
+      {id:'instd',title:'Информация о банке-исполнителе',node:'InstructedAgent',rows:['BIC','CorrespAcc','SWBIC']}]},
+  collect:{title:'Параметры инкассового поручения',kind:'kv',rows:['c48','cLimit','c70','|','c38','c39','c40','c41']}
 };
+var RUB_SECTIONS=['purposeExtra','agents','budget','ed107','collect'];
 var RUB_PARTY=['name','opt','acc','inn','kpp','info','addr','bank','bic','bankAcc','bankInfo'];
 /* Профиль вида документа: hero и блоки фиксированы, party — строки таблицы отправитель|получатель, sections — свёрнутые блоки по порядку. */
-PROFILES.PAYDOCRU={family:'rub',title:'Платёжное поручение',hero:[],blocks:['scen','tx'],grid:[],text:['purpose'],party:RUB_PARTY,sections:['purposeExtra','agents','budget','ed107']};
-PROFILES.REQDOCRU={family:'rub',title:'Инкассовое поручение',hero:[],blocks:['scen','tx'],grid:[],text:['purpose'],party:RUB_PARTY,sections:['purposeExtra','agents','budget','collect','ed107']};
-PROFILES.PAYORDRU={family:'rub',title:'Платёжный ордер',hero:[],blocks:['scen','tx'],grid:[],text:['purpose'],party:RUB_PARTY,sections:['purposeExtra','agents','ed107']};
+PROFILES.PAYDOCRU={family:'rub',title:'Платёжное поручение',hero:[],blocks:['scen','tx'],grid:[],text:['purpose'],party:RUB_PARTY,sections:RUB_SECTIONS};
+PROFILES.REQDOCRU={family:'rub',title:'Инкассовое поручение',hero:[],blocks:['scen','tx'],grid:[],text:['purpose'],party:RUB_PARTY,sections:RUB_SECTIONS};
+PROFILES.PAYORDRU={family:'rub',title:'Платёжный ордер',hero:[],blocks:['scen','tx'],grid:[],text:['purpose'],party:RUB_PARTY,sections:RUB_SECTIONS};
 var TABS_RUB=['Общие данные','Статусы','Комплаенс','Связанные документы','Задачи','Нотификации','ED244','Стриминг','MPU','Аудит'];
 TAB_KEY['ED244']='ed244';
 function famOf(d){return PROFILES[typeOf(d)].family||'cur'}
@@ -1065,14 +1083,11 @@ DOCS.push(rubDoc({status:'DONE',st:'ok',dirTxt:'входящий от ЦБ на 
    party:{s:{name:'ООО «ХУРЫГУПЯ»',opt:'',acc:'40702810064578557830',inn:'4340195751',kpp:'473897776',info:'',addr:'740828, Г. ЛЫСУЛА, УЛ. НИФЕМЯ, Д. 133, ПОМ. 520',bank:'АО «ЗОДО БАНК»',bic:'049597373',bankAcc:'30101810508469019375',bankInfo:''},
           r:{name:'ИП ТЫСЫЛИОВ ГИБАС ЗУДЫОВИЧ',opt:'',acc:'40802810820980451081',inn:'394831189084',kpp:'',info:'',addr:'057617, Г. СОЛОКЫ, УЛ. МЕСОБО, Д. 83, КВ. 143',bank:'БАНК «ХАРОГА» (АО)',bic:'042993195',bankAcc:'30101810664602335376',bankInfo:'Филиал в г. Хупево'}},
    purpose:'Оплата по счёту № 6945-2101 от 18.07.2026 за оборудование по договору 65-89 от 27.02.2026. В том числе НДС 20% — 18 658.24 руб.',
-   purposeExtra:{instr:'',uip:'',reserve:'',f20:'Оплата по счёту № 6945-2101'},
-   agents:[{name:'ФИЛИАЛ № 5065 БАНКА «МАГО» (ПАО) — Ф-Л В Г. ПЕСЫХА',bic:'042450423',bankAcc:'30101810249777754632',acc:'30110810300493704685'}],
-   budget:null,
-   ed107:{head:[['ID связанного документа','1262'],['ID инициирующего документа','77944'],['Дата связанного документа','24.09.2026'],['Запрошенная дата исполнения','24.09.2026']],
-     groups:[{title:'Информация о банке-плательщике',rows:[['ed:OrderingBank/BIC','049597373'],['ed:OrderingBank/ed:Name','АО «ЗОДО БАНК»'],['ed:OrderingBank/BankAccount','30101810508469019375'],['ed:OrderingBank/SWBIC','XБЯКRUKK']]},
-             {title:'Информация о банке-получателе',rows:[['ed:Beneficiary/BIC','042993195'],['ed:Beneficiary/ed:Name','БАНК «ХАРОГА» (АО)'],['ed:Beneficiary/BankAccount','30101810664602335376'],['ed:Beneficiary/SWBIC','XДЯХRUKM']]},
-             {title:'Информация о банке-отправителе',rows:[['ed:InstructingAgent/BIC','049597373'],['ed:InstructingAgent/CorrespAcc','30101810508469019375'],['ed:InstructingAgent/SWBIC','XБЯКRUKK']]},
-             {title:'Информация о банке-исполнителе',rows:[['ed:InstructedAgent/BIC','042993195'],['ed:InstructedAgent/CorrespAcc','30101810664602335376'],['ed:InstructedAgent/SWBIC','XДЯХRUKM']]}]},
+   purposeExtra:{instr:'Гяналу тыпепо вуза факе пысему вя ни лидефе фотохо ва мезе мокефо',uip:'68578800898192015437',reserve:'Зувивофе дыто симу',f20:'Руди фибеку собыве сясе'},
+   agents:[{name:'ФИЛИАЛ № 3826 БАНКА «НУВОСЕ» (ПАО)',bic:'041550162',bankAcc:'30101810951233369033',acc:'30110810217115096554'},{name:'БАНК «ВЯХИЛЯ» (АО)',bic:'041916658',bankAcc:'30101810196704420940',acc:'30110810928566570883'},{name:'АО «ФАДОФЯ БАНК»',bic:'047917152',bankAcc:'30101810671568607430',acc:'30110810450582275781'}],
+   budget:{b101:'51',b104:'96939832480279714550',b105:'92564093',b106:'ТП',b107:'МС.02.2026',b108:'200',b109:'26.02.2026',b110:'649'},
+   ed107:{relId:'5108',initId:'46713',relDate:'24.09.2026',execDate:'24.09.2026',
+     v:{'OrderingBank/BIC':'045131779','OrderingBank/ed:Name':'БАНК «ВУХИДО» (АО)','OrderingBank/BankAccount':'30101810105950215060','OrderingBank/SWBIC':'DUZFRUY9','AcctWithInst/BIC':'045027178','AcctWithInst/ed:Name':'БАНК «ВЫНАФА» (АО)','AcctWithInst/BankAccount':'30101810168267985543','AcctWithInst/SWBIC':'KDHCRU2F','Beneficiary/BIC':'049719713','Beneficiary/ed:Name':'ФИЛИАЛ № 6857 БАНКА «ВАХАСЫ» (ПАО)','Beneficiary/BankAccount':'30101810424324905006','Beneficiary/SWBIC':'REFNRUAM','PrevInstrAgent/BIC':'049125896','PrevInstrAgent/ed:Name':'БАНК «ВЯЗУРЕ» (АО)','PrevInstrAgent/BankAccount':'30101810347900853104','PrevInstrAgent/SWBIC':'TEMGRU4U','InstructingAgent/BIC':'047485823','InstructingAgent/CorrespAcc':'30101810372488940093','InstructingAgent/SWBIC':'XEANRURA','InstructedAgent/BIC':'040266426','InstructedAgent/CorrespAcc':'30101810122840500735','InstructedAgent/SWBIC':'HDNZRU99'}},
    collect:null},
   source:{ED244:'<?xml version="1.0" encoding="UTF-8"?>\n<ed:ED244 xmlns:ed="urn:cbr-ru:ed:v2.0" EDNo="9818" EDDate="2026-09-24" EDAuthor="2072537694" EDReceiver="4971095821" Sum="7639481" PaymentPrecedence="5">\n  <ed:AccDoc AccDocNo="3741" AccDocDate="2026-09-24"/>\n  <ed:Payer PersonalAcc="40702810064578557830" INN="4340195751" KPP="473897776">\n    <ed:Name>ООО «ХУРЫГУПЯ»</ed:Name>\n    <ed:Bank BIC="049597373" CorrespAcc="30101810508469019375"/>\n  </ed:Payer>\n  <ed:Payee PersonalAcc="40802810820980451081" INN="394831189084">\n    <ed:Name>ИП ТЫСЫЛИОВ ГИБАС ЗУДЫОВИЧ</ed:Name>\n    <ed:Bank BIC="042993195" CorrespAcc="30101810664602335376"/>\n  </ed:Payee>\n  <ed:Purpose>Оплата по счёту № 6945-2101 от 18.07.2026 за оборудование по договору 65-89 от 27.02.2026. В том числе НДС 20% — 18 658.24 руб.</ed:Purpose>\n</ed:ED244>'}
 }));
@@ -1085,11 +1100,12 @@ DOCS.push(rubDoc({type:'REQDOCRU',status:'IN_PROGRESS',st:'wait',dirTxt:'исх�
    party:{s:{name:'ПЯРИФООВА ТЯХОР ВУПЯОВНА',opt:'',acc:'40817810122440937855',inn:'724963654922',kpp:'0',info:'',addr:'',bank:'АО «ЛУКЕЗА БАНК»',bic:'045927897',bankAcc:'30101810434016985259',bankInfo:''},
           r:{name:'УФК ПО ДУВЫМЯСКОЙ ОБЛАСТИ (ОСП ПО ДОКАХЫСКОМУ РАЙОНУ, Л/С 49924435382)',opt:'',acc:'03212015887737416204',inn:'6906224315',kpp:'102930012',info:'',addr:'',bank:'ТЕПЕФАСКОЕ ГУ БАНКА РОССИИ // УФК ПО ЗИСИМУСКОЙ ОБЛАСТИ',bic:'014948298',bankAcc:'40102810113853348959',bankInfo:''}},
    purpose:'Взыскание по исп. пост. 228808703/5707 от 12.07.2026. СПИ ПЫБУГИОВА Е. В. по и/п № 290984/26/61340-ИП от 13.02.2026',
-   purposeExtra:{instr:'',uip:'46710664247006847653',reserve:'',f20:''},
+   purposeExtra:{instr:'',uip:'73325333087970403184',reserve:'',f20:''},
    agents:[],
-   budget:{b101:'98',b104:'24943713437772038687',b105:'78166455',b106:'0',b107:'0',b108:'290984/26/61340-ИП',b109:'06.01.2026',b110:'0'},
-   collect:{c48:'23.09.2026',cLimit:'11497427',c70:'Взыскание по исполнительному производству',c38:'9',c39:'3',c40:'181110362/8804',c41:'23.09.2026'},
-   ed107:null},
+   budget:{b101:'35',b104:'54667011946383440120',b105:'36324521',b106:'ТП',b107:'МС.07.2026',b108:'667',b109:'01.07.2026',b110:'846'},
+   collect:{c48:'27.07.2026',cLimit:'25292004',c70:'Рыдетаке козяха ха хякоху позу',c38:'5',c39:'96',c40:'382806550',c41:'12.09.2026'},
+   ed107:{relId:'2719',initId:'74930',relDate:'24.09.2026',execDate:'24.09.2026',
+     v:{'OrderingBank/BIC':'048768792','OrderingBank/ed:Name':'БАНК «МУДЫТЫ» (АО)','OrderingBank/BankAccount':'30101810766322191206','OrderingBank/SWBIC':'FPNTRU2T','InstructingAgent/BIC':'042878504','InstructingAgent/CorrespAcc':'30101810317932318025','InstructingAgent/SWBIC':'ZZULRUAZ','InstructedAgent/BIC':'047521494','InstructedAgent/CorrespAcc':'30101810721171571828','InstructedAgent/SWBIC':'DVHURU8C'}}},
   source:{ED244:'<?xml version="1.0" encoding="UTF-8"?>\n<ed:ED244 xmlns:ed="urn:cbr-ru:ed:v2.0" EDNo="3668" EDDate="2026-09-24" EDAuthor="6918470000" EDReceiver="9869552771" Sum="2384" PaymentPrecedence="4">\n  <ed:AccDoc AccDocNo="714297" AccDocDate="2026-09-23"/>\n  <ed:Payer PersonalAcc="40817810122440937855" INN="724963654922">\n    <ed:Name>ПЯРИФООВА ТЯХОР ВУПЯОВНА</ed:Name>\n    <ed:Bank BIC="045927897" CorrespAcc="30101810434016985259"/>\n  </ed:Payer>\n  <ed:Payee PersonalAcc="03212015887737416204" INN="6906224315" KPP="102930012">\n    <ed:Name>УФК ПО ДУВЫМЯСКОЙ ОБЛАСТИ</ed:Name>\n    <ed:Bank BIC="014948298" CorrespAcc="40102810113853348959"/>\n  </ed:Payee>\n  <ed:Purpose>Взыскание по исп. пост. 228808703/5707 от 12.07.2026</ed:Purpose>\n</ed:ED244>'}
 }));
 /* индексы документов стенда по семействам: a — левый drawer, b — правый, ret — «платёжка и возврат рядом» */
@@ -1305,23 +1321,28 @@ function rubPartyHtml(d,p){var S=d.r.party.s||{},R=d.r.party.r||{};
       return '<div class="rpr'+(empty?' null':'')+'"><span class="nm">'+rlbl(k)+'</span>'+rval(k,a)+rval(k,b)+'</div>'}).join('')+'</div>'}
 function rubTextHtml(d,key){var v=d.r[key];return '<div class="rtxt'+(v?'':' null')+'"><span class="lbl">'+esc(RFIELDS[key].name)+'</span><span class="v">'+(v?esc(v):'—')+'</span></div>'}
 /* свёрнутый блок: без данных — бледный заголовок без раскрытия, чтобы состав блоков не прыгал между документами */
-function rubSectionHtml(d,u,key){var s=RSECTIONS[key],data=d.r[key],has=!!data&&(Array.isArray(data)?data.length:Object.keys(data).some(function(k){return data[k]!=null&&data[k]!==''})),shut=!!u.shut[key];
+function filled(o){if(!o)return false;if(Array.isArray(o))return o.length>0;if(typeof o==='object')return Object.keys(o).some(function(k){return filled(o[k])});return o!==''}
+function rubSectionHtml(d,u,key){var s=RSECTIONS[key],data=d.r[key],has=filled(data),shut=!!u.shut[key];
   if(!has)return '<div class="blk empty"><div class="bh"><h5>'+esc(s.title)+'</h5><span class="lbl">нет данных</span></div></div>';
   var body='';
-  if(s.kind==='kv')body='<div class="rsec">'+s.rows.map(function(k){return '<div class="xr"><span class="nm">'+rlbl(k)+'</span><span class="kv">'+rval(k,data[k])+'</span></div>'}).join('')+'</div>';
+  if(s.kind==='kv')body='<div class="rsec">'+s.rows.map(function(k){return k==='|'?'<div class="rsep"></div>':'<div class="xr"><span class="nm">'+rlbl(k)+'</span><span class="kv">'+rval(k,data[k])+'</span></div>'}).join('')+'</div>';
   else if(s.kind==='table'){var cols=s.cols.map(function(c){return c[2]}).join(' ');
     body='<div class="tt rtab"><div class="th" style="grid-template-columns:'+cols+'">'+s.cols.map(function(c){return '<span>'+esc(c[0])+'</span>'}).join('')+'</div>'+
       data.map(function(row){return '<div class="tr" style="grid-template-columns:'+cols+'">'+s.cols.map(function(c){return '<span class="cut" title="'+esc(row[c[1]])+'">'+rval(c[1],row[c[1]])+'</span>'}).join('')+'</div>'}).join('')+'</div>'}
-  else if(s.kind==='ed107')
-    body='<div class="rsec"><div class="kvs">'+data.head.map(function(h){return '<span class="lbl">'+esc(h[0])+'</span>'+rval('',h[1])}).join('')+'</div>'+
-      data.groups.map(function(g){return '<h6>'+esc(g.title)+'</h6>'+g.rows.map(function(rw){return '<div class="xr"><span class="nm mono">'+esc(rw[0])+'</span><span class="kv">'+rval('',rw[1])+'</span></div>'}).join('')}).join('')+'</div>';
+  else if(s.kind==='ed107'){var v=data.v||{};
+    body='<div class="rsec"><div class="kvs">'+s.head.map(function(h){return '<span class="lbl">'+esc(h[1])+'</span>'+rval('',data[h[0]])}).join('')+'</div>'+
+      s.groups.map(function(g){var gk='ed107.'+g.id,gs=!!u.shut[gk],cnt=g.rows.filter(function(r){return v[g.node+'/'+r]}).length;
+        return '<h6 class="sub" data-tg="'+gk+'" role="button" tabindex="0" aria-expanded="'+!gs+'">'+esc(g.title)+'<span class="n">'+cnt+' / '+g.rows.length+'</span><span class="chev">'+(gs?'▼':'▲')+'</span></h6>'+
+          (gs?'':g.rows.map(function(r){var path=g.node+'/'+r;return '<div class="xr'+(v[path]?'':' null')+'"><span class="nm mono">ed:'+esc(path)+'</span><span class="kv">'+rval(r==='BIC'||/Acc|Account/.test(r)?'bic':'',v[path])+'</span></div>'}).join(''))}).join('')+'</div>'}
   return '<div class="blk'+(shut?' shut':'')+'"><div class="bh txh" data-tg="'+key+'" title="'+(shut?'Показать':'Свернуть')+'"><h5>'+esc(s.title)+'</h5>'+(s.kind==='table'?'<span class="cnt">'+data.length+'</span>':'')+
     '<button class="tg" data-tg="'+key+'" aria-label="Свернуть или развернуть" style="margin-left:auto">▲</button></div><div class="bb" style="padding:0">'+body+'</div></div>'}
 function rubHtml(di){var d=DOCS[di],u=ui[di],T=typeOf(d),p=PROFILES[T];
   return foldHtml()+dhHtml(d,'Платёжная инструкция')+laneHtml(d,T,p)+tabsHtml(d,u)+
     (u.tab!=='main'?'<div class="db">'+viewHtml(di)+'</div>':'<div class="db">'+rubHeroHtml(d)+rubScenHtml(d)+
       txBlockHtml(d,u,'<a class="lnk" data-tip="Запросить остатки по счетам транзакции">Проверить баланс</a>')+
-      rubPartyHtml(d,p)+p.text.map(function(k){return rubTextHtml(d,k)}).join('')+p.sections.map(function(k){return rubSectionHtml(d,u,k)}).join('')+'</div>')}
+      rubPartyHtml(d,p)+p.text.map(function(k){return rubTextHtml(d,k)}).join('')+
+      '<div class="fh"><h5>Дополнительные блоки</h5>'+(function(){var any=p.sections.some(function(k){return filled(d.r[k])&&u.shut[k]});return '<a class="lnk" data-rall="'+(any?'open':'shut')+'">'+(any?'Развернуть все':'Свернуть все')+'</a>'})()+'</div>'+
+      p.sections.map(function(k){return rubSectionHtml(d,u,k)}).join('')+'</div>')}
 /* ---- остальные вкладки ---- */
 function tmHtml(t){var m=/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2}:\d{2})(\.\d+)?/.exec(t||'');return m?'<span class="tm" data-tip="'+esc(t)+'">'+m[3]+'.'+m[2]+' <b>'+m[4]+'</b>'+(m[5]?'<span style="color:var(--faint)">'+m[5].slice(0,4)+'</span>':'')+'</span>':'<span class="tm">'+esc(t||'—')+'</span>'}
 function ms(t){return new Date((t||'').replace(' ','T')+'Z').getTime()}
@@ -1616,6 +1637,7 @@ pair.addEventListener('click',function(e){
   var tb=e.target.closest('[data-tab]');if(tb){u.tab=tb.dataset.tab;tabLoad(di);return}
   var tg=e.target.closest('[data-tg]');if(tg){u.shut[tg.dataset.tg]=!u.shut[tg.dataset.tg];render(di);return}
   if(e.target.closest('[data-all]')){u.all=!u.all;render(di);return}
+  var ra=e.target.closest('[data-rall]');if(ra){var op=ra.dataset.rall==='open';PROFILES[typeOf(d)].sections.forEach(function(k){u.shut[k]=!op});render(di);return}
   var ob=e.target.closest('[data-opts] button');
   if(ob){ob.parentNode.querySelectorAll('button').forEach(function(b){b.setAttribute('aria-pressed',String(b===ob))});return}
   var act=e.target.closest('[data-act]');
@@ -1644,7 +1666,7 @@ pair.addEventListener('click',function(e){
   if(c){var no=c.dataset.no,opening=!u.open.has(no),mates=rowMates(no,d);mates.forEach(function(t){var f=d.f[t];if(opening){if(!isNull(f))u.open.add(t)}else u.open.delete(t)});render(di);var n=dw.querySelector('[data-no="'+no+'"]');if(n)n.focus();}
 });
 document.addEventListener('click',function(e){if(!e.target.closest('.more,.tabmenu'))[].forEach.call(document.querySelectorAll('.tabmenu'),function(m){m.remove()});if(!e.target.closest('.ib.hasmenu,.actmenu')){[].forEach.call(document.querySelectorAll('.actmenu'),function(m){m.remove()});[].forEach.call(document.querySelectorAll('.ib.hasmenu[aria-expanded="true"]'),function(b){b.setAttribute('aria-expanded','false')})}});
-pair.addEventListener('keydown',function(e){var c=e.target.closest&&e.target.closest('.pen,[data-no][tabindex]');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();c.click();}});
+pair.addEventListener('keydown',function(e){var c=e.target.closest&&e.target.closest('.pen,[data-no][tabindex],h6.sub[data-tg]');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();c.click();}});
 function validate(fe){
   var box=fe.querySelector('.box[data-w]'),W=+box.dataset.w,N=+box.dataset.n,errs=[],total=0,X=/^[A-Z0-9\/\-\?:\(\)\.,'\+ ]*$/i;
   fe.querySelectorAll('[data-ln]').forEach(function(inp,k){var v=inp.value;total+=v.length;var bad=false;
