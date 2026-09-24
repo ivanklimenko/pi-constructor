@@ -212,6 +212,9 @@ body.resizing{cursor:col-resize;user-select:none}
 .grid .srl .k{display:inline-block;width:14px;font:11px var(--sans);color:var(--faint)}
 .grid .srl .cv{font:12.5px var(--mono);color:var(--ink);max-width:none}
 /* счёт в маршруте: первые 8 знаков (6–8 — код валюты) … последние 3 */
+/* маршрут: тип (LORO / NOSTRO) · BIC получателя · счёт в общем формате */
+.grid td.route .l2{margin-top:1px;color:var(--ink2)}
+.grid td.route .l2 .mono{font-size:12px}
 .grid .acct b{font-weight:600;color:var(--ink)}
 .grid .acct .e{color:var(--faint);padding:0 1px}
 .grid .nl{color:var(--faint)}
@@ -343,7 +346,7 @@ function rowHtml(d,i,ord){
    (CCY_COL?'<td rowspan="2"><span class="amt">'+cv(d.amount)+'</span></td><td rowspan="2" class="ccy">'+cv(d.ccy,'tag mt')+'</td>':'<td rowspan="2"><span class="amt">'+cv(d.amount)+'</span><span class="l2">'+cv(d.ccy)+'</span></td>')+
    '<td class="f5">'+fld(d.f['50'])+'</td>'+
    '<td class="f5">'+fld(d.f['52'])+'</td><td class="f5">'+fld(d.f['57'])+'</td><td class="f5">'+fld(d.f['58'])+'</td><td class="f5">'+fld(d.f['59'])+'</td>'+
-   '<td rowspan="2">'+acct(d.route.acc)+'<span class="l2">'+cv(d.route.type)+' → '+cv(d.route.recv)+'</span></td>'+
+   '<td rowspan="2" class="route">'+cv(d.route.type,'tag')+'<span class="l2">'+cv(d.route.recv,'mono')+'</span><span class="l2">'+acct(d.route.acc)+'</span></td>'+
    '<td class="sr" rowspan="2">'+srPair(d.inS,d.inR)+'</td>'+
    '<td class="sr" rowspan="2">'+srPair(d.outS,d.outR)+'</td>'+
    '<td class="sr prov" rowspan="2">'+cv(d.provS,'tag snd')+cv(d.provR,'tag rcv')+'</td></tr>'+
