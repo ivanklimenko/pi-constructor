@@ -1740,7 +1740,7 @@ function acct(v){
   v=String(v==null?'':v);
   if(v.length<12)return cv(v,'mono',110);
   return '<span class="cv mono acct" data-short data-v="'+esc(v)+'">'+
-         esc(v.slice(0,5))+'<b>'+esc(v.slice(5,8))+'</b><span class="e">…</span>'+esc(v.slice(-3))+'</span>';
+         esc(v.slice(0,5))+'<b>'+esc(v.slice(5,8))+'</b><span class="e">…</span>'+esc(v.slice(-4))+'</span>';
 }
 function srPair(s,r){
   return '<span class="srl"><span class="k">S:</span>'+cv(s)+'</span>'+
