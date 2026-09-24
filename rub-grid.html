@@ -873,7 +873,7 @@ function tabsFor(d){return famOf(d)==='rub'?TABS_RUB:TABS}
 
 /* ===================== ДАННЫЕ ===================== */
 var ACTIONS=[
-  {id:'refresh',t:'Обновить',k:'F5'},{id:'edit',t:'Редактировать',k:'E'},{id:'esid',t:'Создать ЭСИД по документу'},
+  {id:'refresh',t:'Обновить',k:'F5'},{id:'edit',t:'Редактировать',k:'E'},{id:'esid',t:'Создать служебный документ'},
   {id:'down',t:'Скачать SWIFT-сообщение'},{id:'print',t:'Печать',menu:['Платёжное поручение','Мемориальный ордер','Форма SWIFT']},{id:'link',t:'Скопировать ссылку на документ'},
   {id:'ban',t:'Аннулировать',danger:1}
 ];
@@ -910,103 +910,103 @@ var TX6=[
  {dir:'CREDIT',st:'EXECUTED',acc:'70601840100000000519',reg:'00020_CommissionIncome',time:'2026-09-22 07:35:01.121Z',amount:'35.00',ccy:'USD'},
  {dir:'DEBIT',st:'PENDING',acc:'47422840500000000311',reg:'00030_FxConversion',time:'—',amount:'1 148 300.00',ccy:'EUR'}];
 var DOCS=[
- {status:'DONE',st:'ok',dirTxt:'входящий от ЕРС на клиента',tabsOff:[],uuid:'19ea6301-209c-4185-9a9f-6619d79f8a97',
+ {status:'DONE',st:'ok',dirTxt:'входящий от ЕРС на клиента',tabsOff:[],uuid:'03e8b84b-d1c5-4f07-aa49-8be3e9e4c8e8',
   linked:[
-   {date:'2026-09-23',type:'InternalPAYDOCVAL',status:'NEW',st:'wait',id:'7c02b9e4-51aa-4f0e-8d13-2b7f0c9e41d5',rel:'CHILD',processed:'23.09.2026 09:02:11',posted:'2026-09-23',kind:'SHA',purpose:'MT103 USD 1249965.00 23.09.2026 возврат (1.6.2.2.1.)',
+   {date:'2026-09-23',type:'InternalFXDOC',status:'NEW',st:'wait',id:'a18d3c05-b393-4252-a3c1-c93791937ccc',rel:'CHILD',processed:'23.09.2026 09:02:11',posted:'2026-09-23',kind:'SHA',purpose:'MT103 USD 1249965.00 23.09.2026 возврат (1.6.2.2.1.)',
     dt:{acc:'40817840100050017762',amount:'1 249 965.00',ccy:'USD',reg:'00010_ClientCurrent'},kt:{acc:'30110840700000001842',amount:'1 249 965.00',ccy:'USD',reg:'00000_NostroUSD'},
     from:{name:'SEMENOVA IRINA VLADIMIROVNA',acc:'40817840100050017762',extra:''},to:{name:'LAVRENTIEV DMITRY OLEGOVICH',acc:'40817840500010042371',extra:'RETURN OF FX2609220000417'}},
-   {date:'2026-09-22',type:'InternalCOMMISSION',status:'DONE',st:'ok',id:'3f8a12c0-7d4e-4b9a-a1c2-58e0d9f7b614',rel:'CHILD',processed:'22.09.2026 07:35:01',posted:'2026-09-22',kind:'OUR',purpose:'Комиссия за входящий перевод по тарифу OUR',
+   {date:'2026-09-22',type:'InternalFXFEE',status:'DONE',st:'ok',id:'5e9b7255-c859-4786-b92a-5315c1b73227',rel:'CHILD',processed:'22.09.2026 07:35:01',posted:'2026-09-22',kind:'OUR',purpose:'Комиссия за входящий перевод по тарифу OUR',
     dt:{acc:'40817840100050017762',amount:'35.00',ccy:'USD',reg:'00010_ClientCurrent'},kt:{acc:'70601840100000000519',amount:'35.00',ccy:'USD',reg:'00020_CommissionIncome'},
     from:{name:'SEMENOVA IRINA VLADIMIROVNA',acc:'40817840100050017762',extra:''},to:{name:'VOSTOCHNY KREDIT BANK',acc:'70601840100000000519',extra:'Тариф 4.2.1'}}],
   source:{
    swiftMessage:"{1:F01VKRBRU8KXXXX0427047245}{2:O1030731260922NRDIRUMMXXXX04270806512609220731N}{3:{108:1IBSR00048090722}{111:001}{121:eb6305c9-1f8c-41e3-a3b2-6d7e9f2a4c10}}{4:\n:20:FX2609220000417\n:23B:CRED\n:32A:260922USD1250000,00\n:33B:EUR1148300,00\n:36:1,0886\n:50F:/40817840500010042371\n1/LAVRENTIEV DMITRY OLEGOVICH\n2/ULITSA PROFSOYUZNAYA 83-1-214\n3/RU/MOSCOW, 117279\n:52A:NRDIRUMMXXX\n:53A:BCLHLV22XXX\n:54A:HSTBDEHHXXX\n:56A:MRDNGB2LXXX\n:57A:VKRBRU8KXXX\n:59F:/40817840100050017762\n1/SEMENOVA IRINA VLADIMIROVNA\n2/PROSPEKT MIRA 101-2-45\n3/RU/MOSCOW, 129085\n:70:/INV/ 2026-0417 DD 15.09.2026\nPAYMENT FOR CONSULTING SERVICES\nUNDER CONTRACT 12-45 DD 01.03.2026\nVAT NOT APPLICABLE\n:71A:OUR\n:71F:USD35,00\n:72:/INS/NRDIRUMMXXX\n/ACC/PLEASE CREDIT WITHOUT DELAY\n/REC/REF FX2609220000417\n:77B:/ORDERRES/RU//CONTRACT 12-45 DD 01.03.2026\n-}{5:{MAC:00000000}{CHK:00009443BE30}}{S:{MDG:A35B7A2E46531D1AAD9937DB5DB4CA4F2E3EAEBEF323B6E8EED6769B454F0E91}}",
    outgoingSwiftMessage:"{1:F01VKRBRU8KXXXX0000000000}{2:I103BCLHLV22XXXXN}{3:{121:eb6305c9-1f8c-41e3-a3b2-6d7e9f2a4c10}}{4:\n:20:VK2609220000417\n:23B:CRED\n:32A:260922USD1250000,00\n:50F:/40817840500010042371\n1/LAVRENTIEV DMITRY OLEGOVICH\n2/ULITSA PROFSOYUZNAYA 83-1-214\n3/RU/MOSCOW, 117279\n:52A:NRDIRUMMXXX\n:57A:VKRBRU8KXXX\n:59F:/40817840100050017762\n1/SEMENOVA IRINA VLADIMIROVNA\n:70:/INV/ 2026-0417 DD 15.09.2026\n:71A:OUR\n-}"},
-  mpu:[{id:'82d0e640-5855-4c5b-b8e4-e1f5211c03c4',type:'MT199',created:'2026-09-22T04:35:02.121Z',exportStatus:'SENT',exported:'2026-09-22T04:35:47.308Z',receiver:'NRDIRUMMXXX',docReference:'VK2609220000417',
+  mpu:[{id:'ee8bf4eb-5545-4f07-9617-8a5e7106302f',type:'MT199',created:'2026-09-22T04:35:02.121Z',exportStatus:'SENT',exported:'2026-09-22T04:35:47.308Z',receiver:'NRDIRUMMXXX',docReference:'VK2609220000417',
     swift:"{1:F01VKRBRU8KXXXX0000000000}{2:I199NRDIRUMMXXXXN}{3:{121:eb6305c9-1f8c-41e3-a3b2-6d7e9f2a4c10}}{4:\n:20:VK2609220000417\n:21:FX2609220000417\n:79:YOUR MT103 FX2609220000417 DD 22.09.2026\nUSD 1250000,00 HAS BEEN CREDITED TO\nBENEFICIARY ACCOUNT VALUE 22.09.2026.\nOUR CHARGES USD 35,00 DEDUCTED (71A OUR).\nBEST REGARDS. SETTLEMENTS CENTRE\n-}"}],
-  compliance:{rec:{id:'6a0973c5-5b12-443a-942a-2b6f897aa0ff',start:'2026-09-22 07:31:48.126',end:'2026-09-22 07:31:52.601',nzr:'Нет'},
+  compliance:{rec:{id:'3e854037-b84c-40ee-90e0-440734c1d5e3',start:'2026-09-22 07:31:48.126',end:'2026-09-22 07:31:52.601',nzr:'Нет'},
    neg:{decision:'',direction:'',comment:''},
-   spm:{start:'2026-09-22 07:31:48.220',end:'2026-09-22 07:31:49.601',decision:'ALLOW',txId:'e0ca5acb593840d9a3659ff8b962d8de',reqAt:'2026-09-22 07:31:49.354',clientId:'PKBUL9991265908224'},
+   spm:{start:'2026-09-22 07:31:48.220',end:'2026-09-22 07:31:49.601',decision:'ALLOW',txId:'97cae8c7162531f4093e1db5d7171bde',reqAt:'2026-09-22 07:31:49.354',clientId:'CLT0000123456789'},
    dkk:{start:'2026-09-22 07:31:49.719',end:'2026-09-22 07:31:52.601',decision:'ALLOW'},
-   hist:[['22.09.2026 07:31:51','2176_MSFM','UFM UMMT']]},
+   hist:[['22.09.2026 07:31:51','3308_CTRL','DEP 0417']]},
   statuses:[
-   ['2026-09-22 07:31:45.241','—','pmts-curr-duplicate-checker.end',''],
-   ['2026-09-22 07:31:45.642','SC_CURR_INCOMING','pmts-curr-in-checks.start',''],
-   ['2026-09-22 07:31:47.542','SC_CURR_INCOMING','pmts-curr-in-checks.end',''],
-   ['2026-09-22 07:31:48.141','SC_CURR_INCOMING','pmts-curr-in-routing.start','Ожидание решения сотрудника'],
-   ['2026-09-22 07:33:20.383','SC_CURR_INCOMING','pmts-curr-in-routing.end',''],
-   ['2026-09-22 07:33:21.709','SC_CURR_CREDIT_CLIENT','pmts-curr-crediting-client.start',''],
-   ['2026-09-22 07:33:22.957','SC_CURR_CREDIT_CLIENT','pmts-curr-crediting-client.end',''],
-   ['2026-09-22 07:33:23.413','SC_CURR_CREDIT_CLIENT','pmts-curr-general-postprocess.start',''],
-   ['2026-09-22 07:33:24.312','SC_CURR_CREDIT_CLIENT','pmts-curr-general-postprocess.end',''],
-   ['2026-09-22 07:35:00.814','SC_CURR_CREDIT_CLIENT','pmts-curr-accounting-sgm.start',''],
-   ['2026-09-22 07:35:01.820','SC_CURR_CREDIT_CLIENT','pmts-curr-accounting-sgm.end',''],
-   ['2026-09-22 07:35:01.915','SC_CURR_CREDIT_CLIENT','pmts.finish','']],
+   ['2026-09-22 07:31:45.241','—','fx-dup-check.end',''],
+   ['2026-09-22 07:31:45.642','RT_FX_IN','fx-in-checks.start',''],
+   ['2026-09-22 07:31:47.542','RT_FX_IN','fx-in-checks.end',''],
+   ['2026-09-22 07:31:48.141','RT_FX_IN','fx-in-routing.start','Ожидание решения сотрудника'],
+   ['2026-09-22 07:33:20.383','RT_FX_IN','fx-in-routing.end',''],
+   ['2026-09-22 07:33:21.709','RT_FX_CREDIT','fx-credit-client.start',''],
+   ['2026-09-22 07:33:22.957','RT_FX_CREDIT','fx-credit-client.end',''],
+   ['2026-09-22 07:33:23.413','RT_FX_CREDIT','fx-postprocess.start',''],
+   ['2026-09-22 07:33:24.312','RT_FX_CREDIT','fx-postprocess.end',''],
+   ['2026-09-22 07:35:00.814','RT_FX_CREDIT','fx-accounting.start',''],
+   ['2026-09-22 07:35:01.820','RT_FX_CREDIT','fx-accounting.end',''],
+   ['2026-09-22 07:35:01.915','RT_FX_CREDIT','fx.finish','']],
   tasks:[
-   {st:'ok',type:'PAYMENT_INSTRUCTION',at:'2026-09-22 07:31:59',text:'Требуется подтвердить маршрут; требуется утвердить зачисление по клиентскому счёту 40817840100050017762',who:'Петрова А. С.',done:'2026-09-22 07:33:20',hist:[['07:31:59','Создана: pmts-curr-in-routing'],['07:32:40','Взята в работу: Петрова А. С.'],['07:33:20','Решение: маршрут подтверждён, зачисление утверждено']]},
-   {st:'info',type:'PAYMENT_INSTRUCTION',at:'2026-09-22 07:35:02',text:'Комиссия USD 35,00 удержана по тарифу OUR; проверить корректность тарифного плана клиента',who:'',done:'',hist:[['07:35:02','Создана: pmts-curr-accounting-sgm']]}],
+   {st:'ok',type:'PAYMENT_INSTRUCTION',at:'2026-09-22 07:31:59',text:'Требуется подтвердить маршрут; требуется утвердить зачисление по клиентскому счёту 40817840100050017762',who:'Иванова М. П.',done:'2026-09-22 07:33:20',hist:[['07:31:59','Создана: fx-in-routing'],['07:32:40','Взята в работу: Иванова М. П.'],['07:33:20','Решение: маршрут подтверждён, зачисление утверждено']]},
+   {st:'info',type:'PAYMENT_INSTRUCTION',at:'2026-09-22 07:35:02',text:'Комиссия USD 35,00 удержана по тарифу OUR; проверить корректность тарифного плана клиента',who:'',done:'',hist:[['07:35:02','Создана: fx-accounting']]}],
   stream:[
-   ['2026-09-22 07:33:24.795','UPP','УПП','pmts_curr_event_crediting_end','SENT',1],
-   ['2026-09-22 07:35:01.866','UPP','УПП','pmts_curr_event_account_end','SENT',1],
-   ['2026-09-22 07:35:01.902','DWH','Хранилище','pmts_curr_event_finish','SENT',2]],
+   ['2026-09-22 07:33:24.795','MSB','Шина сообщений','fx_evt_credit_end','SENT',1],
+   ['2026-09-22 07:35:01.866','MSB','Шина сообщений','fx_evt_account_end','SENT',1],
+   ['2026-09-22 07:35:01.902','DWH','Хранилище','fx_evt_finish','SENT',2]],
   notif:[
    ['2026-09-22 07:31:46.000',3,'TIMEOUT','accepted'],
-   ['2026-09-22 07:33:25.000',1,'OK','confirmCOT'],
-   ['2026-09-22 07:35:02.000',3,'TIMEOUT','confirmCredit']],
+   ['2026-09-22 07:33:25.000',1,'OK','confirmAck'],
+   ['2026-09-22 07:35:02.000',3,'TIMEOUT','confirmCrd']],
   audit:{
-   commonSection:{creationDate:'2026-09-22T04:31:45.051765Z',paymentServiceProvider:'SUBOUL',paymentFlow:null,paymentInitiatorSystem:'ERS.ERS_1',sourceSystem:'OPS',resending:false},
+   commonSection:{creationDate:'2026-09-22T04:31:45.051765Z',paymentServiceProvider:'SUBOUL',paymentFlow:null,paymentInitiatorSystem:'ERS.ERS_1',sourceSystem:'SRC1',resending:false},
    documentSection:{docReferenceIn:'FX2609220000417',docReferenceOut:'VK2609220000417',messageType:'MT103',amount:1250000.00,currency:'USD',valueDate:'2026-09-22',uetr:'eb6305c9-1f8c-41e3-a3b2-6d7e9f2a4c10'},
    originalDocumentSection:{receivedAt:'2026-09-22T04:31:44Z',sender:'NRDIRUMMXXX',receiver:'VKRBRU8KXXX',rawLength:612,hash:'sha256:9f3c…a1e0'},
-   statusSections:{count:12,last:'pmts.finish',lastAt:'2026-09-22T04:35:01.915Z'},
+   statusSections:{count:12,last:'fx.finish',lastAt:'2026-09-22T04:35:01.915Z'},
    accountingSection:{debitAccount:'30110840700000001842',creditAccount:'40817840100050017762',postings:6,executed:4,canceled:1,pending:1},
-   paymentTransactionSections:{transactionId:'cf03cfd4-246d-4669-889f-63bc1af67574',registers:['00000_NostroUSD','00010_ClientCurrent','00020_CommissionIncome','00030_FxConversion']},
-   taskSections:{open:1,closed:1,lastAssignee:'Петрова А. С.'},
+   paymentTransactionSections:{transactionId:'ba5ac473-d0a4-40ea-b639-47326d3b8e45',registers:['00000_NostroUSD','00010_ClientCurrent','00020_CommissionIncome','00030_FxConversion']},
+   taskSections:{open:1,closed:1,lastAssignee:'Иванова М. П.'},
    outgoingRoutingSections:{routeType:'NOSTRO',nostroAccount:'30114840900000000517',receiver:'BCLHLV22XXX',rule:'USD_EU_COUNTERPARTIES_V3'},
    controlAttributesSection:{complianceCheck:'PASSED',sanctionsCheck:'PASSED',duplicateCheck:'PASSED',manualReview:true},
-   manualOperationRecordsSection:{records:1,last:{at:'2026-09-22T07:42:00Z',user:'Петрова А. С.',field:'57',action:'EDIT'}}},uetr:'eb6305c9-1f8c-41e3-a3b2-6d7e9f2a4c10',created:'22.09.2026 07:31:45',
+   manualOperationRecordsSection:{records:1,last:{at:'2026-09-22T07:42:00Z',user:'Иванова М. П.',field:'57',action:'EDIT'}}},uetr:'eb6305c9-1f8c-41e3-a3b2-6d7e9f2a4c10',created:'22.09.2026 07:31:45',
   num:'417',numDate:'22.09.26',amount:'1 250 000.00',ccy:'USD',vd:['22.09.2026','22.09.2026','22.09.2026','22.09.2026'],
   inS:'NRDIRUMMXXX',inR:'VKRBRU8KXXX',outS:'VKRBRU8KXXX',outR:'BCLHLV22XXX',r20out:'VK2609220000417',
   dt:'30110 840 7 0000 0001842',kt:'40817 840 1 0005 0017762',
   route:{type:'NOSTRO',acc:'30114840900000000517',desc:'Счёт ностро в Baltic Clearing Bank (Рига), USD',recv:'BCLHLV22XXX',text:'Маршрут через Baltic Clearing по правилу для USD от контрагентов ЕС; прямой корсчёт с NORDINVEST закрыт с 01.07.2026'},
-  txId:'cf03cfd4-246d-4669-889f-63bc1af67574',txDate:'2026-09-22 07:33:21',txs:TX6,
+  txId:'ba5ac473-d0a4-40ea-b639-47326d3b8e45',txDate:'2026-09-22 07:33:21',txs:TX6,
   f:{'20':{lines:['FX2609220000417']},'21':{lines:['NONREF']},'71A':{lines:['OUR']},'71B':{lines:[]},'71F':{lines:['USD 35,00']},'71G':{lines:[]},'33B':{lines:['EUR 1148300,00']},'36':{lines:['1,0886']},'77B':{lines:['/ORDERRES/RU//CONTRACT 12-45 DD 01.03.2026']},
      '50':cl(P50),'59':cl(P59),'52':cl(B52),'53':cl(B53),'54':cl(B54),'55':cl(B55),'56':cl(B56),
-     '57':{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8KXXX'],edit:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BRANCH','VKRBRU8K2KD'],who:'Петрова А. С.',when:'22.09.2026 10:42'},
-       hist:[{who:'Сидоров К. В.',when:'22.09.2026 09:15',was:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8KXXX']},now:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8K2KD']},note:'BIC филиала по справочнику',status:'confirmed',by:'Лебедева О. Н.',at:'22.09.2026 09:40'},
-             {who:'Петрова А. С.',when:'22.09.2026 10:42',was:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8K2KD']},now:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BRANCH','VKRBRU8K2KD']},note:'Полное наименование филиала',status:'pending'}]},
+     '57':{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8KXXX'],edit:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BRANCH','VKRBRU8K2KD'],who:'Иванова М. П.',when:'22.09.2026 10:42'},
+       hist:[{who:'Кузнецов Д. А.',when:'22.09.2026 09:15',was:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8KXXX']},now:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8K2KD']},note:'BIC филиала по справочнику',status:'confirmed',by:'Смирнова Е. В.',at:'22.09.2026 09:40'},
+             {who:'Иванова М. П.',when:'22.09.2026 10:42',was:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8K2KD']},now:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BRANCH','VKRBRU8K2KD']},note:'Полное наименование филиала',status:'pending'}]},
      '58':cl(B58),
      '70':{lines:T70},'72':{lines:T72},
      '79':{lines:['RE YOUR MT103 FX2609220000417 DD 22.09.2026','AMOUNT USD 1250000,00','PLS BE ADVISED THAT BENEFICIARY ACCOUNT','40817840100050017762 IS CLOSED.','KINDLY AUTHORIZE US TO RETURN THE FUNDS','LESS OUR CHARGES USD 35,00','OR PROVIDE AMENDED BENEFICIARY DETAILS.','BEST REGARDS','PAYMENTS DEPT, VOSTOCHNY KREDIT BANK']},
      'B.50':cl(P50),'B.59':cl(P59),'B.52':cl(B52),'B.57':cl(B57),'B.56':cl(B56),'B.70':{lines:T70},'B.72':{lines:['/INS/ NRDIRUMMXXX','/BNF/ COVER FOR FX2609220000417']},'B.33B':{lines:['EUR 1148300,00']}}
  },
- {status:'NEW',st:'wait',dirTxt:'исходящий возврат',tabsOff:['Нотификации','Стриминг','MPU'],uuid:'7c02b9e4-51aa-4f0e-8d13-2b7f0c9e41d5',
-  linked:[{date:'2026-09-22',type:'InternalPAYDOCVAL',status:'DONE',st:'ok',id:'19ea6301-209c-4185-9a9f-6619d79f8a97',rel:'PARENT',processed:'22.09.2026 07:35:01',posted:'2026-09-22',kind:'OUR',purpose:'MT103 USD 1250000.00 22.09.2026 код (1.6.2.2.1.)',
+ {status:'NEW',st:'wait',dirTxt:'исходящий возврат',tabsOff:['Нотификации','Стриминг','MPU'],uuid:'a18d3c05-b393-4252-a3c1-c93791937ccc',
+  linked:[{date:'2026-09-22',type:'InternalFXDOC',status:'DONE',st:'ok',id:'03e8b84b-d1c5-4f07-aa49-8be3e9e4c8e8',rel:'PARENT',processed:'22.09.2026 07:35:01',posted:'2026-09-22',kind:'OUR',purpose:'MT103 USD 1250000.00 22.09.2026 код (1.6.2.2.1.)',
     dt:{acc:'30110840700000001842',amount:'1 250 000.00',ccy:'USD',reg:'00000_NostroUSD'},kt:{acc:'40817840100050017762',amount:'1 250 000.00',ccy:'USD',reg:'00010_ClientCurrent'},
     from:{name:'LAVRENTIEV DMITRY OLEGOVICH',acc:'40817840500010042371',extra:''},to:{name:'SEMENOVA IRINA VLADIMIROVNA',acc:'40817840100050017762',extra:'/INV/ 2026-0417'}}],
   source:{swiftMessage:'',outgoingSwiftMessage:"{1:F01VKRBRU8KXXXX0000000000}{2:I103NRDIRUMMXXXXN}{3:{121:4a1d7e20-9b3f-4c58-8e61-0f2c5d7a9b33}}{4:\n:20:RT2609230000018\n:21:FX2609220000417\n:23B:CRED\n:32A:260923USD1249965,00\n:50F:/40817840100050017762\n1/SEMENOVA IRINA VLADIMIROVNA\n2/PROSPEKT MIRA 101-2-45\n3/RU/MOSCOW, 129085\n:52A:VKRBRU8KXXX\n:53A:BCLHLV22XXX\n:57A:NRDIRUMMXXX\n:59F:/40817840500010042371\n1/LAVRENTIEV DMITRY OLEGOVICH\n:70:/RETN/ RETURN OF FX2609220000417\n/RC/ AC01 BENEFICIARY ACCOUNT CLOSED\n:71A:SHA\n:72:/REC/RETURN OF FUNDS\n-}"},
   mpu:[],
-  compliance:{rec:{id:'b1e4c7d2-08f3-4a6e-9d21-7c5f0e3a9b88',start:'2026-09-23 09:02:14.126',end:'',nzr:'Нет'},
+  compliance:{rec:{id:'135499bc-414f-476b-8e12-990d80905be5',start:'2026-09-23 09:02:14.126',end:'',nzr:'Нет'},
    neg:{decision:'',direction:'',comment:''},
-   spm:{start:'2026-09-23 09:02:14.220',end:'2026-09-23 09:02:15.601',decision:'ALLOW',txId:'7f21c9ab4e0d4c1b9a3f5d6e8b7c2a10',reqAt:'2026-09-23 09:02:15.354',clientId:'PKBUL9991265908224'},
+   spm:{start:'2026-09-23 09:02:14.220',end:'2026-09-23 09:02:15.601',decision:'ALLOW',txId:'e2ddc31c759c3ee4d980136b7e6c0731',reqAt:'2026-09-23 09:02:15.354',clientId:'CLT0000123456789'},
    dkk:{start:'2026-09-23 09:02:15.719',end:'',decision:'REVIEW'},
-   hist:[['23.09.2026 09:02:17','2176_MSFM','UFM UMMT']]},
+   hist:[['23.09.2026 09:02:17','3308_CTRL','DEP 0417']]},
   statuses:[
-   ['2026-09-23 09:02:11.104','—','pmts-curr-duplicate-checker.end',''],
-   ['2026-09-23 09:02:11.530','SC_CURR_OUTGOING','pmts-curr-out-checks.start',''],
-   ['2026-09-23 09:02:13.008','SC_CURR_OUTGOING','pmts-curr-out-checks.end',''],
-   ['2026-09-23 09:02:13.442','SC_CURR_OUTGOING','pmts-curr-out-routing.start','Ожидание решения сотрудника']],
-  tasks:[{st:'info',type:'PAYMENT_INSTRUCTION',at:'2026-09-23 09:02:13',text:'Требуется подтвердить маршрут возврата; требуется подтверждение контролёра на списание',who:'',done:'',hist:[['09:02:13','Создана: pmts-curr-out-routing']]}],
+   ['2026-09-23 09:02:11.104','—','fx-dup-check.end',''],
+   ['2026-09-23 09:02:11.530','RT_FX_OUT','fx-out-checks.start',''],
+   ['2026-09-23 09:02:13.008','RT_FX_OUT','fx-out-checks.end',''],
+   ['2026-09-23 09:02:13.442','RT_FX_OUT','fx-out-routing.start','Ожидание решения сотрудника']],
+  tasks:[{st:'info',type:'PAYMENT_INSTRUCTION',at:'2026-09-23 09:02:13',text:'Требуется подтвердить маршрут возврата; требуется подтверждение контролёра на списание',who:'',done:'',hist:[['09:02:13','Создана: fx-out-routing']]}],
   stream:[],notif:[],
   audit:{
-   commonSection:{creationDate:'2026-09-23T06:02:11.104Z',paymentServiceProvider:'SUBOUL',paymentFlow:'RETURN',paymentInitiatorSystem:'PMTS.MANUAL',sourceSystem:'OPS',resending:false,originalDocumentId:'19ea6301-209c-4185-9a9f-6619d79f8a97'},
+   commonSection:{creationDate:'2026-09-23T06:02:11.104Z',paymentServiceProvider:'SUBOUL',paymentFlow:'RETURN',paymentInitiatorSystem:'PMTS.MANUAL',sourceSystem:'SRC1',resending:false,originalDocumentId:'03e8b84b-d1c5-4f07-aa49-8be3e9e4c8e8'},
    documentSection:{docReferenceIn:'RT2609230000018',relatedReference:'FX2609220000417',messageType:'MT103',amount:1249965.00,currency:'USD',valueDate:'2026-09-23'},
-   statusSections:{count:4,last:'pmts-curr-out-routing.start',lastAt:'2026-09-23T06:02:13.442Z'},
+   statusSections:{count:4,last:'fx-out-routing.start',lastAt:'2026-09-23T06:02:13.442Z'},
    taskSections:{open:1,closed:0},
    controlAttributesSection:{complianceCheck:'PENDING',sanctionsCheck:'PASSED',duplicateCheck:'PASSED',manualReview:true}},uetr:'4a1d7e20-9b3f-4c58-8e61-0f2c5d7a9b33',created:'23.09.2026 09:02:11',
   num:'18',numDate:'23.09.26',amount:'1 249 965.00',ccy:'USD',vd:['23.09.2026','23.09.2026','23.09.2026','24.09.2026'],
   inS:'—',inR:'—',outS:'VKRBRU8KXXX',outR:'NRDIRUMMXXX',r20out:'RT2609230000018',
   dt:'40817 840 1 0005 0017762',kt:'30110 840 7 0000 0001842',
-  route:{type:'NOSTRO',acc:'30114840900000000517',desc:'Счёт ностро в Baltic Clearing Bank (Рига), USD',recv:'BCLHLV22XXX',text:'Возврат по ПИ 19ea6301, ожидает подтверждения контролёра'},
-  txId:'2b91c0de-44a1-4f7b-9c0e-11af0b7e2c39',txDate:'2026-09-23 09:02:40',
+  route:{type:'NOSTRO',acc:'30114840900000000517',desc:'Счёт ностро в Baltic Clearing Bank (Рига), USD',recv:'BCLHLV22XXX',text:'Возврат по ПИ 03e8b84b, ожидает подтверждения контролёра'},
+  txId:'5e20408c-c344-4a6b-9c59-89f0c0602ef0',txDate:'2026-09-23 09:02:40',
   txs:[{dir:'DEBIT',st:'PENDING',acc:'40817840100050017762',reg:'00010_ClientCurrent',time:'—',amount:'1 249 965.00',ccy:'USD'}],
   f:{'20':{lines:['RT2609230000018']},'21':{lines:['FX2609220000417']},'71A':{lines:['SHA']},'71B':{lines:[]},'71F':{lines:[]},'71G':{lines:['USD 15,00']},'33B':{lines:[]},'36':{lines:[]},'77B':{lines:[]},
      '50':cl(P59),'59':cl(P50),'52':cl(B57),'57':cl(B52),'53':cl(B53),'54':{lines:[]},'55':{lines:[]},'56':{lines:[]},
@@ -1022,7 +1022,7 @@ DOCS.push(cl(DOCS[0]));
 function rubDoc(o){
   var b=DOCS[0];
   var tabs=JSON.parse(JSON.stringify({statuses:b.statuses,tasks:b.tasks,stream:b.stream,notif:b.notif,audit:b.audit,compliance:b.compliance})
-    .replace(/pmts-curr-/g,'pmts-rub-').replace(/_curr_/g,'_rub_').replace(/SC_CURR_INCOMING/g,o.r.scen));
+    .replace(/fx-/g,'fx-rub-').replace(/_curr_/g,'_rub_').replace(/RT_FX_IN/g,o.r.scen));
   tabs.audit.documentSection={docNumber:o.num,docDate:o.numDate,amount:+o.amount.replace(/\s/g,''),currency:'RUB',scenario:o.r.scen,operation:o.r.opCode,queue:o.r.queue,docReference:o.r.docRef};
   delete tabs.audit.originalDocumentSection;
   var d={type:o.type,status:o.status,st:o.st,dirTxt:o.dirTxt,tabsOff:o.tabsOff||[],uuid:o.uuid,created:o.created,num:o.num,numDate:o.numDate,amount:o.amount,ccy:'RUB',
@@ -1031,40 +1031,40 @@ function rubDoc(o){
   return d;
 }
 DOCS.push(rubDoc({status:'DONE',st:'ok',dirTxt:'входящий от ЦБ на клиента',tabsOff:['Стриминг','MPU'],
-  uuid:'5d31a7c2-8e4b-4f0a-9c21-7b6e0d2f8a13',created:'24.09.2026 11:08:14',num:'2931',numDate:'24.09.2026',amount:'85 814.36',
-  txId:'9b7e2f41-6c0d-4a8e-b3f5-2d1c7e9a0b64',txDate:'24.09.2026 11:08:20',
-  txs:[{dir:'DEBIT',st:'EXECUTED',acc:'30102810900000000745',reg:'00000_CorrCBR',time:'2026-09-24 08:08:20.114Z',amount:'85 814.36',ccy:'RUB'},
-       {dir:'CREDIT',st:'EXECUTED',acc:'40802810300050017801',reg:'00010_ClientCurrent',time:'2026-09-24 08:08:20.118Z',amount:'85 814.36',ccy:'RUB'}],
-  r:{scen:'SC_CBR_IN_CREDIT',from:'DB01',to:'DB02',initiator:'CBR.CBR_IN',source:'UFEBS',destination:'RETAIL',opCode:'01',opName:'Платёжное поручение',queue:'5',prio:0,docRef:'ED101-2609240001842',
-   party:{s:{name:'ООО «СЕВЕРНЫЙ ВЕТЕР»',opt:'',acc:'40702810400000012345',inn:'7729563210',kpp:'772901001',info:'',addr:'119180, г. Москва, пр-т Мира, д. 70, пом. 854',bank:'НОРДИНВЕСТ БАНК (АО)',bic:'044525207',bankAcc:'30101810200000000207',bankInfo:''},
-          r:{name:'ИП КРЫЛОВА МАРИНА ПЕТРОВНА',opt:'',acc:'40802810300050017801',inn:'540812345678',kpp:'',info:'',addr:'630099, г. Новосибирск, ул. Ленина, д. 12, кв. 7',bank:'ФИЛИАЛ № 7701 БАНКА ВОСТОЧНЫЙ КРЕДИТ (ПАО)',bic:'045004745',bankAcc:'30101810100000000745',bankInfo:'Филиал в г. Новосибирске'}},
-   purpose:'Оплата по счёту № 2026-0417 от 15.09.2026 за консультационные услуги по договору 12-45 от 01.03.2026. В том числе НДС 20% — 14 302.39 руб.',
-   purposeExtra:{instr:'',uip:'',reserve:'',f20:'Оплата по счёту № 2026-0417'},
-   agents:[{name:'НОРДИНВЕСТ БАНК (АО) — Ф-Л В Г. САНКТ-ПЕТЕРБУРГЕ',bic:'044030773',bankAcc:'30101810600000000773',acc:'30110810700000000512'}],
+  uuid:'72aa73fb-dae6-4672-8d09-e15afc0a523d',created:'24.09.2026 11:08:14',num:'3741',numDate:'24.09.2026',amount:'76 394.81',
+  txId:'03d45fed-f505-4fca-a267-60cba12b82f2',txDate:'24.09.2026 11:08:20',
+  txs:[{dir:'DEBIT',st:'EXECUTED',acc:'30102810738223744290',reg:'00000_CorrCBR',time:'2026-09-24 08:08:20.114Z',amount:'76 394.81',ccy:'RUB'},
+       {dir:'CREDIT',st:'EXECUTED',acc:'40802810820980451081',reg:'00010_ClientCurrent',time:'2026-09-24 08:08:20.118Z',amount:'76 394.81',ccy:'RUB'}],
+  r:{scen:'SC_NCB_IN_CREDIT',from:'DB01',to:'DB02',initiator:'NCB.NCB_IN',source:'UFX',destination:'RTL',opCode:'01',opName:'Платёжное поручение',queue:'5',prio:0,docRef:'ED101-5210472026066',
+   party:{s:{name:'ООО «ХУРЫГУПЯ»',opt:'',acc:'40702810064578557830',inn:'4340195751',kpp:'473897776',info:'',addr:'740828, Г. ЛЫСУЛА, УЛ. НИФЕМЯ, Д. 133, ПОМ. 520',bank:'АО «ЗОДО БАНК»',bic:'049597373',bankAcc:'30101810508469019375',bankInfo:''},
+          r:{name:'ИП ТЫСЫЛИОВ ГИБАС ЗУДЫОВИЧ',opt:'',acc:'40802810820980451081',inn:'394831189084',kpp:'',info:'',addr:'057617, Г. СОЛОКЫ, УЛ. МЕСОБО, Д. 83, КВ. 143',bank:'БАНК «ХАРОГА» (АО)',bic:'042993195',bankAcc:'30101810664602335376',bankInfo:'Филиал в г. Хупево'}},
+   purpose:'Оплата по счёту № 6945-2101 от 18.07.2026 за оборудование по договору 65-89 от 27.02.2026. В том числе НДС 20% — 18 658.24 руб.',
+   purposeExtra:{instr:'',uip:'',reserve:'',f20:'Оплата по счёту № 6945-2101'},
+   agents:[{name:'ФИЛИАЛ № 5065 БАНКА «МАГО» (ПАО) — Ф-Л В Г. ПЕСЫХА',bic:'042450423',bankAcc:'30101810249777754632',acc:'30110810300493704685'}],
    budget:null,
-   ed107:{head:[['ID связанного документа','2144'],['ID инициирующего документа','24154'],['Дата связанного документа','24.09.2026'],['Запрошенная дата исполнения','24.09.2026']],
-     groups:[{title:'Информация о банке-плательщике',rows:[['ed:OrderingBank/BIC','044525207'],['ed:OrderingBank/ed:Name','НОРДИНВЕСТ БАНК (АО)'],['ed:OrderingBank/BankAccount','30101810200000000207'],['ed:OrderingBank/SWBIC','NRDIRUMM']]},
-             {title:'Информация о банке-получателе',rows:[['ed:Beneficiary/BIC','045004745'],['ed:Beneficiary/ed:Name','ВОСТОЧНЫЙ КРЕДИТ БАНК (ПАО)'],['ed:Beneficiary/BankAccount','30101810100000000745'],['ed:Beneficiary/SWBIC','VKRBRU8K']]},
-             {title:'Информация о банке-отправителе',rows:[['ed:InstructingAgent/BIC','044525207'],['ed:InstructingAgent/CorrespAcc','30101810200000000207'],['ed:InstructingAgent/SWBIC','NRDIRUMM']]},
-             {title:'Информация о банке-исполнителе',rows:[['ed:InstructedAgent/BIC','045004745'],['ed:InstructedAgent/CorrespAcc','30101810100000000745'],['ed:InstructedAgent/SWBIC','VKRBRU8K']]}]},
+   ed107:{head:[['ID связанного документа','1262'],['ID инициирующего документа','77944'],['Дата связанного документа','24.09.2026'],['Запрошенная дата исполнения','24.09.2026']],
+     groups:[{title:'Информация о банке-плательщике',rows:[['ed:OrderingBank/BIC','049597373'],['ed:OrderingBank/ed:Name','АО «ЗОДО БАНК»'],['ed:OrderingBank/BankAccount','30101810508469019375'],['ed:OrderingBank/SWBIC','XБЯКRUKK']]},
+             {title:'Информация о банке-получателе',rows:[['ed:Beneficiary/BIC','042993195'],['ed:Beneficiary/ed:Name','БАНК «ХАРОГА» (АО)'],['ed:Beneficiary/BankAccount','30101810664602335376'],['ed:Beneficiary/SWBIC','XДЯХRUKM']]},
+             {title:'Информация о банке-отправителе',rows:[['ed:InstructingAgent/BIC','049597373'],['ed:InstructingAgent/CorrespAcc','30101810508469019375'],['ed:InstructingAgent/SWBIC','XБЯКRUKK']]},
+             {title:'Информация о банке-исполнителе',rows:[['ed:InstructedAgent/BIC','042993195'],['ed:InstructedAgent/CorrespAcc','30101810664602335376'],['ed:InstructedAgent/SWBIC','XДЯХRUKM']]}]},
    collect:null},
-  source:{ED244:'<?xml version="1.0" encoding="UTF-8"?>\n<ed:ED244 xmlns:ed="urn:cbr-ru:ed:v2.0" EDNo="1842" EDDate="2026-09-24" EDAuthor="4525207000" EDReceiver="4500474500" Sum="8581436" PaymentPrecedence="5">\n  <ed:AccDoc AccDocNo="2931" AccDocDate="2026-09-24"/>\n  <ed:Payer PersonalAcc="40702810400000012345" INN="7729563210" KPP="772901001">\n    <ed:Name>ООО «СЕВЕРНЫЙ ВЕТЕР»</ed:Name>\n    <ed:Bank BIC="044525207" CorrespAcc="30101810200000000207"/>\n  </ed:Payer>\n  <ed:Payee PersonalAcc="40802810300050017801" INN="540812345678">\n    <ed:Name>ИП КРЫЛОВА МАРИНА ПЕТРОВНА</ed:Name>\n    <ed:Bank BIC="045004745" CorrespAcc="30101810100000000745"/>\n  </ed:Payee>\n  <ed:Purpose>Оплата по счёту № 2026-0417 от 15.09.2026 за консультационные услуги по договору 12-45 от 01.03.2026. В том числе НДС 20% — 14 302.39 руб.</ed:Purpose>\n</ed:ED244>'}
+  source:{ED244:'<?xml version="1.0" encoding="UTF-8"?>\\n<ed:ED244 xmlns:ed="urn:cbr-ru:ed:v2.0" EDNo="9818" EDDate="2026-09-24" EDAuthor="2072537694" EDReceiver="4971095821" Sum="7639481" PaymentPrecedence="5">\\n  <ed:AccDoc AccDocNo="3741" AccDocDate="2026-09-24"/>\\n  <ed:Payer PersonalAcc="40702810064578557830" INN="4340195751" KPP="473897776">\\n    <ed:Name>ООО «ХУРЫГУПЯ»</ed:Name>\\n    <ed:Bank BIC="049597373" CorrespAcc="30101810508469019375"/>\\n  </ed:Payer>\\n  <ed:Payee PersonalAcc="40802810820980451081" INN="394831189084">\\n    <ed:Name>ИП ТЫСЫЛИОВ ГИБАС ЗУДЫОВИЧ</ed:Name>\\n    <ed:Bank BIC="042993195" CorrespAcc="30101810664602335376"/>\\n  </ed:Payee>\\n  <ed:Purpose>Оплата по счёту № 6945-2101 от 18.07.2026 за оборудование по договору 65-89 от 27.02.2026. В том числе НДС 20% — 18 658.24 руб.</ed:Purpose>\\n</ed:ED244>'}
 }));
 DOCS.push(rubDoc({type:'REQDOCRU',status:'IN_PROGRESS',st:'wait',dirTxt:'исходящий на ЦБ · взыскание',tabsOff:['MPU'],
-  uuid:'b8e2f4a1-3c6d-4e7f-8a90-1d2c3b4a5e6f',created:'24.09.2026 10:59:26',num:'879910',numDate:'23.09.2026',amount:'7.00',
-  txId:'2c4d6e8f-0a1b-4c3d-9e5f-7a8b9c0d1e2f',txDate:'24.09.2026 10:59:31',
-  txs:[{dir:'DEBIT',st:'EXECUTED',acc:'40817810600050017913',reg:'00010_ClientCurrent',time:'2026-09-24 07:59:31.402Z',amount:'7.00',ccy:'RUB'},
-       {dir:'CREDIT',st:'PENDING',acc:'30102810900000000745',reg:'00000_CorrCBR',time:'—',amount:'7.00',ccy:'RUB'}],
-  r:{scen:'SC_CBR_OUT_DEBIT',from:'DB02',to:'DB01',initiator:'CNTS.CNTS_DECR',source:'CNTSEXEC',destination:'PRISM',opCode:'06',opName:'Инкассовое поручение',queue:'4',prio:0,docRef:'ED104-2609240008819',
-   party:{s:{name:'СМИРНОВА ЕКАТЕРИНА ПАВЛОВНА',opt:'',acc:'40817810600050017913',inn:'540912345601',kpp:'0',info:'',addr:'',bank:'ФИЛИАЛ № 7701 БАНКА ВОСТОЧНЫЙ КРЕДИТ (ПАО)',bic:'045004745',bankAcc:'30101810100000000745',bankInfo:''},
-          r:{name:'УФК по Новосибирской области (Отделение судебных приставов по Центральному району г. Новосибирска, л/с 05511851990)',opt:'',acc:'03212643000000019876',inn:'5406012345',kpp:'540601001',info:'',addr:'',bank:'СИБИРСКОЕ ГУ БАНКА РОССИИ // УФК по Новосибирской области',bic:'015004950',bankAcc:'40102810845370000019',bankInfo:''}},
-   purpose:'Взыскание по исп. пост. 213253960/6639 от 23.09.2026. СПИ Иванова М. С. по и/п № 170152/26/66039-ИП от 07.09.2026',
-   purposeExtra:{instr:'',uip:'32112643000000019876',reserve:'',f20:''},
+  uuid:'6bb3cd76-2461-4984-a8db-68be95162e4a',created:'24.09.2026 10:59:26',num:'714297',numDate:'23.09.2026',amount:'23.84',
+  txId:'e62ecb99-e53d-4c33-aa2f-c9e53c58abe0',txDate:'24.09.2026 10:59:31',
+  txs:[{dir:'DEBIT',st:'EXECUTED',acc:'40817810122440937855',reg:'00010_ClientCurrent',time:'2026-09-24 07:59:31.402Z',amount:'23.84',ccy:'RUB'},
+       {dir:'CREDIT',st:'PENDING',acc:'30102810412551724960',reg:'00000_CorrCBR',time:'—',amount:'23.84',ccy:'RUB'}],
+  r:{scen:'SC_NCB_OUT_DEBIT',from:'DB02',to:'DB01',initiator:'CLT.CLT_DCR',source:'CLX',destination:'PRM',opCode:'06',opName:'Инкассовое поручение',queue:'4',prio:0,docRef:'ED104-6295478222348',
+   party:{s:{name:'ПЯРИФООВА ТЯХОР ВУПЯОВНА',opt:'',acc:'40817810122440937855',inn:'724963654922',kpp:'0',info:'',addr:'',bank:'АО «ЛУКЕЗА БАНК»',bic:'045927897',bankAcc:'30101810434016985259',bankInfo:''},
+          r:{name:'УФК ПО ДУВЫМЯСКОЙ ОБЛАСТИ (ОСП ПО ДОКАХЫСКОМУ РАЙОНУ, Л/С 49924435382)',opt:'',acc:'03212015887737416204',inn:'6906224315',kpp:'102930012',info:'',addr:'',bank:'ТЕПЕФАСКОЕ ГУ БАНКА РОССИИ // УФК ПО ЗИСИМУСКОЙ ОБЛАСТИ',bic:'014948298',bankAcc:'40102810113853348959',bankInfo:''}},
+   purpose:'Взыскание по исп. пост. 228808703/5707 от 12.07.2026. СПИ ПЫБУГИОВА Е. В. по и/п № 290984/26/61340-ИП от 13.02.2026',
+   purposeExtra:{instr:'',uip:'46710664247006847653',reserve:'',f20:''},
    agents:[],
-   budget:{b101:'19',b104:'32211601201019000140',b105:'50701000',b106:'0',b107:'0',b108:'170152/26/66039-ИП',b109:'07.09.2026',b110:'0'},
-   collect:{c48:'23.09.2026',cLimit:'76349202',c70:'Взыскание по исполнительному производству',c38:'3',c39:'1',c40:'213253960/6639',c41:'23.09.2026'},
+   budget:{b101:'98',b104:'24943713437772038687',b105:'78166455',b106:'0',b107:'0',b108:'290984/26/61340-ИП',b109:'06.01.2026',b110:'0'},
+   collect:{c48:'23.09.2026',cLimit:'11497427',c70:'Взыскание по исполнительному производству',c38:'9',c39:'3',c40:'181110362/8804',c41:'23.09.2026'},
    ed107:null},
-  source:{ED244:'<?xml version="1.0" encoding="UTF-8"?>\n<ed:ED244 xmlns:ed="urn:cbr-ru:ed:v2.0" EDNo="8819" EDDate="2026-09-24" EDAuthor="4500474500" EDReceiver="4500495000" Sum="700" PaymentPrecedence="4">\n  <ed:AccDoc AccDocNo="879910" AccDocDate="2026-09-23"/>\n  <ed:Payer PersonalAcc="40817810600050017913" INN="540912345601">\n    <ed:Name>СМИРНОВА ЕКАТЕРИНА ПАВЛОВНА</ed:Name>\n    <ed:Bank BIC="045004745" CorrespAcc="30101810100000000745"/>\n  </ed:Payer>\n  <ed:Payee PersonalAcc="03212643000000019876" INN="5406012345" KPP="540601001">\n    <ed:Name>УФК по Новосибирской области</ed:Name>\n    <ed:Bank BIC="015004950" CorrespAcc="40102810845370000019"/>\n  </ed:Payee>\n  <ed:Purpose>Взыскание по исп. пост. 213253960/6639 от 23.09.2026</ed:Purpose>\n</ed:ED244>'}
+  source:{ED244:'<?xml version="1.0" encoding="UTF-8"?>\\n<ed:ED244 xmlns:ed="urn:cbr-ru:ed:v2.0" EDNo="3668" EDDate="2026-09-24" EDAuthor="6918470000" EDReceiver="9869552771" Sum="2384" PaymentPrecedence="4">\\n  <ed:AccDoc AccDocNo="714297" AccDocDate="2026-09-23"/>\\n  <ed:Payer PersonalAcc="40817810122440937855" INN="724963654922">\\n    <ed:Name>ПЯРИФООВА ТЯХОР ВУПЯОВНА</ed:Name>\\n    <ed:Bank BIC="045927897" CorrespAcc="30101810434016985259"/>\\n  </ed:Payer>\\n  <ed:Payee PersonalAcc="03212015887737416204" INN="6906224315" KPP="102930012">\\n    <ed:Name>УФК ПО ДУВЫМЯСКОЙ ОБЛАСТИ</ed:Name>\\n    <ed:Bank BIC="014948298" CorrespAcc="40102810113853348959"/>\\n  </ed:Payee>\\n  <ed:Purpose>Взыскание по исп. пост. 228808703/5707 от 12.07.2026</ed:Purpose>\\n</ed:ED244>'}
 }));
 /* индексы документов стенда по семействам: a — левый drawer, b — правый, ret — «платёжка и возврат рядом» */
 var FAM={cur:{a:0,b:2,ret:1,type:'MT103'},rub:{a:3,b:4,ret:4,type:'PAYDOCRU'}};
@@ -1300,7 +1300,7 @@ function rubHtml(di){var d=DOCS[di],u=ui[di],T=typeOf(d),p=PROFILES[T];
 function tmHtml(t){var m=/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2}:\d{2})(\.\d+)?/.exec(t||'');return m?'<span class="tm" data-tip="'+esc(t)+'">'+m[3]+'.'+m[2]+' <b>'+m[4]+'</b>'+(m[5]?'<span style="color:var(--faint)">'+m[5].slice(0,4)+'</span>':'')+'</span>':'<span class="tm">'+esc(t||'—')+'</span>'}
 function ms(t){return new Date((t||'').replace(' ','T')+'Z').getTime()}
 function dur(a,b){var d=ms(b)-ms(a);if(isNaN(d)||d<0)return '';if(d<1000)return d+' мс';if(d<60000)return (d/1000).toFixed(1)+' с';if(d<3600000)return Math.round(d/60000)+' мин';return (d/3600000).toFixed(1)+' ч'}
-function codeHtml(c){var m=/^(.*)\.(start|end)$/.exec(c);if(c==='pmts.finish')return '<span class="code fin">'+esc(c)+'</span>';return m?'<span class="code">'+esc(m[1])+'<span class="suf '+m[2]+'">.'+m[2]+'</span></span>':'<span class="code">'+esc(c)+'</span>'}
+function codeHtml(c){var m=/^(.*)\.(start|end)$/.exec(c);if(c==='fx.finish')return '<span class="code fin">'+esc(c)+'</span>';return m?'<span class="code">'+esc(m[1])+'<span class="suf '+m[2]+'">.'+m[2]+'</span></span>':'<span class="code">'+esc(c)+'</span>'}
 function statusesHtml(d){
   var rows=d.statuses||[];if(!rows.length)return '<div class="tt"><div class="empty">Статусов нет</div></div>';
   return '<div class="tt"><div class="th" style="grid-template-columns:22px 118px 150px 262px minmax(0,1fr) 50px"><span></span><span>Дата/время</span><span>Маршрут</span><span>Статус</span><span>Причина</span><span style="text-align:right">Δ</span></div>'+
@@ -1369,9 +1369,9 @@ function complianceHtml(d){
   function row(n,v,mono){return '<div class="xr"><span class="nm">'+n+'</span><span class="kv">'+(v?'<span class="'+(mono?'v mono':'v')+'">'+esc(v)+'</span>':'<span class="nl">—</span>')+'</span></div>'}
   function dec(v){return v?'<span class="st '+(v==='ALLOW'?'ok':v==='REVIEW'?'wait':'bad')+'">'+v+'</span>':'<span class="nl">—</span>'}
   return '<div class="xg byname cp-kv">'+row('ID записи',c.rec.id,1)+row('ID платёжной инструкции',d.uuid,1)+row('Начало обработки',c.rec.start,1)+row('Окончание обработки',c.rec.end,1)+row('Признак постановки на НЗР',c.rec.nzr)+'</div>'+
-    '<div class="xg byname cp-kv"><h6>Отрицательная нотификация в СУБО/task или sync для ЕРС</h6>'+row('Переданное решение',c.neg.decision)+row('Направление проверки',c.neg.direction)+row('Комментарий',c.neg.comment)+'</div>'+
-    '<div class="xg byname cp-kv"><h6>Контроль в СПМ (ИС1737)</h6>'+row('Начало',c.spm.start,1)+row('Окончание',c.spm.end,1)+'<div class="xr"><span class="nm">Решение СПМ</span><span class="kv">'+dec(c.spm.decision)+'</span></div>'+row('Идентификатор транзакции',c.spm.txId,1)+row('Создание запроса',c.spm.reqAt,1)+row('Идентификатор клиента',c.spm.clientId,1)+'</div>'+
-    '<div class="xg byname cp-kv"><h6>Контроль ДККиФМ / УВКиБС (ОПС2172)</h6>'+row('Начало',c.dkk.start,1)+row('Окончание',c.dkk.end,1)+'<div class="xr"><span class="nm">Решение ДККиФМ / УВКиБС</span><span class="kv">'+dec(c.dkk.decision)+'</span></div>'+
+    '<div class="xg byname cp-kv"><h6>Отрицательная нотификация в источник</h6>'+row('Переданное решение',c.neg.decision)+row('Направление проверки',c.neg.direction)+row('Комментарий',c.neg.comment)+'</div>'+
+    '<div class="xg byname cp-kv"><h6>Контроль в системе мониторинга (ИС4021)</h6>'+row('Начало',c.spm.start,1)+row('Окончание',c.spm.end,1)+'<div class="xr"><span class="nm">Решение мониторинга</span><span class="kv">'+dec(c.spm.decision)+'</span></div>'+row('Идентификатор транзакции',c.spm.txId,1)+row('Создание запроса',c.spm.reqAt,1)+row('Идентификатор клиента',c.spm.clientId,1)+'</div>'+
+    '<div class="xg byname cp-kv"><h6>Контроль подразделения комплаенс (ОПС3308)</h6>'+row('Начало',c.dkk.start,1)+row('Окончание',c.dkk.end,1)+'<div class="xr"><span class="nm">Решение комплаенс</span><span class="kv">'+dec(c.dkk.decision)+'</span></div>'+
       '<div class="tt" style="margin:6px 10px 8px;background:var(--paper)"><div class="th" style="grid-template-columns:150px 1fr 1fr"><span>Время попадания</span><span>Система контроля</span><span>Код подразделения</span></div>'+
       c.hist.map(function(h){return '<div class="tr" style="grid-template-columns:150px 1fr 1fr"><span class="tm">'+h[0]+'</span><span class="mono v">'+h[1]+'</span><span class="v">'+h[2]+'</span></div>'}).join('')+'</div></div>';
 }
@@ -1497,8 +1497,8 @@ document.getElementById('pair').addEventListener('change',function(e){
     note:'<span class="was">'+was+'</span><span class="arr">→</span><span class="now">'+now+'</span>',
     ok:'Утвердить',cancel:'Отмена'}).then(function(ok){
       if(ok){
-        if(!d.vdEdit)d.vdEdit={was:was,who:'Клименко И.',when:nowStr()};
-        d.vdEdit.confirmed=true;d.vdEdit.confirmedBy='Клименко И.';d.vdEdit.confirmedAt=nowStr();
+        if(!d.vdEdit)d.vdEdit={was:was,who:'Орлов С. П.',when:nowStr()};
+        d.vdEdit.confirmed=true;d.vdEdit.confirmedBy='Орлов С. П.';d.vdEdit.confirmedAt=nowStr();
         d.vd[0]=now;u.vdEdit=false;u.vdDraft=null;
       }
       render(di);                        /* отказ — остаёмся в правке с выбранной датой */
@@ -1660,20 +1660,26 @@ window.PI={DOCS:DOCS,ui:ui,mkui:mkui,render:render,cl:cl,PROFILES:PROFILES,FIELD
 var P=window.PI,esc=P.esc,ic=P.ic;
 /* ---- набор строк реестра: клоны двух рублёвых документов конструктора с вариациями (всё вымышленное) ---- */
 var R=P.RUB;
-var RNAMES=[['ООО «СЕВЕРНЫЙ ВЕТЕР»','40702810400000012345','7729563210','772901001'],['ИП КРЫЛОВА МАРИНА ПЕТРОВНА','40802810300050017801','540812345678',''],
-  ['АО «ТЕХНОПАРК ВОСТОК»','40702810600010004420','5406098765','540601001'],['СМИРНОВА ЕКАТЕРИНА ПАВЛОВНА','40817810600050017913','540912345601','0'],
-  ['ООО «ЛОГИСТИКА СИБИРИ»','40702810900010009911','5404123456','540401001'],['ГРИГОРЬЕВ АРТЁМ СЕРГЕЕВИЧ','40817810900010031177','540798765432','0'],
-  ['УФК по Новосибирской области (ОСП по Центральному району г. Новосибирска, л/с 05511851990)','03212643000000019876','5406012345','540601001'],
-  ['ООО «ЗЕЛЁНЫЙ ДОМ»','40702810200010007765','5402567890','540201001']];
-var RBANKS=[['ФИЛИАЛ № 7701 БАНКА ВОСТОЧНЫЙ КРЕДИТ (ПАО)','045004745','30101810100000000745'],['НОРДИНВЕСТ БАНК (АО)','044525207','30101810200000000207'],
-  ['СИБИРСКОЕ ГУ БАНКА РОССИИ // УФК по Новосибирской области','015004950','40102810845370000019'],['АО «БАНК ЮЖНЫЙ УРАЛ»','047501811','30101810900000000811'],
-  ['ПАО «ОКЕАН БАНК»','040507860','30101810300000000860'],['ФИЛИАЛ «ЦЕНТРАЛЬНЫЙ» БАНКА ВОСТОЧНЫЙ КРЕДИТ (ПАО)','044525411','30101810145250000411']];
-var RPURP=['Оплата по счёту № 2026-0417 от 15.09.2026 за консультационные услуги по договору 12-45 от 01.03.2026. В том числе НДС 20% — 14 302.39 руб.',
-  'Взыскание по исп. пост. 213253960/6639 от 23.09.2026. СПИ Иванова М. С. по и/п № 170152/26/66039-ИП от 07.09.2026',
-  'Предоплата по договору поставки № 77-21 от 03.02.2026 за оборудование. НДС не облагается',
-  'Заработная плата за сентябрь 2026 по реестру № 14 от 24.09.2026. НДС не облагается',
-  'Налог на прибыль организаций за 9 месяцев 2026 г. Уведомление № 3 от 22.09.2026',
-  'Возврат ошибочно перечисленных средств по п/п № 2931 от 24.09.2026. Без НДС'];
+var RNAMES=[['ООО «ЛЕЗЯФОТЫ ВЕФО»','40702810999377318571','5790280657','899351656'],
+  ['ИП ЗОСЕДЕОВА ФОДЕС МЫРЯОВИЧ','40802810411821524886','242032929187',''],
+  ['ФЯБЕРИОВА ПИРАС ГИЗАОВНА','40817810516762861162','256169407365','0'],
+  ['АО «МЕФЯ ФОТЕ»','40702810547442693048','1265428092','409490573'],
+  ['АО «ЗАГЕЛУ МЯТА»','40702810296328313510','8298199680','464601040'],
+  ['ИП ПОТОВЯОВА ПОСЯС БЕПЯОВИЧ','40802810904985101300','409237987347',''],
+  ['УФК ПО ТАПУСИСКОЙ ОБЛАСТИ (ОСП ПО ВЕЗОГАСКОМУ РАЙОНУ, Л/С 61607971986)','03212005856973513359','4512765492','571932912'],
+  ['АО «ФОЛО ЛЯГИ»','40702810738902691171','4907238712','281270852']];
+var RBANKS=[['АО «МУЛАПЯ БАНК»','049757384','30101810926712740298'],
+  ['ФИЛИАЛ № 8771 БАНКА «ТЯПЯ» (ПАО)','042242532','30101810238199212863'],
+  ['ГЕВАХИСКОЕ ГУ БАНКА РОССИИ // УФК ПО ДИЗАДОСКОЙ ОБЛАСТИ','015920113','40102810460045043926'],
+  ['ФИЛИАЛ № 9292 БАНКА «ХЕВЯ» (ПАО)','045542573','30101810601804259605'],
+  ['АО «ВЫТУЗЫ БАНК»','044730199','30101810919943546358'],
+  ['БАНК «ПАПА» (АО)','043235386','30101810547929061477']];
+var RPURP=['Оплата по счёту № 2923-2915 от 07.03.2026 за работы по договору 14-56 от 02.08.2026. В том числе НДС 20% — 13 148.08 руб.',
+  'Взыскание по исп. пост. 708283995/9219 от 25.05.2026. СПИ ТЯХУБАОВА А. П. по и/п № 551122/26/86378-ИП от 08.06.2026',
+  'Предоплата по договору поставки № 54-62 от 14.07.2026 за оборудование. НДС не облагается',
+  'Заработная плата за сентябрь 2026 по реестру № 20 от 22.07.2026. НДС не облагается',
+  'Налог на прибыль организаций за 9 месяцев 2026 г. Уведомление № 2 от 04.05.2026',
+  'Возврат ошибочно перечисленных средств по п/п № 0386 от 06.08.2026. Без НДС'];
 var RAMT=['85 814.36','7.00','2 178.00','200 535.00','490 800.00','130 500.00','40 000.00','150 075.00','87 631.00','118 059.00','1 305 599.36','12 700 000.00'];
 var RTYPES=['PAYDOCRU','PAYDOCRU','REQDOCRU','PAYDOCRU','PAYORDRU','PAYDOCRU','PAYDOCRU','REQDOCRU','PAYDOCRU','PAYDOCRU','PAYORDRU','PAYDOCRU'];
 var ED_BY_TYPE={PAYDOCRU:'ED101',REQDOCRU:'ED104',PAYORDRU:'ED105'};
@@ -1686,14 +1692,14 @@ var STATUS_META=[
 var SM={};STATUS_META.forEach(function(x){SM[x[0]]={label:x[1],cls:x[2]}});
 function drawerSt(code){return code==='DONE'||code==='EXPORTED'?'ok':(code==='ERROR'||code==='INVALID'||code==='REJECTED')?'bad':'wait'}
 var STS=['DONE','IN_PROGRESS','DONE','ERROR','DONE','TO_EXPORT','PROCESSING','DEFERRED','EXPORTED','REJECTED','DONE','IN_PROGRESS'];
-var REASONS=['Отправлен запрос в СУБО Контроль(2700)','Документ отправлен в ЦБ','Документ на контроле ДККФМ','Ожидание решения сотрудника','Документ с будущей датой исполнения','Ожидание обработки основного документа','В очереди ожидания средств (картотека 2)','Счёт плательщика закрыт. Поиск исходящего документа','Ожидание ответа от ПРИЗМ'];
+var REASONS=['Отправлен запрос в СУБО Контроль(2700)','Документ отправлен в ЦБ','Документ на контроле ДККФМ','Ожидание решения сотрудника','Документ с будущей датой исполнения','Ожидание обработки основного документа','В очереди ожидания средств (картотека 2)','Счёт плательщика закрыт. Поиск исходящего документа','Ожидание ответа от PRM'];
 /* причина статуса бывает только у Отложенный / Ошибка / Отказ */
 var REASON_BY_ST={DEFERRED:[4,5,6,3,8,0,2,1],ERROR:[7],REJECTED:[7,3]};
 /* направление — два реквизита: группа (IN / OUT / TRANSIT / OTHER) и название направления */
 var DIRS=[['IN','входящий от ЦБ на клиента'],['OUT','исходящий на ЦБ'],['OUT','исходящий на ЦБ · взыскание'],['IN','входящий от ЦБ на клиента'],['OTHER','внутрибанковский перевод'],['OUT','исходящий на ЦБ · бюджетный'],['IN','входящий от ЦБ на клиента'],['OUT','исходящий на ЦБ'],['TRANSIT','транзит через корсчёт филиала'],['OUT','исходящий на ЦБ'],['OTHER','внутрибанковский ордер'],['IN','входящий от ЦБ на клиента']];
 /* системы: инициатор / источник / назначение — короткие коды ИС */
-var SYS=[['CBR.CBR_IN','UFEBS','RETAIL'],['DBO.DBO_PPKOD','SUBOIL','UFEBS'],['CNTS.CNTS_DECR','CNTSEXEC','PRISM'],['CBR.CBR_IN','UFEBS','CORP'],['ERS.ERS_1','OPS','RETAIL'],['TAX.TAX_ENP','SUBOIL','UFEBS']];
-var SCEN={IN:'SC_CBR_IN_CREDIT',OUT:'SC_CBR_OUT_DEBIT',TRANSIT:'SC_BRANCH_TRANSIT',OTHER:'SC_INTERNAL'};
+var SYS=[['NCB.NCB_IN','UFX','RTL'],['DBS.DBS_PKD','SBO','UFX'],['CLT.CLT_DCR','CLX','PRM'],['NCB.NCB_IN','UFX','CRP'],['ERX.ERX_1','OPX','RTL'],['TXS.TXS_ENP','SBO','UFX']];
+var SCEN={IN:'SC_NCB_IN_CREDIT',OUT:'SC_NCB_OUT_DEBIT',TRANSIT:'SC_BRANCH_TRANSIT',OTHER:'SC_INTERNAL'};
 var ROWS=[];
 var N_ROWS=87;
 for(var i=0;i<N_ROWS;i++){
@@ -1716,7 +1722,7 @@ for(var i=0;i<N_ROWS;i++){
   r.purpose=RPURP[i%6];
   base.tabsOff=i%2?['Нотификации','Стриминг','MPU']:['MPU'];
   /* состояния записи для дизайн-системы: заблокирована другим пользователем / неактивна (архив, отозвана) */
-  if(i%11===2)base.lock={who:['Петрова А. С.','Сидоров К. В.','Лебедева О. Н.'][i%3],since:'23.09.2026 '+String(9+i%8).padStart(2,'0')+':'+String((i*13)%60).padStart(2,'0')};
+  if(i%11===2)base.lock={who:['Иванова М. П.','Кузнецов Д. А.','Смирнова Е. В.'][i%3],since:'23.09.2026 '+String(9+i%8).padStart(2,'0')+':'+String((i*13)%60).padStart(2,'0')};
   if(i%13===7)base.inactive={why:['Документ в архиве','Запись отозвана инициатором','Снят с обработки администратором'][i%3]};
   ROWS.push(base);
 }
@@ -1913,7 +1919,7 @@ var CATALOG=[
 ];
 var DEMO_SETS=[
   {id:'demo-1',name:'Входящие от ЦБ исполненные',data:{visible:['direction','status'],ops:{direction:'eq',status:'eq'},values:{direction:{list:[],draft:'IN'},status:{list:[],draft:'Обработан'}}}},
-  {id:'demo-2',name:'Взыскания приставов',data:{visible:['type','initiator','status'],ops:{type:'eq',initiator:'eq',status:'in'},values:{type:{list:[],draft:'REQDOCRU'},initiator:{list:[],draft:'CNTS.CNTS_DECR'},status:{list:['В работе','Отложенный','Ошибка'],draft:''}}}}];
+  {id:'demo-2',name:'Взыскания приставов',data:{visible:['type','initiator','status'],ops:{type:'eq',initiator:'eq',status:'in'},values:{type:{list:[],draft:'REQDOCRU'},initiator:{list:[],draft:'CLT.CLT_DCR'},status:{list:['В работе','Отложенный','Ошибка'],draft:''}}}}];
 function toNum(v){var n=parseFloat(String(v).replace(/\s/g,'').replace(',','.'));return isNaN(n)?null:n}
 function toDate(v){var m=/^(\d{2})\.(\d{2})\.(\d{4})$/.exec(String(v).trim());if(m)return m[3]+m[2]+m[1];m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v).trim());return m?m[1]+m[2]+m[3]:null}
 function cmp(field,a,b){if(field.type==='number'){var x=toNum(a),y=toNum(b);return x==null||y==null?null:x-y}if(field.type==='date'){var p=toDate(a),q=toDate(b);return p==null||q==null?null:(p<q?-1:p>q?1:0)}return String(a).localeCompare(String(b))}
