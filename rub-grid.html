@@ -148,7 +148,11 @@ a.lnk:hover{text-decoration:underline}
 .hero .vd .vdx{border:0;background:none;font:500 11.5px var(--sans);color:var(--muted);cursor:pointer;padding:0 4px}
 .hero .vd .vdx:hover{color:var(--val)}
 .hero .vd.edited .hv{color:var(--warn)}
-.hero .vd.edited .mark{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--warn);vertical-align:3px;margin-left:4px}
+/* индикатор изменения реквизита: шарик — изменено; галочка под ним — изменение утверждено */
+.hero .vd.edited .mark{display:inline-flex;flex-direction:column;align-items:center;gap:1px;vertical-align:middle;margin-left:5px;cursor:help}
+.hero .vd.edited .mark i{display:block;width:6px;height:6px;border-radius:50%;background:var(--warn)}
+.hero .vd.edited .mark b{display:block;font:700 8px/8px var(--sans);color:var(--faint);visibility:hidden}
+.hero .vd.edited .mark.ok b{visibility:visible;color:var(--ok)}
 .amt{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;letter-spacing:-.01em}
 .amt small{font-size:12px;color:var(--val);margin-left:5px;font-weight:600}
 .amt .lnk{font-size:11.5px;margin-left:10px;border:1px solid var(--line);border-radius:4px;padding:1px 6px;background:var(--paper)}
@@ -759,18 +763,18 @@ var FIELDS={
 var PROFILES={
   MT103:{title:'Клиентский перевод',
     hero:['20','71A','vd','32A'], blocks:['msgs','route','tx'],
-    grid:[['50','59'],['52','57'],['53','54'],[{tag:'55',hideIfEmpty:true},{tag:'56',hideIfEmpty:true}]],
+    grid:[['50',{tag:'55',hideIfEmpty:true}],['52',{tag:'56',hideIfEmpty:true}],['53','57'],['54','59']],
     text:['70','72'], extra:['33B','36','77B']},
   MT202:{title:'Межбанковский перевод',
     hero:['20','21','vd','32A'], blocks:['msgs','route','tx'],
-    grid:[['52','58'],['53','54'],['56','57']],
+    grid:[['52','56'],['53','57'],['54','58']],
     text:['72']},
   MT202COV:{title:'Межбанковский перевод с покрытием',
     hero:['20','21','vd','32A'], blocks:['msgs','route','tx'],
-    grid:[['52','58'],['53','54'],['56','57']],
+    grid:[['52','56'],['53','57'],['54','58']],
     text:['72'],
     seqB:{title:'Покрываемый клиентский платёж · последовательность B',
-      grid:[['B.50','B.59'],['B.52','B.57'],[{tag:'B.56',hideIfEmpty:true},null]], text:['B.70','B.72'], extra:['B.33B']}},
+      grid:[['B.50',{tag:'B.56',hideIfEmpty:true}],['B.52','B.57'],[null,'B.59']], text:['B.70','B.72'], extra:['B.33B']}},
   MT199:{title:'Свободный формат',
     hero:['20','21'], blocks:['msgs'],
     grid:[], text:['79']}
@@ -1152,8 +1156,9 @@ function heroHtml(d,p,di){
         return '<div class="vd"><span class="lbl">Валютирование</span>'+
           '<input type="date" class="vdinp" data-vd-input aria-label="Дата валютирования" value="'+ruToIso(u.vdDraft||vd[0])+'" min="'+ruToIso(d.created.slice(0,10))+'">'+
           '<button type="button" class="vdx" data-vd-cancel>Отмена</button></div>';
-      return '<div class="vd'+(d.vdEdit?' edited':'')+'" title="'+esc(allTip+(d.vdEdit?'\nБыло '+d.vdEdit.was+' · '+d.vdEdit.who+', '+d.vdEdit.when:''))+'">'+
-        '<span class="lbl">Валютирование</span><span class="hv">'+vd[0]+'</span>'+(d.vdEdit?'<span class="mark"></span>':'')+right+
+      var mark=d.vdEdit?'<span class="mark'+(d.vdEdit.confirmed?' ok':'')+'" data-tip="Изменено: было '+d.vdEdit.was+' · '+esc(d.vdEdit.who)+', '+d.vdEdit.when+(d.vdEdit.confirmed?' · утверждено '+esc(d.vdEdit.confirmedBy)+', '+d.vdEdit.confirmedAt:' · ожидает утверждения')+'"><i></i><b>✓</b></span>':'';
+      return '<div class="vd'+(d.vdEdit?' edited':'')+'" title="'+esc(allTip)+'">'+
+        '<span class="lbl">Валютирование</span><span class="hv">'+vd[0]+'</span>'+mark+right+
         '<span class="pen" data-vd-edit role="button" tabindex="0" data-tip="Изменить дату валютирования">'+ic('edit')+'</span></div>';
     },
     '32A':function(){return '<div class="amtc"><span class="lbl" data-tip="32A · '+esc(FIELDS['32A'].name)+'">32A · сумма</span><span class="amt">'+d.amount+'<small>'+d.ccy+'</small><a class="lnk">Курс</a></span></div>'}
@@ -1224,7 +1229,7 @@ function rubScenHtml(d){var r=d.r;
     '<div><h6>Идентификаторы</h6><span class="lbl">Ссылки</span><span class="lks">'+lk('txId',d.txId)+lk('docRef',r.docRef)+lk('УИП',r.purposeExtra&&r.purposeExtra.uip)+'</span></div></div>'}
 /* таблица отправитель | получатель: строки фиксированы профилем, пустые остаются бледными — два документа рядом читаются построчно */
 function rubPartyHtml(d,p){var S=d.r.party.s||{},R=d.r.party.r||{};
-  return '<div class="fh"><h5>Отправитель / Получатель</h5><span class="lbl">отправитель слева · получатель справа</span></div>'+
+  return '<div class="fh"><h5>Поля SWIFT</h5><span class="lbl">50–54 слева · 55–59 справа</span></div>'+
     '<div class="rp"><div class="rph"><span></span><span>Отправитель</span><span>Получатель</span></div>'+
     p.party.map(function(k){var a=S[k],b=R[k],empty=(a==null||a==='')&&(b==null||b==='');
       return '<div class="rpr'+(empty?' null':'')+'"><span class="nm">'+rlbl(k)+'</span>'+rval(k,a)+rval(k,b)+'</div>'}).join('')+'</div>'}
@@ -1426,7 +1431,7 @@ function render(di){
   var h=foldHtml()+dhHtml(d,'Платёжная инструкция ВАЛЮТА')+laneHtml(d,T,p)+
   tabsHtml(d,u)+
   (u.tab!=='main'?'<div class="db">'+viewHtml(di)+'</div>':'<div class="db">'+heroHtml(d,p,di)+p.blocks.map(function(b){return B[b]()}).join('')+
-   '<div class="fh"><h5>Поля '+T+'</h5>'+(p.grid.length?'<span class="lbl">отправитель слева · получатель справа</span>':'')+(hasGrid?'<a class="lnk" data-all>'+(u.all?'Свернуть поля':'Развернуть поля')+'</a>':'')+'</div>'+
+   '<div class="fh"><h5>Поля '+T+'</h5>'+(p.grid.length?'<span class="lbl">50–54 слева · 55–59 справа</span>':'')+(hasGrid?'<a class="lnk" data-all>'+(u.all?'Свернуть поля':'Развернуть поля')+'</a>':'')+'</div>'+
    '<div class="fg'+(u.all?' allopen':'')+'">'+gridHtml(di,p.grid)+textHtml(di,p.text)+'</div>'+extraHtml(di,p.extra)+
    (p.seqB?'<div class="fh seqb"><h5>'+p.seqB.title+'</h5></div><div class="fg'+(u.all?' allopen':'')+'">'+gridHtml(di,p.seqB.grid)+textHtml(di,p.seqB.text)+'</div>'+extraHtml(di,p.seqB.extra):'')+
   '</div>');
@@ -1448,7 +1453,8 @@ document.getElementById('pair').addEventListener('change',function(e){
     note:'<span class="was">'+was+'</span><span class="arr">→</span><span class="now">'+now+'</span>',
     ok:'Утвердить',cancel:'Отмена'}).then(function(ok){
       if(ok){
-        if(!d.vdEdit)d.vdEdit={was:was,who:'Клименко И.',when:new Date().toLocaleString('ru-RU').slice(0,16)};
+        if(!d.vdEdit)d.vdEdit={was:was,who:'Клименко И.',when:nowStr()};
+        d.vdEdit.confirmed=true;d.vdEdit.confirmedBy='Клименко И.';d.vdEdit.confirmedAt=nowStr();
         d.vd[0]=now;u.vdEdit=false;u.vdDraft=null;
       }
       render(di);                        /* отказ — остаёмся в правке с выбранной датой */
