@@ -1286,7 +1286,7 @@ function rubScenHtml(d){var r=d.r;
     '<div><h6>Идентификаторы</h6><span class="lbl">Ссылки</span><span class="lks">'+lk('txId',d.txId)+lk('docRef',r.docRef)+lk('УИП',r.purposeExtra&&r.purposeExtra.uip)+'</span></div></div>'}
 /* таблица отправитель | получатель: строки фиксированы профилем, пустые остаются бледными — два документа рядом читаются построчно */
 function rubPartyHtml(d,p){var S=d.r.party.s||{},R=d.r.party.r||{};
-  return '<div class="fh"><h5>Поля SWIFT</h5><span class="lbl">50–54 слева · 55–59 справа</span></div>'+
+  return '<div class="fh"><h5>Отправитель / Получатель</h5><span class="lbl">отправитель слева · получатель справа</span></div>'+
     '<div class="rp"><div class="rph"><span></span><span>Отправитель</span><span>Получатель</span></div>'+
     p.party.map(function(k){var a=S[k],b=R[k],empty=(a==null||a==='')&&(b==null||b==='');
       return '<div class="rpr'+(empty?' null':'')+'"><span class="nm">'+rlbl(k)+'</span>'+rval(k,a)+rval(k,b)+'</div>'}).join('')+'</div>'}

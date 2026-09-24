@@ -1273,7 +1273,7 @@ function rubScenHtml(d){var r=d.r;
     '<div><h6>Идентификаторы</h6><span class="lbl">Ссылки</span><span class="lks">'+lk('txId',d.txId)+lk('docRef',r.docRef)+lk('УИП',r.purposeExtra&&r.purposeExtra.uip)+'</span></div></div>'}
 /* таблица отправитель | получатель: строки фиксированы профилем, пустые остаются бледными — два документа рядом читаются построчно */
 function rubPartyHtml(d,p){var S=d.r.party.s||{},R=d.r.party.r||{};
-  return '<div class="fh"><h5>Поля SWIFT</h5><span class="lbl">50–54 слева · 55–59 справа</span></div>'+
+  return '<div class="fh"><h5>Отправитель / Получатель</h5><span class="lbl">отправитель слева · получатель справа</span></div>'+
     '<div class="rp"><div class="rph"><span></span><span>Отправитель</span><span>Получатель</span></div>'+
     p.party.map(function(k){var a=S[k],b=R[k],empty=(a==null||a==='')&&(b==null||b==='');
       return '<div class="rpr'+(empty?' null':'')+'"><span class="nm">'+rlbl(k)+'</span>'+rval(k,a)+rval(k,b)+'</div>'}).join('')+'</div>'}
@@ -1680,7 +1680,7 @@ var RPURP=['Оплата по счёту № 2923-2915 от 07.03.2026 за ра
   'Заработная плата за сентябрь 2026 по реестру № 20 от 22.07.2026. НДС не облагается',
   'Налог на прибыль организаций за 9 месяцев 2026 г. Уведомление № 2 от 04.05.2026',
   'Возврат ошибочно перечисленных средств по п/п № 0386 от 06.08.2026. Без НДС'];
-var RAMT=['85 814.36','7.00','2 178.00','200 535.00','490 800.00','130 500.00','40 000.00','150 075.00','87 631.00','118 059.00','1 305 599.36','12 700 000.00'];
+var RAMT=['54.05','890.88','34 120.19','5 050.55','34 305.58','285 573.92','769 248.65','176 339.20','1 081 638.71','1 664 409.65','2 245 517.38','84.13'];
 var RTYPES=['PAYDOCRU','PAYDOCRU','REQDOCRU','PAYDOCRU','PAYORDRU','PAYDOCRU','PAYDOCRU','REQDOCRU','PAYDOCRU','PAYDOCRU','PAYORDRU','PAYDOCRU'];
 var ED_BY_TYPE={PAYDOCRU:'ED101',REQDOCRU:'ED104',PAYORDRU:'ED105'};
 var TYPE_NAME={PAYDOCRU:'Платёжное поручение',REQDOCRU:'Инкассовое поручение',PAYORDRU:'Платёжный ордер'};
@@ -1709,7 +1709,7 @@ for(var i=0;i<N_ROWS;i++){
   base.amount=RAMT[(i*7+(i/12|0)*5)%12];base.ccy='RUB';
   var dd=(22+(i%12>7?1:0)),hh=String(7+(i*3)%11).padStart(2,'0'),mm=String((i*17)%60).padStart(2,'0');
   base.created=dd+'.09.2026 '+hh+':'+mm+':'+String((i*7)%60).padStart(2,'0');base.num=String(2900+i*3);base.numDate=dd+'.09.2026';
-  base.changed=(dd+(i%9===4?1:0))+'.09.2026 '+String(Math.min(23,+hh+(i%3)))+':'+String((i*29)%60).padStart(2,'0');
+  base.changed=(dd+(i%9===4?1:0))+'.09.2026 '+String(Math.min(23,+hh+(i%3))).padStart(2,'0')+':'+String((i*29)%60).padStart(2,'0');
   base.uuid=String(i).padStart(2,'0')+'e'+base.uuid.slice(3);
   base.txId=String((i*13)%100).padStart(2,'0')+'f'+base.txId.slice(3);
   var r=base.r,op=OP_BY_TYPE[base.type],sy=SYS[i%6];
