@@ -221,6 +221,25 @@ a.lnk:hover{text-decoration:underline}
 .cell.open>*{align-self:center}
 .cell .full{grid-column:3/-1}
 .cell.open .sc{visibility:hidden}
+/* блок аудита изменений внутри раскрытого поля */
+.cell .hs,.cell .hl{display:none;grid-column:3/-1}
+.cell.open .hs{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:3px 0 4px;padding-top:4px;border-top:1px dashed var(--line)}
+.cell .hs-n{font:600 11px var(--sans);color:var(--ink2)}
+.cell .hs .st{font-size:10px}
+.cell .hs-t{margin-left:auto;font:500 11px var(--sans);color:var(--val);background:none;border:0;padding:0 2px;cursor:pointer}
+.cell .hs-t:hover{text-decoration:underline}
+.cell.open .hl{display:block;margin:0 0 6px;padding:0;list-style:none;border-left:2px solid var(--line)}
+.cell .hl li{position:relative;padding:3px 0 5px 12px}
+.cell .hl li::before{content:'';position:absolute;left:-5px;top:9px;width:8px;height:8px;border-radius:50%;background:var(--ok);border:2px solid var(--paper)}
+.cell .hl li.pend::before{background:var(--warn)}
+.cell .hl-h{display:flex;align-items:center;gap:8px;font-size:11.5px}
+.cell .hl-h b{font-weight:600;color:var(--ink)}
+.cell .hl-h .tm{font:11px var(--mono);color:var(--muted)}
+.cell .hl-h .st{font-size:10px;margin-left:auto}
+.cell .hl-note{font-size:11px;color:var(--muted);margin-top:1px}
+.cell .hl-d{display:flex;flex-direction:column;gap:1px;margin-top:2px;font:11.5px var(--mono);color:var(--ink2)}
+.cell .hl-d s{color:var(--muted);text-decoration-color:var(--faint)}
+.cell .hl-d b{color:var(--warn);font-weight:600}
 .cell .ed{display:none;grid-column:3/-1;justify-self:start;font:500 11px var(--sans);color:var(--val);background:none;border:0;padding:0;cursor:pointer;margin-bottom:2px}
 .cell.open .ed{display:block}
 .cell.edited{background:var(--warn-row);border-color:var(--warn)}
@@ -951,7 +970,9 @@ var DOCS=[
   txId:'cf03cfd4-246d-4669-889f-63bc1af67574',txDate:'2026-09-22 07:33:21',txs:TX6,
   f:{'20':{lines:['FX2609220000417']},'21':{lines:['NONREF']},'71A':{lines:['OUR']},'71B':{lines:[]},'71F':{lines:['USD 35,00']},'71G':{lines:[]},'33B':{lines:['EUR 1148300,00']},'36':{lines:['1,0886']},'77B':{lines:['/ORDERRES/RU//CONTRACT 12-45 DD 01.03.2026']},
      '50':cl(P50),'59':cl(P59),'52':cl(B52),'53':cl(B53),'54':cl(B54),'55':cl(B55),'56':cl(B56),
-     '57':{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8KXXX'],edit:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8K2KD'],who:'Петрова А. С.',when:'22.09.2026 10:42'}},
+     '57':{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8KXXX'],edit:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BRANCH','VKRBRU8K2KD'],who:'Петрова А. С.',when:'22.09.2026 10:42'},
+       hist:[{who:'Сидоров К. В.',when:'22.09.2026 09:15',was:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8KXXX']},now:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8K2KD']},note:'BIC филиала по справочнику',status:'confirmed',by:'Лебедева О. Н.',at:'22.09.2026 09:40'},
+             {who:'Петрова А. С.',when:'22.09.2026 10:42',was:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BR','VKRBRU8K2KD']},now:{opt:'A',lines:['VOSTOCHNY KREDIT BANK KHABAROVSK BRANCH','VKRBRU8K2KD']},note:'Полное наименование филиала',status:'pending'}]},
      '58':cl(B58),
      '70':{lines:T70},'72':{lines:T72},
      '79':{lines:['RE YOUR MT103 FX2609220000417 DD 22.09.2026','AMOUNT USD 1250000,00','PLS BE ADVISED THAT BENEFICIARY ACCOUNT','40817840100050017762 IS CLOSED.','KINDLY AUTHORIZE US TO RETURN THE FUNDS','LESS OUR CHARGES USD 35,00','OR PROVIDE AMENDED BENEFICIARY DETAILS.','BEST REGARDS','PAYMENTS DEPT, VOSTOCHNY KREDIT BANK']},
@@ -1049,7 +1070,7 @@ DOCS.push(rubDoc({type:'REQDOCRU',status:'IN_PROGRESS',st:'wait',dirTxt:'исх�
 var FAM={cur:{a:0,b:2,ret:1,type:'MT103'},rub:{a:3,b:4,ret:4,type:'PAYDOCRU'}};
 var FAMILY='cur';
 var TYPE='MT103';
-function mkui(tx){return {open:new Set(),editing:null,vdEdit:false,vdDraft:null,all:false,shut:{tx:tx,purposeExtra:true,agents:true,budget:true,ed107:true,collect:true},tab:'main',audit:new Set(['commonSection']),tasks:new Set(),linked:new Set([0]),src:new Set(['swiftMessage','ED244']),mpu:new Set([0]),accEdit:null,txtEdit:null}}
+function mkui(tx){return {open:new Set(),editing:null,vdEdit:false,vdDraft:null,all:false,shut:{tx:tx,purposeExtra:true,agents:true,budget:true,ed107:true,collect:true},tab:'main',audit:new Set(['commonSection']),tasks:new Set(),linked:new Set([0]),src:new Set(['swiftMessage','ED244']),mpu:new Set([0]),accEdit:null,txtEdit:null,hist:new Set()}}
 var ui=DOCS.map(function(_,k){return mkui(k!==2)});
 
 /* ===================== ОТРИСОВКА ===================== */
@@ -1073,13 +1094,36 @@ function cell(di,tag){
   if(c.lines.length===1&&isBic(c.lines[0])){sec=c.lines[0];main='';}
   var cls='cell'+(f.edit?' edited':'')+(u.open.has(tag)?' open':'')+(u.editing===tag?' editing':'');
   var tip=f.edit?' title="Изменено: '+esc(f.edit.who)+', '+f.edit.when+'"':'';
+  var H=f.hist||[];
   var fullTxt=f.edit?('Было:\n'+full(f.lines,f.acc)+'\nСтало:\n'+full(f.edit.lines,f.edit.acc||f.acc)):full(c.lines,acc);
+  var histHtml=f.edit&&H.length?histBlock(tag,H,u.hist.has(tag)):'';
   return '<div class="'+cls+'" tabindex="0" data-no="'+tag+'"'+tip+'>'+
     fnoHtml(tag)+opHtml(c.opt)+
     '<span class="mn cut" title="'+esc(main)+'">'+esc(main)+'</span>'+
     '<span class="sc">'+esc(sec)+'</span><span class="eye">'+ic('eye')+'</span>'+penHtml(tag)+
-    '<div class="full">'+esc(fullTxt)+'</div>'+(f.edit?'<button class="ed" data-act="edit" data-no="'+tag+'">✎ Изменить · '+esc(f.edit.who)+', '+f.edit.when+'</button>':'')+
+    '<div class="full">'+esc(fullTxt)+'</div>'+histHtml+(f.edit?'<button class="ed" data-act="edit" data-no="'+tag+'">✎ Изменить</button>':'')+
   '</div>';
+}
+/* ---- аудит изменений поля: несколько правок разными людьми, последняя может ждать утверждения ---- */
+function diffLines(was,now){
+  var out=[],n=Math.max(was.lines.length,now.lines.length);
+  if((was.opt||'')!==(now.opt||''))out.push('опция '+(was.opt||'—')+' → '+(now.opt||'—'));
+  if((was.acc||'')!==(now.acc||''))out.push('счёт '+(was.acc||'—')+' → '+(now.acc||'—'));
+  for(var i=0;i<n;i++){var a=was.lines[i]||'',b=now.lines[i]||'';if(a!==b)out.push((i+1)+'/ '+(a||'—')+' → '+(b||'—'))}
+  return out;
+}
+function histBlock(tag,H,open){
+  var pend=H.filter(function(h){return h.status==='pending'}).length,people=[];
+  H.forEach(function(h){if(people.indexOf(h.who)<0)people.push(h.who)});
+  var head='<div class="hs"><span class="hs-n">'+H.length+' '+(H.length===1?'изменение':H.length<5?'изменения':'изменений')+'</span><span class="lbl">'+esc(people.join(', '))+'</span>'+
+    (pend?'<span class="st wait">ожидает утверждения</span>':'<span class="st ok">утверждено</span>')+
+    '<button type="button" class="hs-t" data-hist="'+tag+'">'+(open?'Свернуть историю':'История')+'</button></div>';
+  if(!open)return head;
+  return head+'<ol class="hl">'+H.map(function(h,i){var d=diffLines(h.was,h.now);
+    return '<li class="'+(h.status==='pending'?'pend':'')+'"><div class="hl-h"><b>'+esc(h.who)+'</b><span class="tm">'+h.when+'</span>'+
+      (h.status==='pending'?'<span class="st wait">ожидает</span>':'<span class="st ok" data-tip="Утвердил(а) '+esc(h.by||'')+', '+(h.at||'')+'">утверждено</span>')+'</div>'+
+      (h.note?'<div class="hl-note">'+esc(h.note)+'</div>':'')+
+      '<div class="hl-d">'+(d.length?d.map(function(x){var p=x.split(' → ');return '<span><s>'+esc(p[0])+'</s> → <b>'+esc(p[1])+'</b></span>'}).join(''):'<span class="lbl">без изменений</span>')+'</div></li>'}).join('')+'</ol>';
 }
 function penHtml(tag){return meta(tag).editable?'<span class="pen" data-act="edit" data-no="'+tag+'" data-tip="Редактировать" role="button" tabindex="0">'+ic('edit')+'</span>':'<span></span>'}
 function editor(di,tag){
@@ -1495,6 +1539,7 @@ pair.addEventListener('click',function(e){
   var tr=e.target.closest('[data-txtrevert]');if(tr){var tk2=tr.dataset.txtrevert;if(d[tk2+'Edit']){d[tk2]=d[tk2+'Edit'].was;delete d[tk2+'Edit']}render(di);return}
   if(e.target.closest('.txted'))return;
   if(u.txtEdit&&!e.target.closest('.txted')){u.txtEdit=null;render(di);}
+  var hb=e.target.closest('[data-hist]');if(hb){var ht=hb.dataset.hist;u.hist.has(ht)?u.hist.delete(ht):u.hist.add(ht);render(di);return}
   var ae=e.target.closest('[data-accedit]');if(ae){var side=ae.dataset.accedit;u.accEdit={side:side,q:'',sel:-1};render(di);var inp=document.getElementById('acc-'+side);if(inp)inp.focus();return}
   var ar=e.target.closest('[data-accrevert]');if(ar){var sd=ar.dataset.accrevert;if(d[sd+'Edit']){d[sd]=accFmt(d[sd+'Edit'].was);delete d[sd+'Edit']}render(di);return}
   var si=e.target.closest('.si[data-acc]');if(si&&u.accEdit){accCommit(di,u.accEdit.side,si.dataset.acc);return}
@@ -1521,8 +1566,12 @@ pair.addEventListener('click',function(e){
       while(lines.length&&!lines[lines.length-1])lines.pop();
       var accEl=fe.querySelector('.acc'),acc=accEl?accEl.value.trim():f.acc;
       var sel=fe.querySelector('[data-opts] [aria-pressed="true"]'),opt=sel?sel.dataset.o:f.opt;
-      if((opt||'')===(f.opt||'')&&(acc||'')===(f.acc||'')&&lines.join('\n')===f.lines.join('\n'))delete f.edit;
-      else f.edit={opt:opt,acc:acc,lines:lines,who:'Вы',when:new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}).replace(',','')};
+      var before=cur(f),beforeSnap={opt:before.opt||'',acc:before.acc||f.acc||'',lines:before.lines.slice()};
+      if((opt||'')===(f.opt||'')&&(acc||'')===(f.acc||'')&&lines.join('\n')===f.lines.join('\n')){delete f.edit;delete f.hist;}
+      else{f.edit={opt:opt,acc:acc,lines:lines,who:'Вы',when:nowStr()};
+        if(!f.hist)f.hist=[];
+        var same=(beforeSnap.opt||'')===(opt||'')&&(beforeSnap.acc||'')===(acc||'')&&beforeSnap.lines.join('\n')===lines.join('\n');
+        if(!same)f.hist.push({who:'Вы',when:nowStr(),was:beforeSnap,now:{opt:opt||'',acc:acc||'',lines:lines.slice()},status:'pending'});}
       u.editing=null;rowMates(no,d).forEach(function(t){if(!isNull(d.f[t]))u.open.add(t)});render(di);
     }
     return;
