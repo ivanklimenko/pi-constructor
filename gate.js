@@ -5,7 +5,7 @@
 // Сменить пароль: python3 -c "import hashlib;print(hashlib.sha256(('pi-constructor:'+'НОВЫЙ-ПАРОЛЬ').encode()).hexdigest())"
 // и подставить результат в HASH. Все, кто уже входил, будут спрошены заново.
 (function () {
-  var HASH = '72a1e91805bea4c0f58a171a25ae33d00b38e1dc63d460ddc29c4a64ccdb9d9e'
+  var HASH = 'de9ebe1b192f4c4f1279ae165f0429b846794e0a62b1b352e27ef3aa89e2b25e'
   var KEY = 'pi-gate'
   var loc = window.location
   if (loc.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(loc.hostname)) return
