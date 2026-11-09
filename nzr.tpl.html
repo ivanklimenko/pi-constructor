@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="robots" content="noindex, nofollow"><script src="gate.js"></script><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="chart.css"><link rel="icon" href="favicon.ico"><title>Отчёт НЗР</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="skeleton.css"><script src="skeleton.js"></script><link rel="stylesheet" href="prompt.css"><script src="prompt.js"></script>
+{{STYLE}}
+<style>
+html,body{height:100%;margin:0;overflow:hidden}
+button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.45}
+.nz-app{height:100%;display:flex;flex-direction:column;background:var(--paper);font-size:12.5px;line-height:1.4}
+.nz-app>*{flex-shrink:0}.nz-top{display:flex;align-items:center;gap:12px;padding:15px 20px 13px;border-bottom:1px solid var(--line)}
+.nz-top h1{font-size:21px;letter-spacing:-.02em;font-weight:600;white-space:nowrap}.nz-count{font-size:12px;color:var(--muted)}
+.nz-top .nz-nav{margin-left:auto;display:flex;align-items:center;gap:18px}.nz-nav a{color:var(--val);text-decoration:none;font-size:12px}.nz-nav a:hover{text-decoration:underline}
+.nz-demo{color:var(--muted);font-size:11px;border:1px solid var(--line);border-radius:4px;padding:2px 7px}
+.nz-tabs{display:flex;align-items:center;padding:0 20px;gap:20px;border-bottom:1px solid var(--line);min-height:43px}
+.nz-tab{border:0;border-bottom:2px solid transparent;align-self:stretch;padding:0 2px;display:flex;gap:7px;align-items:center;background:none;color:var(--ink2);font-size:12px}
+.nz-tab[aria-pressed="true"]{border-bottom-color:var(--val);color:var(--val);font-weight:600}.nz-tab .n{font-size:10.5px;border-radius:9px;background:var(--chip);color:var(--muted);padding:1px 6px;font-weight:500}
+.nz-tab[aria-pressed="true"] .n{background:var(--val-soft);color:var(--val)}.nz-tab-dot{width:6px;height:6px;border-radius:50%;background:var(--warn)}.nz-tab-dot.green{background:var(--ok)}
+.nz-date-note{margin-left:auto;font-size:11px;color:var(--muted);white-space:nowrap}
+.nz-tools{display:flex;align-items:center;gap:8px;padding:10px 20px;background:var(--sunk);border-bottom:1px solid var(--line)}
+.nz-search{display:flex;align-items:center;gap:7px;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:0 9px;height:30px;width:300px;color:var(--muted)}
+.nz-search input{width:100%;min-width:0;border:0;outline:0;background:none;color:var(--ink);font-size:12px}.nz-search:focus-within{outline:2px solid var(--val);outline-offset:1px}
+.nz-search svg,.nz-btn svg{width:14px;height:14px;flex:none}.nz-btn{border:1px solid var(--line);background:var(--paper);border-radius:5px;height:30px;padding:0 10px;color:var(--ink2);display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;font-size:12px;text-decoration:none}
+.nz-btn:hover{border-color:var(--val);color:var(--val)}.nz-btn[aria-expanded="true"]{background:var(--val-soft);border-color:var(--val);color:var(--val)}.nz-btn.primary{background:var(--val);color:var(--paper);border-color:var(--val)}
+.nz-tool-right{margin-left:auto;display:flex;align-items:center;gap:8px}.nz-selection{color:var(--val);font-size:11px}.nz-filter-note{font-size:11px;color:var(--muted)}
+.nz-panel{display:flex;gap:14px;align-items:end;padding:14px 20px;border-bottom:1px solid var(--line);background:var(--paper)}.nz-panel[hidden]{display:none}.nz-panel label{display:flex;flex-direction:column;gap:5px;font-size:11px;color:var(--muted)}
+.nz-panel input,.nz-panel select{height:30px;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--ink);padding:0 8px;min-width:140px;font-size:12px}.nz-panel .nz-error{color:var(--bad);font-size:11px}
+.nz-context{display:flex;align-items:center;gap:7px;padding:9px 20px;color:var(--muted);font-size:11px}.nz-context svg{height:13px;width:13px;color:var(--val)}.nz-context b{font-weight:500;color:var(--ink2)}
+.nz-scroll{flex:1 1 auto;min-height:0;overflow:auto;position:relative}
+.nz-table{width:100%;min-width:1800px;border-spacing:0;table-layout:fixed;font-size:12px;line-height:1.4}
+.nz-table th{position:sticky;top:0;z-index:3;background:var(--sunk);border-top:1px solid var(--line);border-bottom:1px solid var(--line);text-align:left;padding:9px 9px 8px;font-size:11.5px;font-weight:500;color:var(--ink2);vertical-align:top}
+.nz-table th small{display:block;font-size:10px;font-weight:400;color:var(--muted);margin-top:2px}.nz-table th button{border:0;background:none;padding:0;color:inherit;font:inherit;display:flex;align-items:center;gap:5px}.nz-sort{color:var(--faint);font-size:12px}
+.nz-table td{vertical-align:top;padding:11px 9px 4px;border-bottom:1px solid var(--line);overflow:hidden}.nz-table td[rowspan]{padding-bottom:10px}.nz-table .nz-main td:not([rowspan]){border-bottom:0}
+.nz-table tbody.nz-record:hover>.nz-main>td,.nz-table tbody.nz-record:hover>.nz-purpose>td{background:var(--hover)}
+.nz-table tbody.nz-record.selected>.nz-main>td,.nz-table tbody.nz-record.selected>.nz-purpose>td{background:var(--val-soft)}
+.nz-table input[type="checkbox"]{width:14px;height:14px;accent-color:var(--val);margin:4px 0 0;cursor:pointer}
+.nz-sticky{position:sticky;left:0;background:var(--paper);z-index:2}.nz-table th.nz-sticky{z-index:4;background:var(--sunk)}
+.nz-table th.nz-expand-col{left:32px}.nz-expand-col{position:sticky;left:32px;background:var(--paper);z-index:2}
+.nz-expand{border:0;background:none;color:var(--val);padding:0;width:31px;display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:4px;font-size:10px}.nz-expand:hover{background:var(--val-soft)}
+.nz-expand svg{width:16px;height:16px}.nz-expand[aria-expanded="true"] svg{transform:rotate(90deg)}.nz-nolink{display:block;text-align:center;color:var(--faint);padding-top:3px}
+.nz-docline{display:flex;align-items:center;gap:6px;height:20px}.nz-open{border:0;background:none;color:var(--val);padding:0;display:inline-flex;align-items:center;gap:4px}.nz-open:hover{color:var(--ink);text-decoration:underline}.nz-open svg{width:15px;height:15px}
+
+.nz-copy{border:0;background:none;padding:0;color:var(--val);font-size:10px;cursor:copy;margin-top:4px}.nz-copy:hover{text-decoration:underline}
+.nz-sub{display:block;font-size:10.5px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nz-dates{font-variant-numeric:tabular-nums}.nz-dates .nz-sub{display:flex;align-items:center;gap:5px;color:var(--ok)}.nz-dates .nz-sub.pending{color:var(--muted)}
+.nz-dates small{font-size:9px;color:var(--muted)}.nz-amount{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}.nz-amount .nz-sub{text-align:right}
+.nz-reason{line-height:1.5;font-size:11px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.nz-product{display:inline-flex;padding:2px 7px;border:1px solid var(--line);border-radius:4px;color:var(--val);font-size:10px;font-weight:500;background:var(--val-soft)}
+.nz-type{font-family:var(--mono);font-size:11px}.nz-direction{font-family:var(--mono);font-size:11px}.nz-fld{display:flex;gap:5px;align-items:baseline;min-width:0}.nz-opt{color:var(--opt);font:600 11px var(--mono)}
+.nz-value{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;min-width:0;font-family:var(--mono);font-size:11px;cursor:copy}.nz-value:hover{color:var(--val)}.nz-cap{font-size:9.5px;color:var(--muted);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;margin-top:3px}
+.nz-table tr.nz-purpose td{padding:0 9px 10px}.nz-purpose-inner{display:flex;gap:16px;font-size:10px;color:var(--muted)}.nz-purpose-inner>span{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.nz-purpose-inner b{font:500 10px var(--mono);color:var(--ink2);margin-right:5px}.nz-route .nz-value{font-size:10px}.nz-route .nz-sub{font-size:9.5px}
+.nz-table .expanded>.nz-main>td,.nz-table .expanded>.nz-purpose>td{background:var(--hover)}
+.nz-children .nz-child-head td{padding:7px 10px;background:var(--val-soft);color:var(--val);font-size:10.5px;border-top:1px solid var(--line);border-bottom:0}
+.nz-child-head td:first-child{background:var(--paper);border:0}.nz-child-head td:nth-child(2){border-left:2px solid var(--line);border-top-left-radius:7px}.nz-child-head td:last-child{border-right:1px solid var(--line);border-top-right-radius:7px}
+.nz-child-head strong{font-weight:500}.nz-child-head span{color:var(--muted);margin-left:12px}
+.nz-children .nz-child td{background:var(--sunk);border-bottom:1px solid var(--line2);padding-top:9px;padding-bottom:9px}.nz-children .nz-child:hover td{background:var(--hover)}
+.nz-children .nz-child td:first-child{background:var(--paper);border:0}.nz-children .nz-child td:nth-child(2){border-left:2px solid var(--line)}.nz-children .nz-child td:last-child{border-right:1px solid var(--line)}
+.nz-child-label{font-size:9px;color:var(--muted);display:block;margin-top:2px}.nz-child .nz-empty{color:var(--faint)}.nz-child .nz-dates .nz-sub{color:var(--muted)}
+.nz-child .nz-purpose-inner{margin-top:6px}.nz-child-last td:not(:first-child){border-bottom:1px solid var(--line)!important}.nz-child-last td:nth-child(2){border-bottom-left-radius:7px}.nz-child-last td:last-child{border-bottom-right-radius:7px}
+.nz-children .nz-child-main td:not([rowspan]){border-bottom:0!important;padding-bottom:4px}.nz-children .nz-child-purpose td{border-left:0!important;border-right:0!important;border-radius:0!important;padding:0 9px 9px}.nz-child-purpose .nz-purpose-inner{margin-top:0}.nz-children .nz-child-purpose td:first-child{background:var(--sunk);border-bottom:1px solid var(--line2)}.nz-child-gap td{height:9px;padding:0;border:0}.nz-empty-state{text-align:center;padding:70px 20px!important;color:var(--muted)}.nz-empty-state b{display:block;color:var(--ink2);font-weight:500;margin-bottom:10px}
+.nz-foot{display:flex;align-items:center;gap:14px;padding:9px 20px;background:var(--sunk);border-top:1px solid var(--line);font-size:10.5px;color:var(--muted)}.nz-page{display:flex;align-items:center;gap:4px}.nz-page button{border:0;background:none;color:var(--ink2);border-radius:4px;width:24px;height:24px}.nz-page button.on{background:var(--val);color:var(--paper)}.nz-foot-end{margin-left:auto;display:flex;gap:16px;align-items:center}.nz-foot select{background:var(--paper);color:var(--ink2);border:1px solid var(--line);border-radius:4px;font-size:10.5px;padding:3px}
+#pair{position:fixed;top:0;right:0;bottom:0;z-index:50;pointer-events:none;display:flex}#pair .dw{pointer-events:auto;height:100%;overflow-y:auto;border-radius:0;border-left:1px solid var(--line);box-shadow:-8px 0 28px rgba(20,26,41,.14)}#pair .dw .fold,#pair .dw .back{display:none}.nz-slot{padding:8px 14px;background:var(--val-soft);color:var(--val);font-size:11px;position:sticky;top:0;z-index:8}
+.nz-toast{position:fixed;bottom:52px;left:20px;z-index:80;background:var(--ink);color:var(--paper);font-size:12px;padding:8px 12px;border-radius:5px;max-width:70vw}.nz-toast[hidden]{display:none}
+
+
+.nz-accounts-bar{display:flex;align-items:center;gap:12px;padding:9px 20px;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted);min-height:55px}
+.nz-active-account{min-width:270px}.nz-active-account small{display:block;font-size:9px;color:var(--muted);margin-bottom:2px}.nz-active-account strong{font:500 13px var(--mono);color:var(--ink)}.nz-active-account .ccy{font-size:10px;font-weight:600;color:var(--val);background:var(--val-soft);padding:2px 6px;border-radius:4px;margin-left:8px}
+.nz-account-step{display:flex;align-items:center;gap:3px;white-space:nowrap}.nz-account-step button{width:25px;height:26px;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--ink2)}.nz-account-step span{font-size:10px;min-width:54px;text-align:center}.nz-account-picker{position:relative}.nz-account-picker summary{cursor:pointer;list-style:none;color:var(--val);white-space:nowrap;padding:6px 8px;border:1px solid var(--line);border-radius:5px;background:var(--paper)}.nz-account-picker summary::-webkit-details-marker{display:none}.nz-account-picker summary:after{content:'⌄';margin-left:7px}.nz-account-picker[open] summary{background:var(--val-soft);border-color:var(--val)}
+.nz-switch-menu{position:absolute;top:35px;left:0;width:350px;max-width:85vw;z-index:25;padding:9px;background:var(--paper);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow)}.nz-switch-menu>input{width:100%;height:29px;padding:0 8px;border:1px solid var(--line);border-radius:4px;font-size:11px;color:var(--ink);background:var(--paper)}.nz-switch-list{height:270px;overflow:auto;margin-top:6px}.nz-switch-list button{display:block;width:100%;border:0;background:none;text-align:left;padding:7px 8px;border-radius:4px;color:var(--ink2)}.nz-switch-list button:hover,.nz-switch-list button[aria-current="true"]{background:var(--val-soft);color:var(--val)}.nz-switch-list .mono{font-size:10.5px}.nz-switch-list small{display:block;color:var(--muted);font-size:10px;margin-top:2px}.nz-switch-pages{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:7px;font-size:10px;color:var(--muted)}.nz-switch-pages button{border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--ink2);height:23px;width:25px}
+.nz-asof{margin-left:auto;display:flex;align-items:center;gap:7px;white-space:nowrap}.nz-asof input{height:27px;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--ink2);padding:0 6px;font-size:11px}
+.nz-recon{padding:6px 20px;border-bottom:1px solid var(--line);background:var(--paper)}.nz-recon.idle{display:none}.nz-recon-top{display:flex;align-items:center;gap:8px;min-height:25px;font-size:11px}.nz-recon-top>b{font-weight:500;color:var(--ink2)}.nz-recon-top small{font-size:10px;color:var(--muted)}.nz-recon-actions{margin-left:auto;display:flex;gap:5px}.nz-recon-actions button{height:24px;font-size:10.5px;padding:0 7px}.nz-recon-status{font-size:10px;color:var(--ok)}.nz-recon-status.diff{color:var(--warn);font-weight:500}.nz-recon-status.failed{color:var(--bad)}.nz-recon-status.loading{color:var(--muted)}.nz-recon-body{padding-top:4px}.nz-recon-body[hidden]{display:none}.nz-compact-scroll{overflow:auto}.nz-compact{width:100%;min-width:680px;border-collapse:collapse;table-layout:fixed;font-size:11px;line-height:1.25}.nz-compact th{text-align:right;padding:3px 10px;font-size:9px;color:var(--muted);font-weight:400;border-bottom:1px solid var(--line2);background:var(--sunk)}.nz-compact th:first-child,.nz-compact td:first-child{text-align:left;width:105px}.nz-compact td{text-align:right;padding:4px 10px;font-variant-numeric:tabular-nums;border:0;color:var(--ink2)}.nz-compact td.mismatch{color:var(--warn)}.nz-inline-delta{font-size:9px;color:var(--warn);background:var(--warn-soft);padding:1px 4px;border-radius:3px;margin-left:7px;white-space:nowrap}.nz-recon-note{color:var(--muted);font-size:9px;margin-top:4px}.nz-recon-wait{padding:7px 0;font-size:11px;color:var(--muted)}.nz-recon-error{font-size:11px;color:var(--bad);padding:5px 0}
+.nz-archive{margin-left:auto;display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:10.5px}.nz-archive input{accent-color:var(--val)}.nz-aging{display:block;color:var(--warn);font-size:10px;margin-top:4px}.nz-aging.old{font-weight:600}.nz-child-status{display:block;margin-top:3px;font-size:10px;color:var(--muted)}.nz-child-status.failed{color:var(--bad)}
+.nz-doc-status{display:inline-grid;place-items:center;width:16px;height:16px;flex:none;border-radius:50%;color:#fff;font:700 10px var(--sans);background:var(--status-color)}.nz-status-legend{position:relative;font-size:10px;color:var(--val)}.nz-status-legend summary{cursor:pointer;list-style:none;white-space:nowrap}.nz-status-legend>div{position:absolute;top:23px;left:0;z-index:22;width:245px;border:1px solid var(--line);border-radius:5px;box-shadow:var(--shadow);background:var(--paper);padding:7px}.nz-status-legend p{display:flex;align-items:center;gap:7px;padding:4px 5px;color:var(--ink2);font-size:11px}.nz-status-legend p small{margin-left:auto;color:var(--muted);font-size:9px}
+.nz-dialog{padding:0;width:min(780px,94vw);max-height:88vh;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);box-shadow:var(--shadow)}.nz-dialog::backdrop{background:rgba(20,26,41,.3)}.nz-dialog-layout{display:flex;flex-direction:column;max-height:86vh}.nz-dialog-head{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line);gap:12px}.nz-dialog-head h2{font-size:18px;margin:0}.nz-dialog-head small{display:block;margin-top:4px;color:var(--muted);font-size:11px}.nz-dialog-head button{margin-left:auto;border:0;background:none;color:var(--muted);font-size:19px;padding:4px 6px}.nz-dialog-search{display:flex;gap:8px;padding:12px 20px 8px}.nz-dialog-search input{flex:1;min-width:0}.nz-dialog-search input,.nz-dialog-search select{height:31px;border:1px solid var(--line);border-radius:4px;padding:0 8px;background:var(--paper);color:var(--ink);font-size:12px}.nz-dialog-actions{display:flex;align-items:center;gap:12px;padding:0 20px 8px;font-size:11px;color:var(--muted)}.nz-dialog-actions button{border:0;padding:0;background:none;color:var(--val);font-size:11px}.nz-dialog-actions span{margin-left:auto}.nz-dialog-list{overflow:auto;min-height:100px;max-height:395px;padding:0 20px}.nz-account-table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed}.nz-account-table th{text-align:left;font-size:10px;color:var(--muted);font-weight:400;padding:6px 8px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--sunk)}.nz-account-table td{padding:8px;border-bottom:1px solid var(--line2);color:var(--ink2)}.nz-account-table tr.selected{background:var(--val-soft)}.nz-account-table .mono{font-size:11px}.nz-account-table input{accent-color:var(--val);cursor:pointer}.nz-account-table td label{display:block;cursor:pointer}.nz-dialog-foot{padding:12px 20px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}.nz-dialog-foot .nz-dialog-pages{display:flex;gap:5px;align-items:center}.nz-dialog-foot .nz-dialog-pages button{height:26px;width:27px;border:1px solid var(--line);border-radius:4px;background:var(--paper);color:var(--ink2)}.nz-dialog-foot .nz-dialog-cancel{margin-left:auto}
+@media(max-width:1000px){.nz-accounts-bar{flex-wrap:wrap;gap:8px}.nz-active-account{min-width:245px}.nz-asof{margin-left:0}.nz-archive{white-space:normal}.nz-tabs{overflow:auto;gap:14px}.nz-tab{white-space:nowrap}.nz-recon-top small{display:none}}
+@media(max-width:950px){.nz-top{flex-wrap:wrap}.nz-top .nz-nav{gap:12px}.nz-date-note{display:none}.nz-tools{flex-wrap:wrap}.nz-search{width:260px}.nz-tool-right{margin-left:0}.nz-panel{flex-wrap:wrap}.nz-foot-end>span{display:none}#pair .dw{width:min(800px,100vw)}}
+@media(max-width:600px){.nz-top,.nz-tools,.nz-tabs,.nz-context,.nz-foot{padding-left:12px;padding-right:12px}.nz-tabs{gap:12px}.nz-tab{font-size:11px}.nz-top .nz-nav{width:100%;margin-left:0}.nz-search{width:100%}.nz-context{align-items:flex-start}.nz-foot{flex-wrap:wrap}.nz-foot-end{margin-left:0}}
+</style></head><body>
+{{SVG}}
+<main class="nz-app">
+ <header class="nz-top"><h1>Отчёт НЗР</h1><span class="nz-count" id="nz-count"></span><nav class="nz-nav" aria-label="Реестры"><a href="grid.html">Валютные документы ↗</a><a href="rub-grid.html">Рублёвые документы ↗</a><span class="nz-demo">Макет</span><span id="zoomctl"></span></nav></header>
+ <div class="nz-accounts-bar">
+  <div class="nz-active-account" id="nz-active-account"></div>
+  <div class="nz-account-step"><button id="nz-account-prev" aria-label="Предыдущий счёт">‹</button><span id="nz-account-position"></span><button id="nz-account-next" aria-label="Следующий счёт">›</button></div>
+  <details class="nz-account-picker" id="nz-account-picker"><summary>Перейти к счёту</summary><div class="nz-switch-menu"><input type="search" id="nz-switch-search" aria-label="Найти счёт в наборе" placeholder="Номер, валюта или название"><div class="nz-switch-list" id="nz-switch-list"></div><div class="nz-switch-pages" id="nz-switch-pages"></div></div></details>
+  <button class="nz-btn" id="nz-account-set"></button>
+  <label class="nz-asof">На дату <input type="date" id="nz-asof" value="2026-11-09" min="2026-10-01" max="2026-11-09" aria-label="Дата отчёта и оборота"></label>
+ </div>
+ <div class="nz-recon" id="nz-recon" aria-label="Сверка с ПП ЛН" aria-live="polite"></div>
+ <div class="nz-tabs" aria-label="Состояние постановки" id="nz-tabs"></div>
+ <div class="nz-tools">
+  <label class="nz-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" id="nz-search" aria-label="Поиск по постановкам" placeholder="Номер, UUID, счёт или наименование"></label>
+  <button class="nz-btn" id="nz-filter-toggle" aria-expanded="false" aria-controls="nz-filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 5h16l-6 7v6l-4 2v-8Z"/></svg>Фильтры <span id="nz-filter-count"></span></button><span class="nz-filter-note" id="nz-filter-note">За всё время</span>
+  <div class="nz-tool-right"><span class="nz-selection" id="nz-selection"></span><button class="nz-btn" id="nz-expand-all">Раскрыть все связи</button><button class="nz-btn" id="nz-export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v12m-4-4 4 4 4-4M5 16v5h14v-5"/></svg>Экспорт</button></div>
+ </div>
+ <form class="nz-panel" id="nz-filters" hidden>
+  <label>Постановка с<input type="date" id="nz-from" aria-label="Дата постановки с"></label><label>по<input type="date" id="nz-to" aria-label="Дата постановки по"></label>
+  <label>Продукт<select id="nz-product"><option value="">Все продукты</option><option>RETAIL</option><option>CORPORATE</option></select></label>
+  <label>Статус документа<select id="nz-status-filter"><option value="">Все статусы</option></select></label>
+  <button class="nz-btn primary" type="submit">Применить</button><button class="nz-btn" type="button" id="nz-reset">Сбросить</button><span class="nz-error" id="nz-error" role="alert"></span>
+ </form>
+ <div class="nz-context"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M7 4v12h12M15 12l4 4-4 4M4 4h6"/></svg><span><b>Ожидание успешного списания.</b> Срок — от даты постановки; неуспешные попытки его не прерывают.</span><details class="nz-status-legend"><summary>Статусы документов ⌄</summary><div id="nz-status-legend"></div></details><label class="nz-archive"><input type="checkbox" id="nz-include-closed"> Включить списанные</label></div>
+ <div class="nz-scroll" id="nz-scroll"><table class="nz-table" id="nz-table" aria-label="Документы постановки на НЗР и дочерние документы"></table></div>
+ <footer class="nz-foot"><span id="nz-foot-count"></span><div class="nz-page" id="nz-pages" aria-label="Страницы отчёта"></div><div class="nz-foot-end"><span>Демонстрационные данные · реквизиты вымышлены</span><label>На странице <select id="nz-size"><option>10</option><option>20</option><option>50</option></select></label></div></footer>
+</main>
+<dialog class="nz-dialog" id="nz-account-dialog" aria-labelledby="nz-dialog-title"><div class="nz-dialog-layout">
+ <header class="nz-dialog-head"><div><h2 id="nz-dialog-title">Набор счетов НЗР</h2><small>Выберите счета для работы. В реестре открывается один активный счёт.</small></div><button id="nz-dialog-close" aria-label="Закрыть выбор счетов">×</button></header>
+ <div class="nz-dialog-search"><input type="search" id="nz-dialog-search" aria-label="Поиск счетов НЗР" placeholder="Номер счёта или название"><select id="nz-dialog-currency" aria-label="Валюта счетов"><option value="">Все валюты</option></select></div>
+ <div class="nz-dialog-actions"><button id="nz-dialog-select-all">Выбрать все найденные</button><button id="nz-dialog-clear">Снять выбор</button><span id="nz-dialog-count"></span></div>
+ <div class="nz-dialog-list"><table class="nz-account-table" aria-label="Счета НЗР для включения в набор"><colgroup><col style="width:35px"><col style="width:240px"><col style="width:70px"><col></colgroup><thead><tr><th><input type="checkbox" id="nz-dialog-page-check" aria-label="Выбрать счета на странице"></th><th>Счёт НЗР</th><th>Валюта</th><th>Название</th></tr></thead><tbody id="nz-dialog-rows"></tbody></table></div>
+ <footer class="nz-dialog-foot"><div class="nz-dialog-pages" id="nz-dialog-pages"></div><button class="nz-btn nz-dialog-cancel" id="nz-dialog-cancel">Отмена</button><button class="nz-btn primary" id="nz-dialog-apply">Применить набор</button></footer>
+</div></dialog>
+<div id="pair" data-host></div><div class="nz-toast" role="status" id="nz-toast" hidden></div>
+{{SCRIPT}}
+<script src="nzr-logic.js"></script>
+<script src="document-statuses.js"></script>
+<script>
+(function(){
+'use strict';
+var P=window.PI,esc=P.esc,table=document.getElementById('nz-table'),pair=document.getElementById('pair');
+var chevron='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 5 7 7-7 7"/></svg>';
+var docIcon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h8l4 4v14H6ZM14 3v5h5M9 12h6m-6 4h6"/></svg>';
+var names=[['OOO SEVERNAYA ZVEZDA','40702840300010009911'],['LAVRENTIEV DMITRY OLEGOVICH','40817840500010042371'],['AO TEKHNOPARK VOSTOK','40702840600010004420'],['SEMENOVA IRINA VLADIMIROVNA','40817840100050017762']];
+var banks=[['NORDINVEST BANK MOSCOW','NRDIRUMMXXX'],['BALTIC CLEARING BANK RIGA','BCLHLV22XXX'],['HANSEATIC TRADE BANK HAMBURG','HSTBDEHHXXX']];
+var reasons=['Не установлены реквизиты получателя','Требуется уточнение назначения платежа','Счёт получателя закрыт','Ожидание подтверждающих документов'];
+var SNAPSHOT='2026-11-09',L=window.NZRLogic;
+var ACCOUNTS=[
+ {id:'47422840000000000101',ccy:'USD',name:'НЗР · входящие переводы'},
+ {id:'47422840000000000202',ccy:'USD',name:'НЗР · клиентские переводы'},
+ {id:'47422978000000000303',ccy:'EUR',name:'НЗР · евро'},
+ {id:'47422156000000000404',ccy:'CNY',name:'НЗР · юани'}
+];
+var CURRENCIES=[['USD','840'],['EUR','978'],['CNY','156'],['GBP','826'],['CHF','756'],['AED','784'],['AMD','051'],['KZT','398'],['INR','356'],['TRY','949']];
+for(var accountIndex=4;accountIndex<120;accountIndex++){var currency=CURRENCIES[accountIndex%10];ACCOUNTS.push({id:'47422'+currency[1]+String(1000+accountIndex).padStart(12,'0'),ccy:currency[0],name:'НЗР · расчётный центр '+String(accountIndex+1).padStart(3,'0'),demoBalance:10000+accountIndex*175,demoTurnover:5000+accountIndex*90})}
+var specs=[
+ ['08.11.2026',1900234,'USD','RETAIL',0,[['09.11.2026',1900234,'IN_PROGRESS']],0],
+ ['07.11.2026',84300,'EUR','CORPORATE',1,[],2],
+ ['06.11.2026',1250000,'USD','CORPORATE',2,[['08.11.2026',750000,'DONE'],['09.11.2026',500000,'DONE']],0],
+ ['06.11.2026',99000,'CNY','RETAIL',0,[['09.11.2026',99000,'ERROR']],3],
+ ['04.11.2026',318450.75,'EUR','CORPORATE',3,[['09.11.2026',100000,'DONE']],2],
+ ['03.11.2026',64000,'USD','RETAIL',1,[['09.11.2026',64000,'IN_PROGRESS']],1],
+ ['02.11.2026',2200000,'USD','CORPORATE',3,[['09.11.2026',2200000,'DONE']],1],
+ ['01.11.2026',410000,'USD','CORPORATE',2,[],0],
+ ['09.11.2026',148300,'EUR','RETAIL',0,[],2],
+ ['08.11.2026',12500,'CNY','RETAIL',1,[],3],
+ ['30.10.2026',72000,'USD','CORPORATE',3,[['08.11.2026',72000,'ERROR']],1],
+ ['05.11.2026',8500,'EUR','RETAIL',2,[['09.11.2026',8500,'DONE']],2]
+];
+var allDocs={},rows=[];
+function money(v){return v.toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function iso(s){return s.split('.').reverse().join('-')}
+function makeDoc(i,num,date,amount,ccy){var d=P.cl(P.DOCS[i%2]),n=names[i%4],n2=names[(i+1)%4],b=banks[i%3],b2=banks[(i+1)%3];
+ d.uuid='a'+String(num).padStart(7,'0')+'-d1c5-4f07-aa49-8be3e9e4c8e8';d.num=String(num);d.numDate=date;d.created=date+' 10:24:18';d.vd=[date,date,date,date];d.amount=money(amount);d.ccy=ccy;d.type=i%3===2?'MT202':'MT103';d.status='DONE';d.st='ok';d.dir='IN';d.dirTxt='входящий от корреспондента';d.reason='';d.linked=[];
+ d.f['20']={lines:['NZR26'+num]};d.r20out='FX26'+num;d.f['50']={opt:'F',acc:n[1],lines:[n[0]]};d.f['59']={opt:'F',acc:n2[1],lines:[n2[0]]};d.f['52']={opt:'A',lines:[b[0],b[1]]};d.f['57']={opt:'A',lines:[b2[0],b2[1]]};d.f['58']=d.type==='MT202'?{opt:'A',lines:[b2[0],b2[1]]}:{lines:[]};
+ d.f['70']={lines:['PAYMENT UNDER CONTRACT '+(140+i)+' DD 01.10.2026 FOR CONSULTING SERVICES']};d.f['72']={lines:['/ACC/ PLEASE CLARIFY BENEFICIARY DETAILS']};d.route={type:i%2?'LORO':'NOSTRO',recv:b2[1],acc:'30114840000001430157',desc:'Маршрут валютного перевода',text:'Демонстрационный маршрут'};allDocs[d.num]=d;return d;
+}
+specs.forEach(function(s,i){
+ var d=makeDoc(i,400+i*3,s[0],s[1],s[2]);d.product=s[3];d.nzReason=reasons[s[4]];d.value=s[1];d.posted=s[0];d.account=ACCOUNTS[s[6]].id;
+ d.children=s[5].map(function(c,k){var child=makeDoc(i,1400+i*3+k,c[0],c[1],s[2]);child.parent=d.num;child.kind='Списание';child.value=c[1];child.posted=c[0];child.status=c[2];child.st=c[2]==='DONE'?'ok':c[2]==='ERROR'?'bad':'wait';child.dir='OUT';child.dirTxt='списание с НЗР';child.f['70']={lines:['WRITE-OFF FROM NZR /REF/ NZR26'+d.num]};return child});rows.push(d);
+});
+function sampleDate(age){var date=new Date(SNAPSHOT+'T00:00:00Z');date.setUTCDate(date.getUTCDate()-age);return date.toISOString().slice(0,10).split('-').reverse().join('.')}
+function setStatus(d,code){d.status=code;d.st=window.DocumentStatuses.drawerState(code)}
+rows.forEach(function(d,i){setStatus(d,['DEFERRED','DEFERRED','DONE','PROCESSING','DEFERRED','IN_PROGRESS','DONE','ERROR','TO_EXPORT','PROCESSING','DEFERRED','DONE'][i])});
+ACCOUNTS.slice(4).forEach(function(account,index){var i=index+4,amount=account.demoBalance,turnover=account.demoTurnover,age=1+i%10;
+ var open=makeDoc(i,5000+i*3,sampleDate(age),amount,account.ccy);open.account=account.id;open.value=amount;open.posted=sampleDate(age);open.product=i%2?'RETAIL':'CORPORATE';open.nzReason=reasons[i%4];open.children=[];setStatus(open,['DEFERRED','IN_PROGRESS','PROCESSING','ERROR'][i%4]);
+ if(i%3!==2){var attempt=makeDoc(i,20000+i*3,sampleDate(0),amount,account.ccy);attempt.value=amount;attempt.posted=sampleDate(0);attempt.kind='Списание';attempt.parent=open.num;attempt.dir='OUT';attempt.dirTxt='списание с НЗР';setStatus(attempt,['ERROR','PROCESSING','REJECTED','TO_EXPORT','INVALID','EXPORTED'][i%6]);open.children.push(attempt)}
+ var closed=makeDoc(i,5001+i*3,sampleDate(4),turnover,account.ccy),success=makeDoc(i,20001+i*3,sampleDate(0),turnover,account.ccy);closed.account=account.id;closed.value=turnover;closed.posted=sampleDate(4);closed.product=open.product;closed.nzReason=open.nzReason;success.value=turnover;success.posted=sampleDate(0);success.kind='Списание';success.parent=closed.num;success.dir='OUT';success.dirTxt='списание с НЗР';setStatus(closed,'DONE');setStatus(success,'DONE');closed.children=[success];rows.push(open,closed);
+});
+var state={activeAccount:ACCOUNTS[0].id,reconCollapsed:false,status:'',quick:'all',q:'',from:'',to:'',product:'',sort:'age',asc:false,page:1,size:10,asOf:SNAPSHOT,accounts:ACCOUNTS.slice(0,4).map(function(a){return a.id}),includeClosed:false,expanded:new Set(),selected:new Set()},visible=[];
+function annotate(){rows.forEach(function(d){d.visibleChildren=d.children.filter(function(c){return iso(c.posted)<=state.asOf});d.remaining=L.remaining(d,state.asOf);d.written=Math.round((d.value-d.remaining)*100)/100;d.lastWrite=d.children.filter(function(c){return c.status==='DONE'&&iso(c.posted)<=state.asOf}).map(function(c){return c.posted}).sort(function(a,b){return iso(a).localeCompare(iso(b))}).pop()||'';d.age=L.ageDays(d.posted,state.asOf);d.bucket=L.ageBucket(d.posted,state.asOf)})}
+annotate();
+var columns=[32,40,70,124,128,154,90,78,116,155,142,142,128,155,156];
+function crop(v,cls){return '<span class="'+(cls||'nz-value')+'" title="'+esc(v)+'" data-copy="'+esc(v)+'">'+esc(v)+'</span>'}
+function field(f){if(!f||(!f.acc&&!f.lines.length))return '<span class="nz-empty">—</span>';var l=f.lines,main=f.acc||l[l.length-1],cap=f.acc?l[0]:(l.length>1?l[0]:'');return '<div class="nz-fld"><span class="nz-opt">'+esc(f.opt||'')+'</span>'+crop(main)+'</div>'+(cap?crop(cap,'nz-cap'):'')}
+function statusBadge(code){var meta=window.DocumentStatuses.byCode[code],kind=window.DocumentStatuses.drawerState(code),symbol=kind==='ok'?'✓':kind==='bad'?'✕':'·';return '<span class="nz-doc-status" style="--status-color:var(--st-'+meta.color+')" role="img" aria-label="'+esc(meta.label+' · '+code)+'" title="'+esc(meta.label+' · '+code)+'">'+symbol+'</span>'}
+function docCell(d){return '<div class="nz-docline">'+statusBadge(d.status)+'<button class="nz-open" data-open="'+d.num+'" aria-label="Открыть документ '+d.num+'" title="Открыть документ '+d.num+'">'+docIcon+'</button></div><button class="nz-copy" data-copy="'+d.uuid+'" title="'+d.uuid+'">uuid</button>'}
+
+function dates(d,child){
+ if(child)return '<span>'+d.posted+'</span><span class="nz-child-status'+(['ERROR','INVALID','REJECTED'].includes(d.status)?' failed':'')+'">'+esc(window.DocumentStatuses.byCode[d.status].label)+'</span>';
+ return '<span title="Дата постановки">'+d.posted+'</span><span class="nz-sub'+(d.remaining>0?' pending':'')+'">'+(d.remaining===0?'Списано '+d.lastWrite:d.written>0?'Частично списано':'Не списано')+'</span>'+(d.remaining>0?'<span class="nz-aging'+(d.age>5?' old':'')+'">'+(d.age===0?'Сегодня':d.age+' '+(d.age===1?'день':d.age<5?'дня':'дней')+' на НЗР')+'</span>':'');
+}
+function swift(d){return ['50','52','57','58','59'].map(function(f){return '<td>'+field(d.f[f])+'</td>'}).join('')}
+function purpose(d){return '<div class="nz-purpose-inner"><span title="'+esc(d.f['70'].lines.join(' '))+'"><b>70</b>'+esc(d.f['70'].lines.join(' '))+'</span><span title="'+esc(d.f['72'].lines.join(' '))+'"><b>72</b>'+esc(d.f['72'].lines.join(' '))+'</span></div>'}
+function route(d,rowspan){return '<td class="nz-route"'+(rowspan?' rowspan="2"':'')+'>'+crop(d.route.acc)+'<span class="nz-sub">'+esc(d.route.type)+' · '+esc(d.route.recv)+'</span></td>'}
+function parentRow(d){var opened=state.expanded.has(d.num);return '<tbody class="nz-record'+(opened?' expanded':'')+(state.selected.has(d.num)?' selected':'')+'" data-record="'+d.num+'"><tr class="nz-main">'+
+ '<td class="nz-sticky" rowspan="2"><input type="checkbox" data-select="'+d.num+'" aria-label="Выбрать постановку '+d.num+'"'+(state.selected.has(d.num)?' checked':'')+'></td>'+
+ '<td class="nz-expand-col" rowspan="2">'+(d.visibleChildren.length?'<button class="nz-expand" data-expand="'+d.num+'" aria-expanded="'+opened+'" aria-controls="children-'+d.num+'" aria-label="'+(opened?'Свернуть':'Показать')+' дочерние документы постановки '+d.num+'">'+chevron+'<span>'+d.visibleChildren.length+'</span></button>':'<span class="nz-nolink" title="Дочерних документов нет">—</span>')+'</td>'+
+ '<td rowspan="2">'+docCell(d,false)+'</td><td class="nz-dates" rowspan="2">'+dates(d,false)+'</td><td class="nz-amount" rowspan="2">'+money(d.value)+'<span class="nz-sub">'+d.ccy+'</span>'+(d.written>0&&d.remaining>0?'<span class="nz-sub" title="Остаток на НЗР">Ост. '+money(d.remaining)+'</span>':'')+'</td>'+
+ '<td rowspan="2"><span class="nz-reason" title="'+esc(d.nzReason)+'">'+esc(d.nzReason)+'</span></td><td rowspan="2"><span class="nz-product">'+d.product+'</span><span class="nz-sub" title="Счёт НЗР '+d.account+'">НЗР · '+d.account.slice(-4)+'</span></td><td rowspan="2"><span class="nz-type">'+d.type+'</span></td><td rowspan="2"><span class="nz-direction">IN</span><span class="nz-sub" title="'+d.dirTxt+'">'+d.dirTxt+'</span></td>'+swift(d)+route(d,true)+'</tr><tr class="nz-purpose"><td colspan="5">'+purpose(d)+'</td></tr></tbody>';
+}
+function children(d){
+ if(!d.visibleChildren.length)return '';
+ var opened=state.expanded.has(d.num);
+ return '<tbody class="nz-children" id="children-'+d.num+'"'+(opened?'':' hidden')+'><tr class="nz-child-head"><td></td><td colspan="5"><strong>Дочерние документы · '+d.visibleChildren.length+'</strong><span>к постановке № '+d.num+'</span></td><td colspan="9">Успешно списано '+money(d.written)+' '+d.ccy+' <span>из '+money(d.value)+' '+d.ccy+'</span></td></tr>'+d.visibleChildren.map(function(c,k){
+  var last=k===d.visibleChildren.length-1?' nz-child-last':'';
+  return '<tr class="nz-child nz-child-main'+last+'"><td rowspan="2"></td><td rowspan="2"><span class="nz-child-label">↳</span></td><td rowspan="2">'+docCell(c,true)+'</td><td class="nz-dates" rowspan="2">'+dates(c,true)+'</td><td class="nz-amount" rowspan="2">'+money(c.value)+'<span class="nz-sub">'+c.ccy+'</span></td><td rowspan="2"><span class="nz-child-label">'+c.kind+'</span><span class="nz-sub">Документ № '+c.num+'</span></td><td rowspan="2"><span class="nz-empty">—</span></td><td rowspan="2"><span class="nz-type">'+c.type+'</span></td><td rowspan="2"><span class="nz-direction">OUT</span><span class="nz-sub">списание с НЗР</span></td>'+swift(c)+route(c,true)+'</tr><tr class="nz-child nz-child-purpose'+last+'"><td colspan="5">'+purpose(c)+'</td></tr>';
+ }).join('')+'<tr class="nz-child-gap"><td colspan="15"></td></tr></tbody>';
+}
+function baseRows(){return L.scopeRows(rows,state.activeAccount).filter(function(d){return iso(d.posted)<=state.asOf&&(state.includeClosed||d.remaining>0)&&(!state.from||iso(d.posted)>=state.from)&&(!state.to||iso(d.posted)<=state.to)&&(!state.status||d.status===state.status)&&(!state.product||d.product===state.product)&&(!state.q||[d.num,d.uuid,d.account,d.nzReason,d.product,d.ccy,d.type,d.route.acc].concat(['50','52','57','58','59'].map(function(f){return (d.f[f].acc||'')+' '+d.f[f].lines.join(' ')})).join(' ').toLowerCase().includes(state.q))})}
+function render(){renderAccountWorkspace();var base=baseRows(),counts={all:base.length};['1-2','3-5','6+'].forEach(function(bucket){counts[bucket]=base.filter(function(d){return d.remaining>0&&d.bucket===bucket}).length});
+ document.getElementById('nz-tabs').innerHTML=[['all',state.includeClosed?'Все документы':'Все на НЗР'],['1-2','1–2 дня'],['3-5','3–5 дней'],['6+','Более 5 дней']].map(function(t){return '<button class="nz-tab" data-quick="'+t[0]+'" aria-pressed="'+(state.quick===t[0])+'">'+t[1]+'<span class="n">'+counts[t[0]]+'</span></button>'}).join('')+'<span class="nz-date-note">'+(state.sort==='value'?'По сумме':state.sort==='age'?'Сначала самые давние':'По дате постановки')+' '+(state.asc?'↑':'↓')+'</span>';
+ visible=base.filter(function(d){return state.quick==='all'||(d.remaining>0&&d.bucket===state.quick)}).sort(function(a,b){var v=state.sort==='value'?a.value-b.value:state.sort==='age'?a.age-b.age:iso(a.posted).localeCompare(iso(b.posted));return (state.asc?1:-1)*v});
+ var pages=Math.max(1,Math.ceil(visible.length/state.size));state.page=Math.min(state.page,pages);var from=(state.page-1)*state.size,pageRows=visible.slice(from,from+state.size);
+ var heads=['','','Документ','Постановка','Сумма','Причина постановки','Продукт','Тип','Направление','50','52','57','58','59','Маршрут'],subs=['','','статус · uuid','срок ожидания','валюта','','','','','приказодатель','банк отправителя','банк получателя','банк-бенефициар','бенефициар','счёт · получатель'];
+ table.innerHTML='<colgroup>'+columns.map(function(w){return '<col style="width:'+w+'px">'}).join('')+'</colgroup><thead><tr>'+heads.map(function(h,i){return '<th scope="col" class="'+(i===0?'nz-sticky':i===1?'nz-sticky nz-expand-col':'')+'"'+(i===3||i===4?' aria-sort="'+(state.sort===(i===3?'posted':'value')?(state.asc?'ascending':'descending'):'none')+'"':'')+'>'+(i===0?'<input type="checkbox" id="nz-check-all" aria-label="Выбрать все постановки на странице">':(i===3||i===4?'<button data-sort="'+(i===3?'posted':'value')+'">'+h+'<span class="nz-sort">'+(state.sort===(i===3?'posted':'value')?(state.asc?'↑':'↓'):'↕')+'</span></button>':h))+'<small>'+subs[i]+'</small></th>'}).join('')+'</tr></thead>'+pageRows.map(function(d){return parentRow(d)+children(d)}).join('')+(!visible.length?'<tbody><tr><td colspan="15" class="nz-empty-state"><b>'+(state.activeAccount?'Постановки не найдены':'Выберите счета НЗР')+'</b>'+(state.activeAccount?'Измените поиск или сбросьте фильтры.':'Добавьте счета в набор, затем откройте один из них.')+'<br><button class="nz-btn" '+(state.activeAccount?'data-clear':'data-pick-accounts')+' style="margin-top:14px">'+(state.activeAccount?'Сбросить поиск и фильтры':'Выбрать счета')+'</button></td></tr></tbody>':'');
+ var checked=pageRows.filter(function(d){return state.selected.has(d.num)}).length,all=document.getElementById('nz-check-all');all.checked=pageRows.length>0&&checked===pageRows.length;all.indeterminate=checked>0&&checked<pageRows.length;all.disabled=!pageRows.length;
+ document.getElementById('nz-count').textContent=L.scopeRows(rows,state.activeAccount).filter(function(d){return d.remaining>0}).length+' на НЗР';document.getElementById('nz-foot-count').textContent=(visible.length?(from+1)+'–'+Math.min(from+state.size,visible.length):'0')+' из '+visible.length+' постановок';document.getElementById('nz-selection').textContent=state.selected.size?'Выбрано: '+state.selected.size:'';
+ document.getElementById('nz-pages').innerHTML='<button data-page="'+(state.page-1)+'" aria-label="Предыдущая страница"'+(state.page===1?' disabled':'')+'>‹</button>'+Array.from({length:pages},function(_,i){return '<button data-page="'+(i+1)+'" class="'+(i+1===state.page?'on':'')+'"'+(i+1===state.page?' aria-current="page"':'')+'>'+(i+1)+'</button>'}).join('')+'<button data-page="'+(state.page+1)+'" aria-label="Следующая страница"'+(state.page===pages?' disabled':'')+'>›</button>';
+ var expandable=pageRows.filter(function(d){return d.visibleChildren.length});var expandedAll=expandable.length>0&&expandable.every(function(d){return state.expanded.has(d.num)});var btn=document.getElementById('nz-expand-all');btn.textContent=expandedAll?'Свернуть все связи':'Раскрыть все связи';btn.disabled=!expandable.length;btn.dataset.collapse=expandedAll?'yes':'';
+ document.getElementById('nz-export').disabled=!visible.length&&!state.selected.size;
+}
+function reset(){state.from='';state.to='';state.status='';state.product='';state.q='';state.quick='all';state.page=1;document.getElementById('nz-search').value='';document.getElementById('nz-filters').reset();document.getElementById('nz-error').textContent='';filterNote();render()}
+function filterNote(){var n=[state.from,state.to,state.status,state.product].filter(Boolean).length;document.getElementById('nz-filter-count').textContent=n||'';document.getElementById('nz-filter-note').textContent=[state.from||state.to?(state.from?state.from.split('-').reverse().join('.'):'…')+' — '+(state.to?state.to.split('-').reverse().join('.'):'…'):'За всё время',state.status?window.DocumentStatuses.byCode[state.status].label:'',state.product].filter(Boolean).join(' · ')}
+var toastTimer;function say(t){var el=document.getElementById('nz-toast');el.textContent=t;el.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.hidden=true},2200)}
+var drawerIndex=null;function openDoc(num){var d=allDocs[num];if(drawerIndex===null){drawerIndex=P.DOCS.length;P.DOCS.push(d);P.ui.push(P.mkui(true))}else{P.DOCS[drawerIndex]=d;P.ui[drawerIndex]=P.mkui(true)}pair.innerHTML='<div class="dw" data-d="'+drawerIndex+'"></div>';P.render(drawerIndex);pair.firstElementChild.insertAdjacentHTML('afterbegin','<div class="nz-slot">'+(d.parent?'Списание · к постановке № '+d.parent:'Постановка на НЗР')+' · документ № '+d.num+'</div>')}
+document.getElementById('nz-search').addEventListener('input',function(e){state.q=e.target.value.trim().toLowerCase();state.page=1;render()});
+document.getElementById('nz-tabs').addEventListener('click',function(e){var b=e.target.closest('[data-quick]');if(b){state.quick=b.dataset.quick;state.page=1;render()}});
+document.getElementById('nz-filter-toggle').onclick=function(){var p=document.getElementById('nz-filters');p.hidden=!p.hidden;this.setAttribute('aria-expanded',String(!p.hidden))};
+document.getElementById('nz-filters').addEventListener('submit',function(e){e.preventDefault();var from=document.getElementById('nz-from').value,to=document.getElementById('nz-to').value;if(from&&to&&from>to){document.getElementById('nz-error').textContent='Дата «по» должна быть не раньше даты «с»';return}document.getElementById('nz-error').textContent='';state.from=from;state.to=to;state.status=document.getElementById('nz-status-filter').value;state.product=document.getElementById('nz-product').value;state.page=1;filterNote();render()});
+document.getElementById('nz-reset').onclick=reset;
+table.addEventListener('click',function(e){var b=e.target.closest('[data-expand]');if(b){var id=b.dataset.expand;state.expanded.has(id)?state.expanded.delete(id):state.expanded.add(id);render();table.querySelector('[data-expand="'+id+'"]').focus();return}var sort=e.target.closest('[data-sort]');if(sort){state.asc=state.sort===sort.dataset.sort?!state.asc:false;state.sort=sort.dataset.sort;render();return}var op=e.target.closest('[data-open]');if(op){openDoc(op.dataset.open);return}var copy=e.target.closest('[data-copy]');if(copy){if(navigator.clipboard)navigator.clipboard.writeText(copy.dataset.copy).then(function(){say('Скопировано')},function(){say('Не удалось скопировать')});else say('Копирование недоступно в этом браузере');return}if(e.target.closest('[data-pick-accounts]'))openAccountDialog();else if(e.target.closest('[data-clear]'))reset()});
+table.addEventListener('change',function(e){var b=e.target;if(b.dataset.select){b.checked?state.selected.add(b.dataset.select):state.selected.delete(b.dataset.select)}else if(b.id==='nz-check-all'){visible.slice((state.page-1)*state.size,state.page*state.size).forEach(function(d){b.checked?state.selected.add(d.num):state.selected.delete(d.num)})}else return;render()});
+document.getElementById('nz-expand-all').onclick=function(){var collapse=this.dataset.collapse==='yes';visible.slice((state.page-1)*state.size,state.page*state.size).forEach(function(d){if(d.visibleChildren.length){collapse?state.expanded.delete(d.num):state.expanded.add(d.num)}});render()};
+document.getElementById('nz-pages').addEventListener('click',function(e){var b=e.target.closest('[data-page]');if(b&&!b.disabled){state.page=+b.dataset.page;render();document.getElementById('nz-scroll').scrollTop=0}});
+document.getElementById('nz-size').onchange=function(){state.size=+this.value;state.page=1;render()};
+document.getElementById('nz-export').onclick=function(){var data=state.selected.size?rows.filter(function(d){return state.selected.has(d.num)}):visible;function csv(v){v=String(v==null?'':v);if(/^[=+@\-\t\r]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'}var contents=[['Документ','UUID','Постановка','Последнее успешное списание','Сумма','Валюта','Причина постановки','Продукт','Тип','Направление','Дочерних документов','Счёт НЗР','Остаток на НЗР','Дней на НЗР']].concat(data.map(function(d){return [d.num,d.uuid,d.posted,d.lastWrite,d.value,d.ccy,d.nzReason,d.product,d.type,d.dir,d.visibleChildren.length,d.account,d.remaining,d.remaining>0?d.age:'']})).map(function(line){return line.map(csv).join(';')}).join('\r\n');var url=URL.createObjectURL(new Blob(['\ufeff'+contents],{type:'text/csv;charset=utf-8;'})),a=document.createElement('a');a.href=url;a.download='nzr-report.csv';a.click();setTimeout(function(){URL.revokeObjectURL(url)},1000);say('Экспортировано постановок: '+data.length)};
+pair.addEventListener('click',function(e){if(e.target.closest('.x'))pair.innerHTML=''});document.addEventListener('keydown',function(e){if(e.key==='Escape')pair.innerHTML=''});
+/* Демонстрационный ответ мастера. При подключении API заменяется только fetchMaster. */
+var MASTER={
+ '47422840000000000101':{balance:2310234,documents:2,turnover:500000,operations:1},
+ '47422840000000000202':{balance:137000,documents:3,turnover:2201000,operations:2},
+ '47422978000000000303':{balance:451050.75,documents:3,turnover:256800,operations:3},
+ '47422156000000000404':{balance:111500,documents:2,turnover:0,operations:0}
+};
+var reconciliation={phase:'idle',request:0,master:null};
+function emptyMetric(){return {balance:0,documents:0,turnover:0,operations:0}}
+function fetchMaster(accountIds,date){return new Promise(function(resolve,reject){setTimeout(function(){
+ if(date!==SNAPSHOT){reject(new Error('В макете данные ПП ЛН доступны на 09.11.2026. Выберите эту дату для сверки.'));return}
+ var result={};accountIds.forEach(function(id){var account=ACCOUNTS.find(function(a){return a.id===id}),m=result[account.ccy]||(result[account.ccy]=emptyMetric());Object.keys(m).forEach(function(key){m[key]=Math.round((m[key]+MASTER[id][key])*100)/100})});resolve(result);
+},650)})}
+function activeAccount(){return ACCOUNTS.find(function(a){return a.id===state.activeAccount})||null}
+function renderReconciliation(){
+ var host=document.getElementById('nz-recon'),account=activeAccount(),phase=reconciliation.phase;
+ host.classList.toggle('idle',!account||phase==='idle');host.setAttribute('aria-busy',String(phase==='loading'));
+ if(!account||phase==='idle'){host.innerHTML='';return}
+ var report=phase==='ready'?(L.aggregate(rows,[account.id],state.asOf)[account.ccy]||emptyMetric()):null;
+ var master=phase==='ready'?reconciliation.master[account.ccy]:null,delta=report?L.difference(report,master):null;
+ var keys=['balance','documents','turnover','operations'],bad=delta&&keys.some(function(k){return delta[k]!==0});
+ var status=phase==='loading'?'Запрос ПП ЛН…':phase==='error'?'Сверка не выполнена':bad?'Есть расхождения':'Данные совпадают';
+ var header='<div class="nz-recon-top"><b>Сверка ПП ЛН</b><span class="nz-recon-status'+(phase==='error'?' failed':phase==='loading'?' loading':bad?' diff':'')+'">'+status+'</span><small>Демоснимок · 09.11.2026, 12:00</small><div class="nz-recon-actions"><button class="nz-btn" data-reconcile'+(phase==='loading'?' disabled':'')+' aria-label="Обновить сверку" title="Обновить сверку">↻</button><button class="nz-btn" data-recon-toggle aria-controls="nz-recon-body" aria-expanded="'+(!state.reconCollapsed)+'">'+(state.reconCollapsed?'Развернуть сверку':'Свернуть сверку')+' '+(state.reconCollapsed?'⌄':'⌃')+'</button></div></div>';
+ var body='';
+ if(phase==='loading')body='<div class="nz-recon-wait">Запрашиваем данные активного счёта…</div>';
+ else if(phase==='error')body='<div class="nz-recon-error">'+esc(reconciliation.message)+'</div><div class="nz-recon-note">Нет ответа ПП ЛН — совпадение не подтверждено.</div>';
+ else {
+  function values(data,own){return keys.map(function(key){var amount=key==='balance'||key==='turnover',v=data[key],difference=delta[key];return '<td class="'+(own&&difference!==0?'mismatch':'')+'">'+(amount?money(v):v)+(own&&difference!==0?'<span class="nz-inline-delta" title="Наш отчёт − ПП ЛН">'+(difference>0?'+':'−')+(amount?money(Math.abs(difference)):Math.abs(difference))+'</span>':'')+'</td>'}).join('')}
+  body='<div class="nz-compact-scroll"><table class="nz-compact" aria-label="Сверка активного счёта с ПП ЛН"><thead><tr><th>Источник</th><th>Баланс, '+account.ccy+'</th><th>Документов на НЗР</th><th>Оборот за '+state.asOf.slice(8,10)+'.'+state.asOf.slice(5,7)+', '+account.ccy+'</th><th>Операций</th></tr></thead><tbody><tr><td>ПП ЛН · мастер</td>'+values(master,false)+'</tr><tr><td>Наш отчёт</td>'+values(report,true)+'</tr></tbody></table></div><div class="nz-recon-note">По активному счёту целиком, до фильтров документов. Выделенная разница: наш отчёт − ПП ЛН.</div>';
+ }
+ host.innerHTML=header+'<div id="nz-recon-body" class="nz-recon-body"'+(state.reconCollapsed?' hidden':'')+'>'+body+'</div>';
+}
+function requestReconciliation(){var request=++reconciliation.request;
+ if(!state.activeAccount){reconciliation.phase='idle';reconciliation.master=null;renderReconciliation();return}
+ reconciliation.phase='loading';reconciliation.master=null;renderReconciliation();
+ fetchMaster([state.activeAccount],state.asOf).then(function(master){if(request!==reconciliation.request)return;reconciliation.master=master;reconciliation.phase='ready';renderReconciliation()},function(error){if(request!==reconciliation.request)return;reconciliation.phase='error';reconciliation.message=error.message;renderReconciliation()});
+}
+var switcher={q:'',page:1},accountDraft={selected:new Set(),q:'',currency:'',page:1},ACCOUNT_PAGE=10;
+function selectedAccounts(){var ids=new Set(state.accounts);return ACCOUNTS.filter(function(a){return ids.has(a.id)})}
+function renderAccountWorkspace(){var account=activeAccount(),chosen=selectedAccounts(),index=chosen.findIndex(function(a){return a.id===state.activeAccount});
+ document.getElementById('nz-active-account').innerHTML=account?'<small>Активный счёт НЗР</small><strong>'+account.id+'</strong><span class="ccy">'+account.ccy+'</span>':'<small>Рабочий реестр</small><strong>Счёт не выбран</strong>';
+ document.getElementById('nz-account-position').textContent=(index+1)+' из '+chosen.length;
+ document.getElementById('nz-account-prev').disabled=index<=0;document.getElementById('nz-account-next').disabled=index<0||index>=chosen.length-1;
+ document.getElementById('nz-account-set').textContent='Набор счетов · '+state.accounts.length;
+ renderSwitcher();
+}
+function renderSwitcher(){var found=selectedAccounts().filter(function(a){return (a.id+' '+a.ccy+' '+a.name).toLowerCase().includes(switcher.q)}),pages=Math.max(1,Math.ceil(found.length/ACCOUNT_PAGE));switcher.page=Math.min(switcher.page,pages);
+ var start=(switcher.page-1)*ACCOUNT_PAGE,page=found.slice(start,start+ACCOUNT_PAGE);
+ document.getElementById('nz-switch-list').innerHTML=page.length?page.map(function(a){return '<button data-activate-account="'+a.id+'" aria-current="'+(a.id===state.activeAccount)+'"><span class="mono">'+a.id+'</span> · '+a.ccy+'<small>'+esc(a.name)+'</small></button>'}).join(''):'<p class="nz-sub">Счета не найдены</p>';
+ document.getElementById('nz-switch-pages').innerHTML='<button data-switch-page="'+(switcher.page-1)+'" aria-label="Предыдущая страница счетов"'+(switcher.page===1?' disabled':'')+'>‹</button><span>'+(found.length?start+1:0)+'–'+Math.min(start+ACCOUNT_PAGE,found.length)+' из '+found.length+'</span><button data-switch-page="'+(switcher.page+1)+'" aria-label="Следующая страница счетов"'+(switcher.page===pages?' disabled':'')+'>›</button>';
+}
+function changeActiveAccount(id){if(!state.accounts.includes(id))return;state.activeAccount=id;state.page=1;state.selected.clear();state.expanded.clear();document.getElementById('nz-account-picker').open=false;switcher.q='';switcher.page=1;document.getElementById('nz-switch-search').value='';reset();requestReconciliation()}
+function draftAccounts(){return ACCOUNTS.filter(function(a){return (!accountDraft.currency||a.ccy===accountDraft.currency)&&(a.id+' '+a.name).toLowerCase().includes(accountDraft.q)})}
+function renderAccountDialog(){var found=draftAccounts(),pages=Math.max(1,Math.ceil(found.length/ACCOUNT_PAGE));accountDraft.page=Math.min(accountDraft.page,pages);var start=(accountDraft.page-1)*ACCOUNT_PAGE,page=found.slice(start,start+ACCOUNT_PAGE),checked=page.filter(function(a){return accountDraft.selected.has(a.id)}).length;
+ document.getElementById('nz-dialog-rows').innerHTML=page.map(function(a){var chosen=accountDraft.selected.has(a.id);return '<tr class="'+(chosen?'selected':'')+'"><td><input type="checkbox" data-draft-account="'+a.id+'" id="draft-'+a.id+'" aria-label="Включить счёт '+a.id+' '+a.ccy+'"'+(chosen?' checked':'')+'></td><td><label for="draft-'+a.id+'" class="mono">'+a.id+'</label></td><td>'+a.ccy+'</td><td>'+esc(a.name)+'</td></tr>'}).join('')||'<tr><td colspan="4">Счета не найдены</td></tr>';
+ var check=document.getElementById('nz-dialog-page-check');check.disabled=!page.length;check.checked=page.length>0&&checked===page.length;check.indeterminate=checked>0&&checked<page.length;
+ document.getElementById('nz-dialog-count').textContent='Выбрано '+accountDraft.selected.size+' из '+ACCOUNTS.length;
+ document.getElementById('nz-dialog-select-all').textContent='Выбрать все найденные · '+found.length;
+ document.getElementById('nz-dialog-pages').innerHTML='<button data-draft-page="'+(accountDraft.page-1)+'" aria-label="Предыдущая страница выбора"'+(accountDraft.page===1?' disabled':'')+'>‹</button><span>'+(found.length?start+1:0)+'–'+Math.min(start+ACCOUNT_PAGE,found.length)+' из '+found.length+'</span><button data-draft-page="'+(accountDraft.page+1)+'" aria-label="Следующая страница выбора"'+(accountDraft.page===pages?' disabled':'')+'>›</button>';
+}
+function openAccountDialog(){accountDraft={selected:new Set(state.accounts),q:'',currency:'',page:1};document.getElementById('nz-dialog-search').value='';document.getElementById('nz-dialog-currency').value='';renderAccountDialog();document.getElementById('nz-account-dialog').showModal();document.getElementById('nz-dialog-search').focus()}
+function closeAccountDialog(){document.getElementById('nz-account-dialog').close()}
+ACCOUNTS.slice(4).forEach(function(a){MASTER[a.id]={balance:a.demoBalance,documents:1,turnover:a.demoTurnover,operations:1}});
+document.getElementById('nz-account-set').onclick=openAccountDialog;
+document.getElementById('nz-dialog-close').onclick=closeAccountDialog;document.getElementById('nz-dialog-cancel').onclick=closeAccountDialog;
+document.getElementById('nz-dialog-currency').innerHTML+=[...new Set(ACCOUNTS.map(function(a){return a.ccy}))].map(function(ccy){return '<option>'+ccy+'</option>'}).join('');
+document.getElementById('nz-dialog-search').oninput=function(){accountDraft.q=this.value.trim().toLowerCase();accountDraft.page=1;renderAccountDialog()};
+document.getElementById('nz-dialog-currency').onchange=function(){accountDraft.currency=this.value;accountDraft.page=1;renderAccountDialog()};
+document.getElementById('nz-dialog-select-all').onclick=function(){draftAccounts().forEach(function(a){accountDraft.selected.add(a.id)});renderAccountDialog()};
+document.getElementById('nz-dialog-clear').onclick=function(){accountDraft.selected.clear();renderAccountDialog()};
+document.getElementById('nz-dialog-rows').onchange=function(e){var id=e.target.dataset.draftAccount;if(!id)return;e.target.checked?accountDraft.selected.add(id):accountDraft.selected.delete(id);renderAccountDialog()};
+document.getElementById('nz-dialog-page-check').onchange=function(){var checked=this.checked;draftAccounts().slice((accountDraft.page-1)*ACCOUNT_PAGE,accountDraft.page*ACCOUNT_PAGE).forEach(function(a){checked?accountDraft.selected.add(a.id):accountDraft.selected.delete(a.id)});renderAccountDialog()};
+document.getElementById('nz-dialog-pages').onclick=function(e){var b=e.target.closest('[data-draft-page]');if(b&&!b.disabled){accountDraft.page=+b.dataset.draftPage;renderAccountDialog();document.querySelector('.nz-dialog-list').scrollTop=0}};
+document.getElementById('nz-dialog-apply').onclick=function(){state.accounts=ACCOUNTS.filter(function(a){return accountDraft.selected.has(a.id)}).map(function(a){return a.id});state.activeAccount=L.resolveActiveAccount(ACCOUNTS,state.accounts,state.activeAccount);state.selected.clear();state.expanded.clear();switcher={q:'',page:1};document.getElementById('nz-switch-search').value='';closeAccountDialog();reset();requestReconciliation()};
+document.getElementById('nz-switch-search').oninput=function(){switcher.q=this.value.trim().toLowerCase();switcher.page=1;renderSwitcher()};
+document.getElementById('nz-switch-list').onclick=function(e){var b=e.target.closest('[data-activate-account]');if(b)changeActiveAccount(b.dataset.activateAccount)};
+document.getElementById('nz-switch-pages').onclick=function(e){var b=e.target.closest('[data-switch-page]');if(b&&!b.disabled){switcher.page=+b.dataset.switchPage;renderSwitcher()}};
+document.getElementById('nz-account-prev').onclick=function(){var chosen=selectedAccounts(),index=chosen.findIndex(function(a){return a.id===state.activeAccount});if(index>0)changeActiveAccount(chosen[index-1].id)};
+document.getElementById('nz-account-next').onclick=function(){var chosen=selectedAccounts(),index=chosen.findIndex(function(a){return a.id===state.activeAccount});if(index>=0&&index<chosen.length-1)changeActiveAccount(chosen[index+1].id)};
+document.getElementById('nz-asof').onchange=function(){if(!this.value){this.value=state.asOf;return}state.asOf=this.value;state.page=1;state.selected.clear();annotate();render();requestReconciliation()};
+document.getElementById('nz-include-closed').onchange=function(){state.includeClosed=this.checked;state.page=1;state.selected.clear();render()};
+document.getElementById('nz-recon').onclick=function(e){if(e.target.closest('[data-recon-toggle]')){state.reconCollapsed=!state.reconCollapsed;renderReconciliation()}else if(e.target.closest('[data-reconcile]'))requestReconciliation()};
+window.DocumentStatuses.meta.forEach(function(status){document.getElementById('nz-status-filter').insertAdjacentHTML('beforeend','<option value="'+status[0]+'">'+status[1]+'</option>')});
+document.getElementById('nz-status-legend').innerHTML=window.DocumentStatuses.meta.map(function(status){return '<p>'+statusBadge(status[0])+'<span>'+status[1]+'</span><small>'+status[0]+'</small></p>'}).join('');
+render();requestReconciliation();
+})();
+</script></body></html>

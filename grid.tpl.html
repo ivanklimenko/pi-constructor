@@ -14,6 +14,7 @@
 <script src="prompt.js"></script>
 <link rel="stylesheet" href="chart.css">
 <script src="chart.js"></script>
+<script src="document-statuses.js"></script>
 {{STYLE}}
 <style>
 .zoomctl{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--paper);height:24px}
@@ -238,7 +239,7 @@ body.resizing{cursor:col-resize;user-select:none}
 {{SVG}}
 <div class="app">
   <div class="apph"><h1>Валютные документы</h1><span class="cnt" id="cnt"></span>
-    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, двойной клик по ней — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · 🔒 — заблокирована другим пользователем, штриховка — неактивная запись</span><a href="rub-grid.html">реестр «Рублёвые документы» →</a><a href="index.html" style="margin-left:8px">конструктор деталки →</a><button type="button" class="skbtn" id="skdemo" aria-pressed="false" style="margin-left:10px" data-tip="Первое нажатие — скелетон первой загрузки, второе — обновление уже показанных данных">Скелетоны</button><span id="zoomctl" style="display:inline-flex;align-items:center;margin-left:10px"></span></div></div>
+    <div class="sp"><span class="lbl"><b>▣</b> — деталка справа, двойной клик по ней — вторая рядом для сравнения · клик по значению копирует его, обрезанное — тултип · 🔒 — заблокирована другим пользователем, штриховка — неактивная запись</span><a href="nzr.html">отчёт НЗР →</a><a href="rub-grid.html">реестр «Рублёвые документы» →</a><a href="index.html" style="margin-left:8px">конструктор деталки →</a><button type="button" class="skbtn" id="skdemo" aria-pressed="false" style="margin-left:10px" data-tip="Первое нажатие — скелетон первой загрузки, второе — обновление уже показанных данных">Скелетоны</button><span id="zoomctl" style="display:inline-flex;align-items:center;margin-left:10px"></span></div></div>
   <div class="slane"><div class="slist" id="slane"></div><button type="button" class="chbtn" id="chartbtn" aria-pressed="false" data-tip="Динамика по статусам во времени" aria-label="Динамика по статусам во времени"></button></div>
   <div id="chhost"></div>
   <div class="filters">
@@ -265,11 +266,9 @@ var PURP=['/INV/ 2026-0417 DD 15.09.2026 PAYMENT FOR CONSULTING SERVICES UNDER C
 var AMT=[['1 250 000.00','USD'],['1 249 965.00','USD'],['84 300.00','EUR'],['12 700 000.00','RUB'],['500.10','AMD'],['2 200 000.00','USD'],['318 450.75','EUR'],['99 000.00','CNY'],['1 148 300.00','EUR'],['64 000.00','USD'],['7 500.00','USD'],['410 000.00','USD']];
 var TYPES=['MT103','MT103','MT202','MT103','MT199','MT202COV','MT103','MT103','MT202','MT103','MT199','MT103'];
 /* Статусы системы — порядок как в лейне на проме */
-var STATUS_META=[
-  ['IN_PROGRESS','В работе','flow'],['TO_EXPORT','К экспорту','flowl'],['PROCESSING','В обработке','flowd'],['ERROR','Ошибка','bad'],
-  ['DEFERRED','Отложенный','warn'],['EXPORTED','Экспортирован','okl'],['INVALID','INVALID','badd'],['REJECTED','Отказ','grey'],['DONE','Обработан','ok']];
+var STATUS_META=window.DocumentStatuses.meta;
 var SM={};STATUS_META.forEach(function(x){SM[x[0]]={label:x[1],cls:x[2]}});
-function drawerSt(code){return code==='DONE'||code==='EXPORTED'?'ok':(code==='ERROR'||code==='INVALID'||code==='REJECTED')?'bad':'wait'}
+var drawerSt=window.DocumentStatuses.drawerState;
 var STS=['DONE','IN_PROGRESS','DONE','ERROR','DONE','TO_EXPORT','PROCESSING','DEFERRED','EXPORTED','REJECTED','DONE','IN_PROGRESS'];
 var REASONS=['Отправлен запрос в СУБО Контроль(2700)','Документ отправлен в ЕРС','Документ на контроле ДККФМ','Ожидание решения сотрудника','Документ с будущей датой исполнения','Ожидание обработки основного документа от Лоро','В очереди ожидания средств','Возврат на закрытый счёт. Поиск исходящего документа','Ожидание ответа от ВКО'];
 /* причина статуса бывает только у Отложенный / Ошибка / Отказ */
