@@ -21,6 +21,15 @@
   function difference(report,master){return {balance:(cents(report.balance)-cents(master.balance))/100,documents:report.documents-master.documents,turnover:(cents(report.turnover)-cents(master.turnover))/100,operations:report.operations-master.operations}}
   function scopeRows(rows,activeId){return activeId?rows.filter(function(row){return row.account===activeId}):[]}
   function resolveActiveAccount(accounts,selectedIds,current){var selected=new Set(selectedIds),available=accounts.filter(function(account){return selected.has(account.id)});return available.some(function(account){return account.id===current})?current:available.length?available[0].id:null}
-  var api={ageDays:ageDays,ageBucket:ageBucket,remaining:remaining,aggregate:aggregate,difference:difference,scopeRows:scopeRows,resolveActiveAccount:resolveActiveAccount};
+  function filterAccounts(accounts,options){
+    options=options||{};var q=(options.q||'').trim().toLowerCase(),direction=options.direction==='asc'?1:-1;
+    return accounts.filter(function(a){return (!options.currency||a.ccy===options.currency)&&(!options.nonZero||a.availableBalance>0)&&(!q||(a.id+' '+a.name).toLowerCase().includes(q))}).sort(function(a,b){return (a.availableBalance-b.availableBalance)*direction||a.id.localeCompare(b.id)});
+  }
+  function accountBalances(rows,accountIds,asOf){
+    var totals=new Map(accountIds.map(function(id){return [id,0]}));
+    rows.forEach(function(row){if(totals.has(row.account))totals.set(row.account,totals.get(row.account)+cents(remaining(row,asOf)))});
+    return Object.fromEntries(Array.from(totals,function(entry){return [entry[0],entry[1]/100]}));
+  }
+  var api={ageDays:ageDays,ageBucket:ageBucket,remaining:remaining,aggregate:aggregate,difference:difference,scopeRows:scopeRows,resolveActiveAccount:resolveActiveAccount,filterAccounts:filterAccounts,accountBalances:accountBalances};
   if(typeof module==='object'&&module.exports)module.exports=api;else root.NZRLogic=api;
 })(typeof window==='object'?window:globalThis);

@@ -60,3 +60,27 @@ test('a set of 100 accounts retains one active account and replaces it only if r
   assert.equal(logic.resolveActiveAccount?.(accounts,selected,'119'),'0');
   assert.equal(logic.resolveActiveAccount?.(accounts,[],'72'),null);
 });
+
+test('account selection combines currency, search and positive balance before numeric sorting', () => {
+  const accounts=[
+    {id:'u1',ccy:'USD',name:'Центр',availableBalance:2},
+    {id:'u2',ccy:'USD',name:'Центр',availableBalance:100},
+    {id:'u3',ccy:'USD',name:'Центр',availableBalance:10},
+    {id:'u4',ccy:'USD',name:'Центр',availableBalance:0},
+    {id:'e1',ccy:'EUR',name:'Центр',availableBalance:200},
+    {id:'u5',ccy:'USD',name:'Филиал',availableBalance:300}
+  ];
+  assert.deepEqual(logic.filterAccounts?.(accounts,{currency:'USD',q:'центр',nonZero:true,direction:'desc'}).map(a=>a.id),['u2','u3','u1']);
+  assert.deepEqual(logic.filterAccounts?.(accounts,{currency:'USD',q:'центр',nonZero:false,direction:'asc'}).map(a=>a.id),['u4','u1','u3','u2']);
+  assert.deepEqual(accounts.map(a=>a.id),['u1','u2','u3','u4','e1','u5']);
+});
+
+test('register snapshot keeps accounts of the same currency separate and includes zero balances', () => {
+  const rows=[
+    {account:'a',value:100.3,posted:'08.11.2026',children:[{value:40.1,posted:'09.11.2026',status:'DONE'}]},
+    {account:'a',value:20.2,posted:'09.11.2026',children:[{value:20.2,posted:'09.11.2026',status:'ERROR'}]},
+    {account:'b',value:50,posted:'09.11.2026',children:[{value:50,posted:'09.11.2026',status:'DONE'}]},
+    {account:'a',value:900,posted:'10.11.2026',children:[]}
+  ];
+  assert.deepEqual(logic.accountBalances?.(rows,['a','b','c'],'2026-11-09'),{a:80.4,b:0,c:0});
+});
