@@ -105,7 +105,7 @@ button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:de
 </main>
 <dialog class="nz-dialog" id="nz-account-dialog" aria-labelledby="nz-dialog-title"><div class="nz-dialog-layout">
  <header class="nz-dialog-head"><div><h2 id="nz-dialog-title">Набор счетов НЗР</h2><small>Выберите счета для работы. В реестре открывается один активный счёт.</small></div><button id="nz-dialog-close" aria-label="Закрыть выбор счетов">×</button></header>
- <div class="nz-dialog-search"><input type="search" id="nz-dialog-search" aria-label="Поиск счетов НЗР" placeholder="Номер счёта или название"><select id="nz-dialog-currency" aria-label="Валюта счетов"><option value="">Все валюты</option></select><label class="nz-nonzero"><input type="checkbox" id="nz-dialog-nonzero">Только ненулевые</label></div>
+ <div class="nz-dialog-search"><input type="search" id="nz-dialog-search" aria-label="Поиск счетов НЗР" placeholder="Номер счёта или название"><select id="nz-dialog-currency" aria-label="Валюта счетов"><option value="">Все валюты</option></select><label class="nz-nonzero"><input type="checkbox" id="nz-dialog-nonzero" checked>Только ненулевые</label></div>
  <div class="nz-register-note" id="nz-register-note"></div>
  <div class="nz-dialog-actions"><button id="nz-dialog-select-all">Выбрать все найденные</button><button id="nz-dialog-clear">Снять выбор</button><span id="nz-dialog-count"></span></div>
  <div class="nz-dialog-list"><table class="nz-account-table" aria-label="Счета НЗР для включения в набор"><colgroup><col style="width:35px"><col style="width:225px"><col style="width:65px"><col style="width:180px"><col></colgroup><thead><tr><th><input type="checkbox" id="nz-dialog-page-check" aria-label="Выбрать счета на странице"></th><th>Счёт НЗР</th><th>Валюта</th><th class="nz-balance-heading" id="nz-balance-heading" aria-sort="descending"><button type="button" id="nz-balance-sort" aria-label="Сортировать по доступному остатку">Доступный остаток <span id="nz-balance-sort-arrow">↓</span></button></th><th>Название</th></tr></thead><tbody id="nz-dialog-rows"></tbody></table></div>
@@ -276,7 +276,7 @@ function requestReconciliation(){var request=++reconciliation.request;
  reconciliation.phase='loading';reconciliation.master=null;renderReconciliation();
  fetchMaster([state.activeAccount],state.asOf).then(function(master){if(request!==reconciliation.request)return;reconciliation.master=master;reconciliation.phase='ready';renderReconciliation()},function(error){if(request!==reconciliation.request)return;reconciliation.phase='error';reconciliation.message=error.message;renderReconciliation()});
 }
-var switcher={q:'',page:1},accountDraft={selected:new Set(),q:'',currency:'',nonZero:false,direction:'desc',page:1},ACCOUNT_PAGE=10;
+var switcher={q:'',page:1},accountDraft={selected:new Set(),q:'',currency:'',nonZero:true,direction:'desc',page:1},ACCOUNT_PAGE=10;
 function selectedAccounts(){var ids=new Set(state.accounts);return ACCOUNTS.filter(function(a){return ids.has(a.id)})}
 function renderAccountWorkspace(){var account=activeAccount(),chosen=selectedAccounts(),index=chosen.findIndex(function(a){return a.id===state.activeAccount});
  document.getElementById('nz-active-account').innerHTML=account?'<small>Активный счёт НЗР</small><strong>'+account.id+'</strong><span class="ccy">'+account.ccy+'</span>':'<small>Рабочий реестр</small><strong>Счёт не выбран</strong>';
@@ -300,7 +300,7 @@ function renderAccountDialog(){var found=draftAccounts(),pages=Math.max(1,Math.c
  document.getElementById('nz-dialog-select-all').textContent='Выбрать все найденные · '+found.length;
  document.getElementById('nz-dialog-pages').innerHTML='<button data-draft-page="'+(accountDraft.page-1)+'" aria-label="Предыдущая страница выбора"'+(accountDraft.page===1?' disabled':'')+'>‹</button><span>'+(found.length?start+1:0)+'–'+Math.min(start+ACCOUNT_PAGE,found.length)+' из '+found.length+'</span><button data-draft-page="'+(accountDraft.page+1)+'" aria-label="Следующая страница выбора"'+(accountDraft.page===pages?' disabled':'')+'>›</button>';
 }
-function openAccountDialog(){accountDraft={selected:new Set(state.accounts),q:'',currency:'',nonZero:false,direction:'desc',page:1};document.getElementById('nz-dialog-search').value='';document.getElementById('nz-dialog-currency').value='';document.getElementById('nz-dialog-nonzero').checked=false;renderAccountDialog();document.getElementById('nz-account-dialog').showModal();document.getElementById('nz-dialog-search').focus()}
+function openAccountDialog(){accountDraft={selected:new Set(state.accounts),q:'',currency:'',nonZero:true,direction:'desc',page:1};document.getElementById('nz-dialog-search').value='';document.getElementById('nz-dialog-currency').value='';document.getElementById('nz-dialog-nonzero').checked=true;renderAccountDialog();document.getElementById('nz-account-dialog').showModal();document.getElementById('nz-dialog-search').focus()}
 function closeAccountDialog(){document.getElementById('nz-account-dialog').close()}
 
 document.getElementById('nz-account-set').onclick=openAccountDialog;
